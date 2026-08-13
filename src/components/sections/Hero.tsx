@@ -78,9 +78,7 @@ export function Hero() {
             variants={item}
             className="max-w-xl text-[17px] leading-relaxed text-foreground-secondary lg:text-xl"
           >
-            Literaphy; özel yazılım, web geliştirme, AI otomasyonları, WhatsApp iş
-            otomasyonu, API entegrasyonları ve QR menü sistemleriyle
-            işletmenizin operasyonunu hızlandırır.
+            Literaphy; web geliştirme, özel yazılım, N8N otomasyonları ve QR menü sistemleriyle operasyonunuzu hızlandırır.
           </motion.p>
 
           <motion.div variants={item} className="flex flex-col items-center gap-4 sm:flex-row">
