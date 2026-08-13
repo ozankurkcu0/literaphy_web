@@ -8,16 +8,16 @@ export const SITE_DESCRIPTION =
   "Literaphy; web geliştirme, özel yazılım, AI otomasyonları, WhatsApp otomasyonu, API entegrasyonları ve QR menü sistemleriyle operasyonunuzu hızlandırır.";
 
 // Gerçek alan adı belirlendiğinde tek bu satırı güncellemeniz yeterli.
-export const SITE_URL = "https://literaphy.com.tr";
+export const SITE_URL = "https://literaphy.com";
 
 // Gerçek iletişim bilgileri netleşince bu blok güncellenmeli — bkz. TODO.md.
 export const CONTACT = {
-  email: "merhaba@literaphy.com.tr",
+  email: "iletisim@literaphy.com",
   phone: "+90 850 000 00 00",
   phoneDisplay: "0850 000 00 00",
   whatsapp: "https://wa.me/908500000000",
-  addressLine: "Levent, İstanbul, Türkiye",
-  workingHours: "Pazartesi – Cuma, 09:00 – 18:00",
+  addressLine: "Kartepe, Kocaeli, Türkiye",
+  workingHours: "Pazartesi – Cumartesi, 09:00 – 20:00",
 };
 
 export const SOCIAL_LINKS = [
