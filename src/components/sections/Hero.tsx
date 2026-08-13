@@ -97,10 +97,10 @@ export function Hero() {
             <MagneticWrap>
               <LiquidButton
                 size="lg"
-                onClick={() => router.push("/qr-menu-sistemleri")}
+                onClick={() => router.push("/hizmetler/ai-otomasyon")}
                 className="group !rounded-full gap-2 text-accent-product shadow-[0_0_20px_-12px_var(--color-accent-product-glow)] hover:bg-accent-product-soft hover:shadow-[0_0_28px_-8px_var(--color-accent-product-glow)]"
               >
-                QR Menü Sistemlerini Keşfedin
+                N8N Otomasyonlarını Keşfedin
                 <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" aria-hidden />
               </LiquidButton>
             </MagneticWrap>

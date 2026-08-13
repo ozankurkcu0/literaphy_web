@@ -13,8 +13,11 @@ import { services } from "@/content/services";
 const initialState: ContactFormState = { status: "idle" };
 
 const serviceOptions = [
+  // QR Menü Sistemleri artık services.ts'in kendisinde (href ile kendi
+  // sayfasına yönlenen bir kayıt olarak) — burada ayrıca elle eklemeye
+  // gerek yok; eklenirse aynı "qr-menu-sistemleri" değeri iki kez
+  // üretilip React'ın duplicate key hatasına yol açar.
   ...services.map((service) => ({ label: service.name, value: service.slug })),
-  { label: "QR Menü Sistemleri", value: "qr-menu-sistemleri" },
   { label: "Diğer / Emin değilim", value: "diger" },
 ];
 
