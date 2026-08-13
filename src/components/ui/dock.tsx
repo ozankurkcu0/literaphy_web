@@ -96,7 +96,14 @@ function Dock({
         height,
         scrollbarWidth: "none",
       }}
-      className="mx-auto flex max-w-full items-center overflow-x-auto overflow-y-visible"
+      // `overflow-x-auto overflow-y-visible` looks like it should scroll
+      // horizontally while staying open vertically, but per the CSS overflow
+      // spec, pairing a non-visible value on one axis forces the "visible"
+      // axis to compute as `auto` too — so `overflow-y` silently clipped
+      // anything that popped out below the bar (ServicesDropdown's panel).
+      // This nav is desktop-only with a small fixed item count that never
+      // needs horizontal scroll, so drop it and let both axes stay visible.
+      className="mx-auto flex max-w-full items-center overflow-visible"
     >
       <motion.div
         onMouseMove={({ pageX }) => {
