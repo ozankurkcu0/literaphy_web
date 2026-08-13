@@ -49,7 +49,7 @@ export function HeroScrollShowcase({ children }: { children: React.ReactNode }) 
 
   return (
     <div ref={wrapperRef} className="relative h-[300vh]">
-      <section className="sticky top-0 flex h-screen items-center overflow-hidden bg-deep">
+      <section className="sticky top-0 flex h-screen overflow-hidden bg-deep">
         {/* görsel katmanları */}
         {slides.map((slide, index) => {
           const start = index * SEGMENT;

@@ -35,7 +35,7 @@ export function DifferentiatorGrid() {
         {differentiators.map((item) => (
           <RevealItem key={item.title} className="flex flex-col items-start gap-4 lg:px-8 lg:first:pl-0 lg:last:pr-0">
             <IconBox icon={item.icon} />
-            <h3 className="text-base font-semibold text-foreground">{item.title}</h3>
+            <h3 className="text-[16px] font-semibold text-foreground">{item.title}</h3>
             <p className="text-sm leading-relaxed text-foreground-muted">{item.description}</p>
           </RevealItem>
         ))}

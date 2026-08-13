@@ -10,7 +10,7 @@ export function ValuesGrid() {
       <RevealGroup className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
         {companyValues.map((value) => (
           <RevealItem key={value.title} className="flex flex-col gap-2 border-t border-hairline pt-5">
-            <h3 className="text-base font-semibold text-foreground">{value.title}</h3>
+            <h3 className="text-[16px] font-semibold text-foreground">{value.title}</h3>
             <p className="text-sm leading-relaxed text-foreground-muted">{value.description}</p>
           </RevealItem>
         ))}

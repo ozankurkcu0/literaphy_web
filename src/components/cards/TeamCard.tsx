@@ -19,7 +19,7 @@ export function TeamCard({ member }: { member: TeamMember }) {
         <Avatar name={member.name} size={56} />
       )}
       <div>
-        <h3 className="text-base font-semibold text-foreground">{member.name}</h3>
+        <h3 className="text-[16px] font-semibold text-foreground">{member.name}</h3>
         <p className="font-mono text-xs text-accent">{member.role}</p>
       </div>
       <p className="text-sm leading-relaxed text-foreground-muted">{member.bio}</p>
