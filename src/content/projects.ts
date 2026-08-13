@@ -3,7 +3,7 @@ import type { Project } from "@/types";
 export const projects: Project[] = [
   {
     slug: "vento-yapi-kurumsal-site",
-    title: "Kurumsal Web Sitesi Yenilemesi",
+    title: "Kurumsal Web Sitesi",
     client: "Vento Yapı",
     category: "web-gelistirme",
     categoryLabel: "Web Geliştirme",
@@ -27,7 +27,7 @@ export const projects: Project[] = [
   {
     slug: "lupa-lojistik-operasyon-paneli",
     title: "Operasyon Yönetim Paneli",
-    client: "Lupa Lojistik",
+    client: "",
     category: "yazilim-gelistirme",
     categoryLabel: "Yazılım Geliştirme",
     summary:
@@ -43,12 +43,14 @@ export const projects: Project[] = [
     ],
     techStack: ["React", "Node.js", "PostgreSQL", "WebSocket"],
     coverTone: "violet",
+    image: "/projects/yonetim_panel.jpg",
+    imageWide: "/projects/yonetim_panel.jpg",
     featured: true,
   },
   {
     slug: "meva-finans-belge-otomasyonu",
     title: "AI Destekli Belge İşleme Otomasyonu",
-    client: "Meva Finans",
+    client: "",
     category: "ai-otomasyon",
     categoryLabel: "AI Otomasyonu",
     summary:
@@ -64,12 +66,14 @@ export const projects: Project[] = [
     ],
     techStack: ["OpenAI API", "Python", "LangChain", "PostgreSQL"],
     coverTone: "cyan",
+    image: "/projects/ai-powered-document.jpg",
+    imageWide: "/projects/ai-powered-document.jpg",
     featured: true,
   },
   {
     slug: "cizgi-mobilya-whatsapp-satis",
-    title: "WhatsApp Üzerinden Otomatik Sipariş Akışı",
-    client: "Çizgi Mobilya",
+    title: "WhatsApp Üzerinden Sipariş Otomasyonu",
+    client: "",
     category: "whatsapp-otomasyonu",
     categoryLabel: "WhatsApp Otomasyonu",
     summary:
@@ -85,14 +89,16 @@ export const projects: Project[] = [
     ],
     techStack: ["WhatsApp Business API", "Node.js", "OpenAI API"],
     coverTone: "emerald",
+    image: "/projects/whatsapp_siparis.jpg",
+    imageWide: "/projects/whatsapp_siparis.jpg",
     featured: false,
   },
   {
     slug: "orkide-market-entegrasyon",
-    title: "Çoklu Pazaryeri Stok Entegrasyonu",
-    client: "Orkide Market",
-    category: "api-entegrasyonu",
-    categoryLabel: "API Entegrasyonu",
+    title: "E-Ticaret Sitesi",
+    client: "",
+    category: "web-gelistirme",
+    categoryLabel: "WEB Geliştirme",
     summary:
       "Orkide Market'in kendi e-ticaret sitesi ile 3 farklı pazaryeri arasındaki stok ve fiyat senkronizasyonunu otomatikleştirdik.",
     problem:
@@ -113,7 +119,7 @@ export const projects: Project[] = [
   {
     slug: "kahve-duragi-qr-menu",
     title: "Zincir Şubeler için QR Menü Sistemi",
-    client: "Kahve Durağı",
+    client: "RAFF Coffee",
     category: "qr-menu",
     categoryLabel: "QR Menü Sistemleri",
     summary:

@@ -21,7 +21,11 @@ export function PricingCard({ plan, billing }: PricingCardProps) {
       whileHover={!plan.highlighted ? { y: -4, borderColor: "var(--color-strong)" } : undefined}
       transition={{ duration: 0.25, ease: EASE_STANDARD }}
       className={cn(
-        "relative flex h-full flex-col gap-6 overflow-hidden rounded-xl border p-10",
+        // Not: overflow-hidden yok — "En Popüler" rozeti kartın üst kenarından
+        // taşacak şekilde (-top-3) konumlanıyor; kart kendi taşmasını gizlerse
+        // rozetin üst kısmı kırpılıp kaybolur. Köşe yuvarlaklığı zaten
+        // background-clip:border-box sayesinde bozulmadan kalıyor.
+        "relative flex h-full flex-col gap-6 rounded-xl border p-10",
         plan.highlighted
           ? "scale-[1.02] border-[1.5px] border-accent-product shadow-[0_24px_70px_-24px_var(--color-accent-product-glow),inset_0_1px_0_rgba(255,255,255,0.08)]"
           : "border-hairline bg-surface shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]",
