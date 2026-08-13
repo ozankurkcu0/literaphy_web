@@ -17,15 +17,18 @@ interface BaseProps {
 }
 
 const toneVars: Record<Tone, { gradient: string; gradientHover: string; ring: string; glow: string }> = {
+  // Tek vurgu sistemi: her iki tonda da simsiyah zemin + beyaz yazı (Apple-tarzı
+  // CTA). "accent" ve "product" artık aynı paleti paylaşıyor; ayırt edicilik
+  // buton metniyle sağlanıyor, renkle değil.
   accent: {
-    gradient: "linear-gradient(180deg, #7075db 0%, #5e6ad2 55%, #525dc4 100%)",
-    gradientHover: "linear-gradient(180deg, #7d82e2 0%, #6a75da 55%, #5e6ad2 100%)",
+    gradient: "linear-gradient(180deg, #262626 0%, #000000 55%, #000000 100%)",
+    gradientHover: "linear-gradient(180deg, #3a3a3a 0%, #1a1a1a 55%, #0a0a0a 100%)",
     ring: "focus-visible:outline-accent",
     glow: "var(--color-accent-glow)",
   },
   product: {
-    gradient: "linear-gradient(180deg, #ffc25c 0%, #f5a623 55%, #e2960f 100%)",
-    gradientHover: "linear-gradient(180deg, #ffcd76 0%, #ffb840 55%, #f5a623 100%)",
+    gradient: "linear-gradient(180deg, #262626 0%, #000000 55%, #000000 100%)",
+    gradientHover: "linear-gradient(180deg, #3a3a3a 0%, #1a1a1a 55%, #0a0a0a 100%)",
     ring: "focus-visible:outline-accent-product",
     glow: "var(--color-accent-product-glow)",
   },
@@ -40,7 +43,7 @@ function variantClass(variant: Variant) {
     case "pill":
       return "text-white rounded-full shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_1px_2px_rgba(0,0,0,0.35)] active:scale-[0.98]";
     case "secondary":
-      return "border border-hairline bg-surface text-foreground hover:border-strong hover:bg-surface-hover active:scale-[0.98]";
+      return "border border-hairline bg-surface text-foreground shadow-[0_1px_2px_rgba(0,0,0,0.04)] hover:border-strong hover:bg-surface-hover active:scale-[0.98]";
     case "ghost":
       return "text-foreground-muted hover:text-foreground bg-transparent active:scale-[0.98]";
     default:

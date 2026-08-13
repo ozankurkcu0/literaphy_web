@@ -29,6 +29,8 @@ function LiquidMetalFallback() {
           background: "radial-gradient(ellipse 80% 55% at 50% 0%, var(--color-accent-soft), transparent 60%)",
         }}
       />
+      {/* On the light palette these stay as a barely-there haze — a single sparing
+          tint (the spec's "incecik elektrik mavisi"), not a colored glow. */}
       <motion.div
         className="absolute rounded-full blur-[110px]"
         style={{
@@ -36,8 +38,8 @@ function LiquidMetalFallback() {
           height: 620,
           top: "-14%",
           left: "-10%",
-          background: "radial-gradient(circle, var(--color-accent) 0%, transparent 70%)",
-          opacity: 0.3,
+          background: "radial-gradient(circle, var(--color-icon-tint) 0%, transparent 70%)",
+          opacity: 0.08,
         }}
         animate={{ x: [0, 60, -20, 0], y: [0, 40, 80, 0], scale: [1, 1.15, 0.95, 1] }}
         transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
@@ -49,8 +51,8 @@ function LiquidMetalFallback() {
           height: 520,
           top: "8%",
           right: "-12%",
-          background: "radial-gradient(circle, var(--color-accent-hover) 0%, transparent 70%)",
-          opacity: 0.22,
+          background: "radial-gradient(circle, var(--color-foreground) 0%, transparent 70%)",
+          opacity: 0.05,
         }}
         animate={{ x: [0, -50, 30, 0], y: [0, 60, -30, 0], scale: [1, 0.9, 1.1, 1] }}
         transition={{ duration: 26, repeat: Infinity, ease: "easeInOut", delay: 2 }}
@@ -62,8 +64,8 @@ function LiquidMetalFallback() {
           height: 460,
           bottom: "-18%",
           left: "28%",
-          background: "radial-gradient(circle, var(--color-accent-product) 0%, transparent 70%)",
-          opacity: 0.14,
+          background: "radial-gradient(circle, var(--color-icon-tint) 0%, transparent 70%)",
+          opacity: 0.06,
         }}
         animate={{ x: [0, 40, -40, 0], y: [0, -30, 20, 0] }}
         transition={{ duration: 30, repeat: Infinity, ease: "easeInOut", delay: 4 }}
@@ -107,8 +109,8 @@ export function LiquidMetalBackground() {
 
   return (
     <LiquidMetal
-      colorBack="#020203"
-      colorTint="#4b54b8"
+      colorBack="#ffffff"
+      colorTint="#eef4ff"
       shape="none"
       scale={1}
       speed={reducedMotion ? 0 : 0.45}
@@ -124,7 +126,7 @@ export function LiquidMetalBackground() {
         inset: 0,
         width: "100%",
         height: "100%",
-        opacity: 0.6,
+        opacity: 0.5,
         pointerEvents: "none",
       }}
       aria-hidden

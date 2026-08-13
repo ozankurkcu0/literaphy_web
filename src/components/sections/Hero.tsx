@@ -39,7 +39,7 @@ export function Hero() {
         className="absolute inset-0"
         style={{
           backgroundImage:
-            "linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px)",
+            "linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,0,0,0.05) 1px, transparent 1px)",
           backgroundSize: "64px 64px",
           maskImage: "radial-gradient(ellipse 60% 55% at 50% 40%, black 10%, transparent 75%)",
           WebkitMaskImage: "radial-gradient(ellipse 60% 55% at 50% 40%, black 10%, transparent 75%)",
@@ -52,7 +52,7 @@ export function Hero() {
         className="absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse 70% 65% at 50% 45%, rgba(2,2,3,0.72) 0%, rgba(2,2,3,0.45) 55%, rgba(2,2,3,0.2) 100%)",
+            "radial-gradient(ellipse 70% 65% at 50% 45%, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.3) 55%, rgba(255,255,255,0.08) 100%)",
         }}
         aria-hidden
       />
@@ -68,16 +68,14 @@ export function Hero() {
               framer-motion would render it opacity:0 in the SSR HTML and delay the browser's
               LCP timestamp until after hydration + animation. */}
           <h1
-            style={{ textShadow: "0 2px 24px rgba(2,2,3,0.8)" }}
             className="balance text-[40px] leading-[1.05] font-bold tracking-[-0.02em] text-foreground sm:text-[56px] lg:text-[76px]"
           >
             İşletmenizi teknolojiyle{" "}
-            <span className="text-accent">büyüten</span> yazılım ortağınız
+            <span className="text-icon-tint">büyüten</span> yazılım ortağınız
           </h1>
 
           <motion.p
             variants={item}
-            style={{ textShadow: "0 2px 16px rgba(2,2,3,0.7)" }}
             className="max-w-xl text-[17px] leading-relaxed text-foreground-secondary lg:text-xl"
           >
             OBSoft; özel yazılım, web geliştirme, AI otomasyonları, WhatsApp iş

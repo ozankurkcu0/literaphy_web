@@ -20,11 +20,11 @@ export function FeatureCard({ index }: { index: number }) {
     >
       <motion.div
         variants={{
-          rest: { backgroundColor: "var(--color-accent-product-soft)" },
-          hover: { backgroundColor: "var(--color-accent-product-glow)" },
+          rest: { backgroundColor: "var(--color-icon-tint-soft)" },
+          hover: { backgroundColor: "rgba(10, 132, 255, 0.16)" },
         }}
         transition={{ duration: 0.25, ease: EASE_STANDARD }}
-        className="flex size-11 items-center justify-center rounded-md text-accent-product"
+        className="flex size-11 items-center justify-center rounded-md text-icon-tint"
       >
         <Icon className="size-5" aria-hidden strokeWidth={1.75} />
       </motion.div>

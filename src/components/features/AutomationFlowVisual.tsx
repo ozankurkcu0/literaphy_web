@@ -23,7 +23,7 @@ export function AutomationFlowVisual() {
             key={d}
             d={d}
             fill="none"
-            stroke="var(--color-accent)"
+            stroke="var(--color-icon-tint)"
             strokeWidth={0.4}
             strokeDasharray="2 2"
             initial={{ pathLength: 0, opacity: 0.3 }}
@@ -37,7 +37,7 @@ export function AutomationFlowVisual() {
         return (
           <motion.div
             key={index}
-            className="absolute flex size-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-md border border-accent/30 bg-base text-accent"
+            className="absolute flex size-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-md border border-icon-tint/30 bg-base text-icon-tint"
             style={{ left: `${node.x}%`, top: `${node.y}%` }}
             animate={{ scale: [1, 1.08, 1] }}
             transition={{ duration: 2, repeat: Infinity, delay: index * 0.3, ease: "easeInOut" }}

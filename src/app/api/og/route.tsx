@@ -21,14 +21,14 @@ export function GET(request: NextRequest) {
           flexDirection: "column",
           justifyContent: "space-between",
           padding: "72px",
-          backgroundColor: "#020203",
+          backgroundColor: "#ffffff",
           backgroundImage:
-            "radial-gradient(circle at 12% 8%, rgba(101,112,214,0.32), transparent 48%), radial-gradient(circle at 88% 92%, rgba(245,166,35,0.14), transparent 45%)",
+            "radial-gradient(circle at 12% 8%, rgba(10,132,255,0.08), transparent 48%), radial-gradient(circle at 88% 92%, rgba(0,0,0,0.05), transparent 45%)",
           fontFamily: "sans-serif",
         }}
       >
-        <div style={{ display: "flex", fontSize: 34, fontWeight: 700, color: "#EDEDEF" }}>
-          <span style={{ color: "#6570d6" }}>OB</span>
+        <div style={{ display: "flex", fontSize: 34, fontWeight: 700, color: "#000000" }}>
+          <span>OB</span>
           <span>Soft</span>
         </div>
 
@@ -41,7 +41,7 @@ export function GET(request: NextRequest) {
                 fontWeight: 600,
                 letterSpacing: 2,
                 textTransform: "uppercase",
-                color: "#6570d6",
+                color: "#71717A",
               }}
             >
               {eyebrow}
@@ -54,7 +54,7 @@ export function GET(request: NextRequest) {
               fontWeight: 700,
               lineHeight: 1.15,
               letterSpacing: -1,
-              color: "#EDEDEF",
+              color: "#000000",
             }}
           >
             {title}

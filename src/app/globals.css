@@ -16,35 +16,50 @@
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, "SF Mono", monospace;
 
-  /* ---- Color: surfaces (dark-first, tek tema) ---- */
-  --color-deep: #020203;
-  --color-base: #050506;
-  --color-elevated: #0a0a0c;
-  --color-surface: rgba(255, 255, 255, 0.03);
-  --color-surface-hover: rgba(255, 255, 255, 0.06);
-  --color-hairline: rgba(255, 255, 255, 0.08);
-  --color-strong: rgba(255, 255, 255, 0.14);
+  /* ---- Color: surfaces (High-End Minimalist, Apple tarzı — light-first, tek tema) ---- */
+  --color-deep: #fafafa;
+  --color-base: #ffffff;
+  --color-elevated: #f5f5f7;
+  --color-surface: rgba(0, 0, 0, 0.035);
+  --color-surface-hover: rgba(0, 0, 0, 0.06);
+  /* Not: bu opaklıklar koyu temadan miras kaldıysa (rgba(255,255,255,x))
+     beyaz zeminde neredeyse görünmez olurlar — siyah-üzerine-beyaz ile
+     aynı alfa, göz için eşit kontrast vermez. Butonların/kartların
+     hover beklemeden, dinlenme halinde de görünür kalması için bilerek
+     biraz daha koyu tutuldu. */
+  --color-hairline: rgba(0, 0, 0, 0.12);
+  --color-strong: rgba(0, 0, 0, 0.22);
 
   /* ---- Color: foreground ---- */
-  --color-foreground: #ededef;
-  --color-foreground-secondary: #c4c4c9;
-  --color-foreground-muted: #8a8f98;
-  --color-foreground-faint: #55575e;
+  --color-foreground: #000000;
+  --color-foreground-secondary: #18181b;
+  --color-foreground-muted: #71717a;
+  --color-foreground-faint: #a1a1aa;
 
-  /* ---- Color: brand accent (OBSoft indigo) ----
-     #6570d6 (not #5e6ad2) is intentional: at 4.33:1 the original Linear
-     indigo fails WCAG AA (4.5:1) for small text; this value holds ~4.7:1
-     as text on --color-base while staying in the same hue family. */
-  --color-accent: #6570d6;
-  --color-accent-hover: #7c86e2;
-  --color-accent-glow: rgba(101, 112, 214, 0.25);
-  --color-accent-soft: rgba(101, 112, 214, 0.1);
+  /* ---- Color: brand accent ----
+     Tek vurgu rengi: saf siyah. CTA'lar simsiyah zemin + beyaz yazıyla
+     tasarlanır; renk karmaşasından kaçınmak için ayrı bir "marka rengi"
+     kullanılmaz — hiyerarşi tipografi ve boşlukla kurulur. */
+  --color-accent: #000000;
+  --color-accent-hover: #262626;
+  --color-accent-glow: rgba(0, 0, 0, 0.14);
+  --color-accent-soft: rgba(0, 0, 0, 0.05);
 
-  /* ---- Color: product accent (QR Menu Sistemleri) ---- */
-  --color-accent-product: #f5a623;
-  --color-accent-product-hover: #ffb840;
-  --color-accent-product-glow: rgba(245, 166, 35, 0.22);
-  --color-accent-product-soft: rgba(245, 166, 35, 0.1);
+  /* ---- Color: product accent (QR Menu Sistemleri) ----
+     Ayrı bir marka rengi yok — genel vurguyla birleştirildi (siyah).
+     Ürün hattının ayırt ediciliği renkle değil, ikon/etiket metniyle
+     sağlanır. */
+  --color-accent-product: #000000;
+  --color-accent-product-hover: #262626;
+  --color-accent-product-glow: rgba(0, 0, 0, 0.14);
+  --color-accent-product-soft: rgba(0, 0, 0, 0.05);
+
+  /* ---- Color: icon tint ----
+     Spesifikasyondaki "incecik elektrik mavisi": sadece hizmet
+     ikonlarında ve mikro dokunuşlarda kullanılan tek, çok kısıtlı
+     renk çıkışı. Buton/rozet/metin vurgusu için KULLANILMAZ. */
+  --color-icon-tint: #0a84ff;
+  --color-icon-tint-soft: rgba(10, 132, 255, 0.1);
 
   /* ---- Color: status ---- */
   --color-success: #10b981;
@@ -86,7 +101,7 @@
 
   html {
     scroll-behavior: smooth;
-    color-scheme: dark;
+    color-scheme: light;
   }
 
   body {
