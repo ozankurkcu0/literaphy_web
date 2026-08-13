@@ -1,3 +1,4 @@
+import Image from "next/image";
 import type { TeamMember } from "@/types";
 import { Avatar } from "@/components/ui/Avatar";
 import { cardSurfaceClass, cn } from "@/lib/utils";
@@ -10,7 +11,13 @@ export function TeamCard({ member }: { member: TeamMember }) {
         "flex flex-col gap-4 p-7 transition-[transform,border-color] duration-200 hover:-translate-y-1 hover:border-strong",
       )}
     >
-      <Avatar name={member.name} size={56} />
+      {member.avatar ? (
+        <div className="relative size-14 shrink-0 overflow-hidden rounded-full">
+          <Image src={member.avatar} alt={member.name} fill sizes="56px" className="object-cover" />
+        </div>
+      ) : (
+        <Avatar name={member.name} size={56} />
+      )}
       <div>
         <h3 className="text-base font-semibold text-foreground">{member.name}</h3>
         <p className="font-mono text-xs text-accent">{member.role}</p>

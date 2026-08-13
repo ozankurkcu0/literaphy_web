@@ -3,29 +3,19 @@ import type { StatItem, TeamMember } from "@/types";
 // Ekip isimleri ve istatistikler gerçek verilerle değiştirilmeli — bkz. TODO.md.
 export const teamMembers: TeamMember[] = [
   {
-    name: "Onur Baş",
-    role: "Kurucu Ortak & Teknik Direktör",
-    bio: "12 yıllık yazılım mimarisi deneyimiyle Literaphy'nin teknik vizyonunu yönetiyor; büyük ölçekli entegrasyon projelerine liderlik ediyor.",
+    name: "Ozan Kürkçü",
+    role: "Kurucu Ortak & Geliştirici",
+    bio: "6 yıllık yazılım mimarisi deneyimiyle Literaphy'nin teknik vizyonunu yönetiyor; web ve otomasyon projelerine liderlik ediyor.",
   },
   {
-    name: "Elif Sancak",
-    role: "Ürün ve Tasarım Direktörü",
+    name: "Berat Alakuş",
+    role: "Kurucu Ortak & Yönetici",
     bio: "Kurumsal web ve QR Menü Sistemleri ürün ailesinin tasarım dilini kuruyor; marka deneyimi ile kullanılabilirliği birlikte tasarlıyor.",
-  },
-  {
-    name: "Kaan Doğu",
-    role: "AI & Otomasyon Mühendisi",
-    bio: "AI otomasyonu ve WhatsApp entegrasyon projelerinde uçtan uca mimariyi kuruyor; süreç analizinden canlıya almaya kadar sürece eşlik ediyor.",
-  },
-  {
-    name: "Naz Ergin",
-    role: "Müşteri Başarı Yöneticisi",
-    bio: "Proje süreçlerinin şeffaf ilerlemesinden ve teslim sonrası destekten sorumlu; müşterilerin Literaphy ile çalışma deneyimini yönetiyor.",
-  },
+  }
 ];
 
 export const companyStats: StatItem[] = [
-  { value: 60, suffix: "+", label: "Tamamlanan proje" },
+  { value: 10, suffix: "+", label: "Tamamlanan proje" },
   { value: 98, suffix: "%", label: "Müşteri memnuniyeti" },
   { value: 6, suffix: "", label: "Yıllık sektör deneyimi" },
   { value: 24, suffix: "sa", label: "Ortalama geri dönüş süresi" },

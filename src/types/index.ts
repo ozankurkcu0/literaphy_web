@@ -97,6 +97,9 @@ export interface TeamMember {
   name: string;
   role: string;
   bio: string;
+  /** Opsiyonel profil fotoğrafı (public/team/ altından). Yoksa baş harflerden
+   * üretilen renkli Avatar'a düşer. */
+  avatar?: string;
 }
 
 export interface StatItem {
