@@ -43,8 +43,8 @@ export const projects: Project[] = [
     ],
     techStack: ["React", "Node.js", "PostgreSQL", "WebSocket"],
     coverTone: "violet",
-    image: "/projects/yonetim_panel.jpg",
-    imageWide: "/projects/yonetim_panel.jpg",
+    image: "/projects/lupa-lojistik-operasyon-paneli.jpg",
+    imageWide: "/projects/lupa-lojistik-operasyon-paneli-wide.jpg",
     featured: true,
   },
   {
@@ -66,8 +66,8 @@ export const projects: Project[] = [
     ],
     techStack: ["OpenAI API", "Python", "LangChain", "PostgreSQL"],
     coverTone: "cyan",
-    image: "/projects/ai-powered-document.jpg",
-    imageWide: "/projects/ai-powered-document.jpg",
+    image: "/projects/meva-finans-belge-otomasyonu.jpg",
+    imageWide: "/projects/meva-finans-belge-otomasyonu-wide.jpg",
     featured: true,
   },
   {
@@ -89,8 +89,8 @@ export const projects: Project[] = [
     ],
     techStack: ["WhatsApp Business API", "Node.js", "OpenAI API"],
     coverTone: "emerald",
-    image: "/projects/whatsapp_siparis.jpg",
-    imageWide: "/projects/whatsapp_siparis.jpg",
+    image: "/projects/cizgi-mobilya-whatsapp-satis.jpg",
+    imageWide: "/projects/cizgi-mobilya-whatsapp-satis-wide.jpg",
     featured: false,
   },
   {
