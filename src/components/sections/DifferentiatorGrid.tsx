@@ -30,7 +30,7 @@ const differentiators = [
 export function DifferentiatorGrid() {
   return (
     <Section tone="base" padding="standard">
-      <SectionHeading eyebrow="Neden OBSoft" title="Teknoloji ortağınızı seçerken önemli olanlar" className="mb-14" />
+      <SectionHeading eyebrow="Neden Literaphy" title="Teknoloji ortağınızı seçerken önemli olanlar" className="mb-14" />
       <RevealGroup className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-0 lg:divide-x lg:divide-hairline">
         {differentiators.map((item) => (
           <RevealItem key={item.title} className="flex flex-col items-start gap-4 lg:px-8 lg:first:pl-0 lg:last:pr-0">

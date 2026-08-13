@@ -8,7 +8,7 @@ import { CTABand } from "@/components/sections/CTABand";
 export const metadata: Metadata = buildMetadata({
   title: "Yazılım, Web ve AI Otomasyon Hizmetleri",
   description:
-    "OBSoft; web geliştirme, yazılım geliştirme, AI otomasyonu, WhatsApp otomasyonu ve API entegrasyonu hizmetleri sunar.",
+    "Literaphy; web geliştirme, yazılım geliştirme, AI otomasyonu, WhatsApp otomasyonu ve API entegrasyonu hizmetleri sunar.",
   path: "/hizmetler",
 });
 

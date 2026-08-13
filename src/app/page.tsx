@@ -12,9 +12,9 @@ import { CTABand } from "@/components/sections/CTABand";
 import { testimonials } from "@/content/testimonials";
 
 export const metadata: Metadata = buildMetadata({
-  title: "OBSoft — Yazılım, Otomasyon ve Dijital Büyüme Ortağınız",
+  title: "Literaphy — Yazılım, Otomasyon ve Dijital Büyüme Ortağınız",
   description:
-    "OBSoft; web geliştirme, özel yazılım, AI otomasyonları, WhatsApp otomasyonu, API entegrasyonları ve QR menü sistemleriyle operasyonunuzu hızlandırır.",
+    "Literaphy; web geliştirme, özel yazılım, AI otomasyonları, WhatsApp otomasyonu, API entegrasyonları ve QR menü sistemleriyle operasyonunuzu hızlandırır.",
   path: "/",
 });
 

@@ -28,8 +28,7 @@ export function GET(request: NextRequest) {
         }}
       >
         <div style={{ display: "flex", fontSize: 34, fontWeight: 700, color: "#000000" }}>
-          <span>OB</span>
-          <span>Soft</span>
+          Literaphy
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 20, maxWidth: 980 }}>

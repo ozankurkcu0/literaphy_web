@@ -9,7 +9,7 @@ import { CTABand } from "@/components/sections/CTABand";
 export const metadata: Metadata = buildMetadata({
   title: "Hakkımızda — Yazılım ve Otomasyon Ortağınız",
   description:
-    "OBSoft, işletmelerin dijitalleşme sürecinde tekrar eden ve zaman alan iş yüklerini teknolojiyle ortadan kaldırmak için kuruldu.",
+    "Literaphy, işletmelerin dijitalleşme sürecinde tekrar eden ve zaman alan iş yüklerini teknolojiyle ortadan kaldırmak için kuruldu.",
   path: "/hakkimizda",
 });
 

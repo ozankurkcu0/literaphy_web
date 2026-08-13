@@ -9,10 +9,9 @@ export function Logo({ className }: { className?: string }) {
         "font-mono text-lg font-semibold tracking-tight text-foreground transition-opacity hover:opacity-80",
         className,
       )}
-      aria-label="OBSoft anasayfa"
+      aria-label="Literaphy anasayfa"
     >
-      <span className="text-accent">OB</span>
-      <span>Soft</span>
+      Literaphy
     </Link>
   );
 }

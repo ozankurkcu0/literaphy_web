@@ -49,10 +49,10 @@ export function organizationJsonLd() {
     logo: `${SITE_URL}/icon.svg`,
     description: SITE_DESCRIPTION,
     sameAs: [
-      "https://linkedin.com/company/obsoft",
-      "https://instagram.com/obsoft",
-      "https://x.com/obsoft",
-      "https://github.com/obsoft",
+      "https://linkedin.com/company/literaphy",
+      "https://instagram.com/literaphy",
+      "https://x.com/literaphy",
+      "https://github.com/literaphy",
     ],
   };
 }

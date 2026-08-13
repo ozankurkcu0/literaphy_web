@@ -8,7 +8,7 @@ import { BlogExplorer } from "@/components/features/BlogExplorer";
 export const metadata: Metadata = buildMetadata({
   title: "Blog — Yazılım ve Otomasyon Üzerine Notlar",
   description:
-    "Yazılım geliştirme, AI otomasyonu, WhatsApp otomasyonu, API entegrasyonu ve QR menü sistemleri üzerine OBSoft'tan içerikler.",
+    "Yazılım geliştirme, AI otomasyonu, WhatsApp otomasyonu, API entegrasyonu ve QR menü sistemleri üzerine Literaphy'den içerikler.",
   path: "/blog",
 });
 

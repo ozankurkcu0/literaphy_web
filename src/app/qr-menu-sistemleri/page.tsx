@@ -18,7 +18,7 @@ import { MagneticWrap } from "@/components/ui/MagneticWrap";
 export const metadata: Metadata = buildMetadata({
   title: "QR Menü Sistemleri — Cafe ve Restoranlar İçin Dijital Menü",
   description:
-    "OBSoft QR Menü Sistemleri ile basılı menü maliyetinden kurtulun, fiyat güncellemelerini saniyeler içinde yayına alın. Kurulum 24-48 saat içinde tamamlanır.",
+    "Literaphy QR Menü Sistemleri ile basılı menü maliyetinden kurtulun, fiyat güncellemelerini saniyeler içinde yayına alın. Kurulum 24-48 saat içinde tamamlanır.",
   path: "/qr-menu-sistemleri",
 });
 
@@ -35,7 +35,7 @@ export default function QrMenuLandingPage() {
       />
       <JsonLd
         data={productJsonLd({
-          name: "OBSoft QR Menü Sistemleri",
+          name: "Literaphy QR Menü Sistemleri",
           description:
             "Cafe ve restoranlar için anlık güncellenebilir, çoklu dilli QR menü sistemi.",
           path: "/qr-menu-sistemleri",

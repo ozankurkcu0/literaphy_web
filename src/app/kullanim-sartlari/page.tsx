@@ -5,7 +5,7 @@ import { LegalContent } from "@/components/sections/LegalContent";
 
 export const metadata: Metadata = buildMetadata({
   title: "Kullanım Şartları",
-  description: "OBSoft web sitesi kullanım şartları.",
+  description: "Literaphy web sitesi kullanım şartları.",
   path: "/kullanim-sartlari",
 });
 

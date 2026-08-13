@@ -7,7 +7,7 @@ import { DemoRequestForm } from "@/components/features/DemoRequestForm";
 
 export const metadata: Metadata = buildMetadata({
   title: "Canlı Demo",
-  description: "OBSoft QR Menü Sistemleri'ni adım adım keşfedin ve kendi işletmeniz için demo isteyin.",
+  description: "Literaphy QR Menü Sistemleri'ni adım adım keşfedin ve kendi işletmeniz için demo isteyin.",
   path: "/qr-menu-sistemleri/demo",
 });
 

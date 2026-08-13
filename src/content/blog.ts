@@ -7,7 +7,7 @@ export const blogPosts: BlogPost[] = [
     excerpt:
       "Yapay zeka otomasyonuna geçişte doğru ilk adım hangi süreç olmalı? İşletmenizde en yüksek etkiyi yaratacak alanları nasıl belirleyeceğinizi anlatıyoruz.",
     category: "AI Otomasyonu",
-    author: "OBSoft Ekibi",
+    author: "Literaphy Ekibi",
     authorRole: "Yazılım & AI Danışmanlığı",
     publishedAt: "2026-06-02",
     coverTone: "cyan",
@@ -19,7 +19,7 @@ export const blogPosts: BlogPost[] = [
       "İlk adım, ekibinizin haftalık olarak en çok zaman harcadığı 3-5 tekrarlayan görevi listelemektir: fatura kontrolü, e-posta sınıflandırma, rapor hazırlama gibi. Bu görevlerden kural tabanlı ve yüksek hacimli olanlar, AI otomasyonu için en uygun adaylardır.",
       "İkinci adım, bu süreçlerin şu anki maliyetini somutlaştırmaktır: haftada kaç saat harcanıyor, hata oranı nedir, gecikme müşteri deneyimini nasıl etkiliyor? Bu veriler hem doğru önceliklendirme yapmanızı sağlar hem de otomasyon sonrası başarıyı ölçmenin temelini oluşturur.",
       "Üçüncü adım, küçük ama tam kapsamlı bir pilot uygulama ile başlamaktır. Tüm süreci baştan sona otomatikleştirmek yerine, en yüksek etkiyi yaratacak tek bir akışı uçtan uca otomatikleştirip sonuçları gözlemlemek, hem riski azaltır hem de organizasyonda AI otomasyonuna güveni artırır.",
-      "OBSoft olarak her AI otomasyon projesine bu üç adımla başlıyoruz: süreç haritalama, maliyet/etki analizi ve odaklı bir pilot uygulama. Bu yaklaşım, otomasyon yatırımının ilk üç ay içinde somut sonuç vermesini sağlıyor.",
+      "Literaphy olarak her AI otomasyon projesine bu üç adımla başlıyoruz: süreç haritalama, maliyet/etki analizi ve odaklı bir pilot uygulama. Bu yaklaşım, otomasyon yatırımının ilk üç ay içinde somut sonuç vermesini sağlıyor.",
     ],
   },
   {
@@ -28,7 +28,7 @@ export const blogPosts: BlogPost[] = [
     excerpt:
       "Kişisel WhatsApp ile WhatsApp Business API arasındaki fark nedir? İşletmenize otomasyon eklemeden önce bilmeniz gereken her şey.",
     category: "WhatsApp Otomasyonu",
-    author: "OBSoft Ekibi",
+    author: "Literaphy Ekibi",
     authorRole: "Entegrasyon Mühendisliği",
     publishedAt: "2026-05-18",
     coverTone: "emerald",
@@ -40,7 +40,7 @@ export const blogPosts: BlogPost[] = [
       "Kurulum süreci Meta iş hesabı doğrulaması ile başlar; işletme belgeleriniz ve marka bilgileriniz Meta tarafından incelenir. Bu süreç genellikle birkaç iş günü sürer ve doğru şekilde hazırlanmadığında gecikebilir.",
       "Onay sonrası, otomatik yanıt akışlarını, sipariş/randevu senaryolarını ve insan devrini (human handoff) tanımlayan bir konuşma mimarisi kurulur. Burada asıl değer, botun her şeyi yanıtlamaya çalışması değil, doğru anda doğru şekilde bir temsilciye devretmesidir.",
       "Son adım, WhatsApp hattını mevcut CRM, sipariş veya randevu sisteminize bağlamaktır — böylece müşteri WhatsApp'tan yazdığında sistemleriniz otomatik olarak güncellenir, ekstra veri girişine gerek kalmaz.",
-      "OBSoft, Meta onay sürecinden konuşma akışı tasarımına ve sistem entegrasyonuna kadar WhatsApp Business API kurulumunun tamamını uçtan uca yönetir.",
+      "Literaphy, Meta onay sürecinden konuşma akışı tasarımına ve sistem entegrasyonuna kadar WhatsApp Business API kurulumunun tamamını uçtan uca yönetir.",
     ],
   },
   {
@@ -49,7 +49,7 @@ export const blogPosts: BlogPost[] = [
     excerpt:
       "Basılı menüden QR menüye geçerken maliyet, müşteri deneyimi ve marka tutarlılığı açısından dikkat edilmesi gereken noktalar.",
     category: "QR Menü Sistemleri",
-    author: "OBSoft Ekibi",
+    author: "Literaphy Ekibi",
     authorRole: "Ürün Ekibi",
     publishedAt: "2026-04-27",
     coverTone: "amber",
@@ -61,7 +61,7 @@ export const blogPosts: BlogPost[] = [
       "İlk dikkat edilmesi gereken nokta yükleme hızıdır. Müşteri masada beklerken menünün 3 saniyeden uzun sürede açılması doğrudan deneyimi kötüleştirir; bu yüzden görsellerin optimize edilmiş, sayfanın hafif olması kritik önemdedir.",
       "İkinci nokta, kategorileme ve görsel hiyerarşidir. En çok satılan veya en yüksek marjlı ürünleri menüde öne çıkaracak bir görsel düzen, ortalama sipariş tutarını doğrudan etkiler.",
       "Üçüncü nokta, güncelleme kolaylığıdır. Fiyat veya stok değişikliklerini anlık yapabilmek, özellikle mevsimsel menü değişikliği yapan işletmeler için basılı menüye kıyasla ciddi bir maliyet ve zaman avantajı sağlar.",
-      "OBSoft QR Menü Sistemleri, bu üç noktayı da (hız, görsel hiyerarşi, anlık güncelleme) merkezine alan bir ürün mimarisiyle tasarlandı — detaylar için özellikler sayfamızı inceleyebilirsiniz.",
+      "Literaphy QR Menü Sistemleri, bu üç noktayı da (hız, görsel hiyerarşi, anlık güncelleme) merkezine alan bir ürün mimarisiyle tasarlandı — detaylar için özellikler sayfamızı inceleyebilirsiniz.",
     ],
   },
   {
@@ -70,7 +70,7 @@ export const blogPosts: BlogPost[] = [
     excerpt:
       "Hazır bir SaaS ürünü mü kullanmalısınız yoksa özel yazılım mı geliştirmelisiniz? Karar verirken sormanız gereken sorular.",
     category: "Yazılım Geliştirme",
-    author: "OBSoft Ekibi",
+    author: "Literaphy Ekibi",
     authorRole: "Yazılım Danışmanlığı",
     publishedAt: "2026-03-14",
     coverTone: "violet",
@@ -82,7 +82,7 @@ export const blogPosts: BlogPost[] = [
       "Eğer süreciniz sektörünüzdeki diğer işletmelerle büyük ölçüde aynıysa (ör. genel muhasebe, temel stok takibi), hazır bir yazılım büyük olasılıkla daha hızlı ve ekonomik bir çözümdür.",
       "Ancak süreciniz rekabet avantajınızın bir parçasıysa — yani sizi rakiplerinizden ayıran özel bir iş akışınız varsa — bu süreci hazır bir yazılıma sıkıştırmak, o avantajı zayıflatır. Bu noktada özel yazılım, uzun vadede daha değerli bir yatırımdır.",
       "Orta yol da mümkündür: Kritik olmayan süreçler için hazır araçları kullanıp yalnızca fark yaratan süreç için özel bir modül geliştirmek, hem maliyeti hem geliştirme süresini optimize eder.",
-      "OBSoft ile yaptığımız keşif görüşmelerinde önce bu ayrımı netleştiriyoruz — bazı durumlarda en doğru tavsiyemiz özel yazılım geliştirmemek, mevcut bir araca entegrasyon kurmak oluyor.",
+      "Literaphy ile yaptığımız keşif görüşmelerinde önce bu ayrımı netleştiriyoruz — bazı durumlarda en doğru tavsiyemiz özel yazılım geliştirmemek, mevcut bir araca entegrasyon kurmak oluyor.",
     ],
   },
   {
@@ -91,7 +91,7 @@ export const blogPosts: BlogPost[] = [
     excerpt:
       "Farklı sistemler arasında elle veri taşımak, büyüyen işletmelerin en büyük gizli maliyetlerinden biridir. Çözüm nasıl kurulur?",
     category: "API Entegrasyonu",
-    author: "OBSoft Ekibi",
+    author: "Literaphy Ekibi",
     authorRole: "Entegrasyon Mühendisliği",
     publishedAt: "2026-02-09",
     coverTone: "rose",
@@ -103,7 +103,7 @@ export const blogPosts: BlogPost[] = [
       "Manuel veri girişinin asıl riski zaman kaybı değil, tutarsızlıktır: bir sistemde güncellenen bir bilgi diğerine yansımadığında stok hataları, yanlış faturalama veya kayıp siparişler ortaya çıkar.",
       "API entegrasyonu, bu sistemler arasında otomatik ve gerçek zamanlı bir köprü kurar. Doğru kurgulandığında, bir sistemdeki değişiklik saniyeler içinde diğer tüm sistemlere yansır — elle taşımaya gerek kalmaz.",
       "Entegrasyon kurarken en kritik nokta hata yönetimidir: bir API çağrısı başarısız olduğunda sistem sessizce veri kaybetmemeli, otomatik yeniden denemeli ve gerekirse ilgili ekibi anında bilgilendirmelidir.",
-      "OBSoft olarak her entegrasyon projesinde bu üç unsuru standart olarak kuruyoruz: gerçek zamanlı senkronizasyon, otomatik hata kurtarma ve anlık izleme — böylece entegrasyon 'kurulur ve unutulur' değil, güvenilir bir altyapı bileşeni olur.",
+      "Literaphy olarak her entegrasyon projesinde bu üç unsuru standart olarak kuruyoruz: gerçek zamanlı senkronizasyon, otomatik hata kurtarma ve anlık izleme — böylece entegrasyon 'kurulur ve unutulur' değil, güvenilir bir altyapı bileşeni olur.",
     ],
   },
   {
@@ -112,7 +112,7 @@ export const blogPosts: BlogPost[] = [
     excerpt:
       "Instagram ve LinkedIn'in bu kadar güçlü olduğu bir dönemde, hâlâ bağımsız bir kurumsal web sitesine neden ihtiyacınız var?",
     category: "Web Geliştirme",
-    author: "OBSoft Ekibi",
+    author: "Literaphy Ekibi",
     authorRole: "Dijital Strateji",
     publishedAt: "2026-01-21",
     coverTone: "indigo",
@@ -124,7 +124,7 @@ export const blogPosts: BlogPost[] = [
       "Web siteniz ise tamamen sizin kontrolünüzdedir: arama motoru sıralamanız, ziyaretçi verileriniz ve marka anlatınız uzun vadeli bir varlık olarak birikir — sosyal medya paylaşımının aksine zamanla değer kaybetmez, tam tersine SEO ile birlikte güçlenir.",
       "Ayrıca B2B karar vericilerin büyük çoğunluğu, bir sosyal medya hesabından önce kurumsal web sitesini güvenilirlik kontrolü için ziyaret eder. Profesyonel, hızlı ve net bir web sitesi, ilk izlenimde güven inşa etmenin en doğrudan yoludur.",
       "Doğru kurgulanmış bir kurumsal site aynı zamanda sosyal medya yatırımınızın verimini de artırır: paylaşımlarınızdan gelen trafiği dönüşüme çeviren merkezi nokta odur.",
-      "OBSoft olarak web sitesini bir 'dijital kartvizit' değil, uzun vadeli bir büyüme altyapısı olarak tasarlıyoruz — SEO, hız ve dönüşüm optimizasyonu bu yaklaşımın standart bir parçası.",
+      "Literaphy olarak web sitesini bir 'dijital kartvizit' değil, uzun vadeli bir büyüme altyapısı olarak tasarlıyoruz — SEO, hız ve dönüşüm optimizasyonu bu yaklaşımın standart bir parçası.",
     ],
   },
 ];

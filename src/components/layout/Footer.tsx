@@ -65,7 +65,7 @@ export function Footer() {
       <div className="relative border-t border-hairline">
         <Container className="flex flex-col items-center justify-between gap-4 py-6 sm:flex-row">
           <p className="text-xs text-foreground-muted">
-            © {new Date().getFullYear()} OBSoft Yazılım Teknolojileri. Tüm hakları saklıdır.
+            © {new Date().getFullYear()} Literaphy Yazılım Teknolojileri. Tüm hakları saklıdır.
           </p>
           <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
             {FOOTER_LINKS.legal.map((link) => (

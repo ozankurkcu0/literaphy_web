@@ -5,7 +5,7 @@ import { LegalContent } from "@/components/sections/LegalContent";
 
 export const metadata: Metadata = buildMetadata({
   title: "KVKK Aydınlatma Metni",
-  description: "OBSoft KVKK aydınlatma metni ve veri sahibi hakları.",
+  description: "Literaphy KVKK aydınlatma metni ve veri sahibi hakları.",
   path: "/kvkk-aydinlatma-metni",
 });
 

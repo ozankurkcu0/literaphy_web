@@ -8,7 +8,7 @@ import { CTABand } from "@/components/sections/CTABand";
 
 export const metadata: Metadata = buildMetadata({
   title: "Sıkça Sorulan Sorular",
-  description: "OBSoft hizmetleri, QR Menü Sistemleri, fiyatlandırma ve süreç hakkında sıkça sorulan sorular.",
+  description: "Literaphy hizmetleri, QR Menü Sistemleri, fiyatlandırma ve süreç hakkında sıkça sorulan sorular.",
   path: "/sss",
 });
 

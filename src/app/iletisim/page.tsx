@@ -7,7 +7,7 @@ import { LocationPanel } from "@/components/sections/LocationPanel";
 
 export const metadata: Metadata = buildMetadata({
   title: "İletişim — Projenizi Konuşalım",
-  description: "OBSoft ile iletişime geçin, projenizi anlatın, size özel bir teklif hazırlayalım.",
+  description: "Literaphy ile iletişime geçin, projenizi anlatın, size özel bir teklif hazırlayalım.",
   path: "/iletisim",
 });
 

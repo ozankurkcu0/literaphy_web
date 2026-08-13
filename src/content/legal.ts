@@ -7,7 +7,7 @@ export const privacyPolicy = {
     {
       heading: "1. Genel Bilgilendirme",
       paragraphs: [
-        `${SITE_LEGAL_NAME} ("OBSoft", "biz") olarak, obsoft.com.tr web sitesi üzerinden topladığımız kişisel verilerin gizliliğini ve güvenliğini önemsiyoruz. Bu politika, hangi verileri, hangi amaçla topladığımızı ve nasıl işlediğimizi açıklar.`,
+        `${SITE_LEGAL_NAME} ("Literaphy", "biz") olarak, literaphy.com.tr web sitesi üzerinden topladığımız kişisel verilerin gizliliğini ve güvenliğini önemsiyoruz. Bu politika, hangi verileri, hangi amaçla topladığımızı ve nasıl işlediğimizi açıklar.`,
       ],
     },
     {
@@ -45,31 +45,31 @@ export const termsOfService = {
     {
       heading: "1. Kabul",
       paragraphs: [
-        `obsoft.com.tr web sitesini kullanarak bu kullanım şartlarını kabul etmiş sayılırsınız. Şartları kabul etmiyorsanız lütfen siteyi kullanmayınız.`,
+        `literaphy.com.tr web sitesini kullanarak bu kullanım şartlarını kabul etmiş sayılırsınız. Şartları kabul etmiyorsanız lütfen siteyi kullanmayınız.`,
       ],
     },
     {
       heading: "2. Hizmetlerin Kapsamı",
       paragraphs: [
-        "OBSoft, web geliştirme, yazılım geliştirme, AI otomasyonu, WhatsApp otomasyonu, API entegrasyonu ve QR Menü Sistemleri hizmetlerini sunar. Hizmet kapsamı, süresi ve bedeli her proje için ayrı bir sözleşme veya teklif ile belirlenir.",
+        "Literaphy, web geliştirme, yazılım geliştirme, AI otomasyonu, WhatsApp otomasyonu, API entegrasyonu ve QR Menü Sistemleri hizmetlerini sunar. Hizmet kapsamı, süresi ve bedeli her proje için ayrı bir sözleşme veya teklif ile belirlenir.",
       ],
     },
     {
       heading: "3. Fikri Mülkiyet",
       paragraphs: [
-        "Web sitesinde yer alan marka, logo ve içerikler OBSoft'a aittir. İzinsiz kullanılamaz veya çoğaltılamaz. Proje teslimlerinde fikri mülkiyet devri, ilgili proje sözleşmesinde ayrıca düzenlenir.",
+        "Web sitesinde yer alan marka, logo ve içerikler Literaphy'ye aittir. İzinsiz kullanılamaz veya çoğaltılamaz. Proje teslimlerinde fikri mülkiyet devri, ilgili proje sözleşmesinde ayrıca düzenlenir.",
       ],
     },
     {
       heading: "4. Sorumluluğun Sınırlandırılması",
       paragraphs: [
-        "Web sitesindeki bilgiler genel bilgilendirme amaçlıdır. OBSoft, sitenin kesintisiz veya hatasız çalışacağını garanti etmez.",
+        "Web sitesindeki bilgiler genel bilgilendirme amaçlıdır. Literaphy, sitenin kesintisiz veya hatasız çalışacağını garanti etmez.",
       ],
     },
     {
       heading: "5. Değişiklikler",
       paragraphs: [
-        "OBSoft, bu kullanım şartlarını dilediği zaman güncelleme hakkını saklı tutar. Güncellemeler bu sayfada yayınlandığı andan itibaren geçerli olur.",
+        "Literaphy, bu kullanım şartlarını dilediği zaman güncelleme hakkını saklı tutar. Güncellemeler bu sayfada yayınlandığı andan itibaren geçerli olur.",
       ],
     },
   ],

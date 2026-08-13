@@ -6,7 +6,7 @@ export const testimonials: Testimonial[] = [
     role: "Genel Müdür",
     company: "Vento Yapı",
     quote:
-      "OBSoft ile çalışmadan önce web sitemiz bizim için sadece bir zorunluluktu. Şimdi en güçlü satış kanallarımızdan biri — hem teknik hem de stratejik olarak süreci baştan sona çok profesyonel yönettiler.",
+      "Literaphy ile çalışmadan önce web sitemiz bizim için sadece bir zorunluluktu. Şimdi en güçlü satış kanallarımızdan biri — hem teknik hem de stratejik olarak süreci baştan sona çok profesyonel yönettiler.",
     tag: "kurumsal",
   },
   {
@@ -14,7 +14,7 @@ export const testimonials: Testimonial[] = [
     role: "Operasyon Direktörü",
     company: "Lupa Lojistik",
     quote:
-      "Excel'den gerçek bir operasyon paneline geçiş, ekibimizin günlük çalışma şeklini kökten değiştirdi. OBSoft ekibi ihtiyacımızı bizden bile daha net anladı.",
+      "Excel'den gerçek bir operasyon paneline geçiş, ekibimizin günlük çalışma şeklini kökten değiştirdi. Literaphy ekibi ihtiyacımızı bizden bile daha net anladı.",
     tag: "kurumsal",
   },
   {

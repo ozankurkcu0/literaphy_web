@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     "WhatsApp otomasyonu",
     "API entegrasyonu",
     "QR menü sistemi",
-    "OBSoft",
+    "Literaphy",
   ],
   authors: [{ name: SITE_NAME }],
   icons: {

@@ -78,7 +78,7 @@ export function Hero() {
             variants={item}
             className="max-w-xl text-[17px] leading-relaxed text-foreground-secondary lg:text-xl"
           >
-            OBSoft; özel yazılım, web geliştirme, AI otomasyonları, WhatsApp iş
+            Literaphy; özel yazılım, web geliştirme, AI otomasyonları, WhatsApp iş
             otomasyonu, API entegrasyonları ve QR menü sistemleriyle
             işletmenizin operasyonunu hızlandırır.
           </motion.p>

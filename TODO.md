@@ -8,18 +8,18 @@ sebep olmamak için akış durdurulmadı; aşağıdakiler devreye alınmadan
 ## Yüksek Öncelik
 
 - **Gerçek alan adı**: `src/lib/constants.ts` içindeki `SITE_URL` şu an
-  `https://obsoft.com.tr` olarak varsayıldı (metadata, sitemap, robots,
+  `https://literaphy.com.tr` olarak varsayıldı (metadata, sitemap, robots,
   JSON-LD, OG görselleri bu değeri kullanıyor). Gerçek domain
   belirlenince tek bu satır güncellenmeli.
 - **İletişim bilgileri**: `CONTACT` bloğundaki e-posta, telefon ve adres
-  placeholder değerlerdir (`merhaba@obsoft.com.tr`, `0850 000 00 00`,
+  placeholder değerlerdir (`merhaba@literaphy.com.tr`, `0850 000 00 00`,
   "Levent, İstanbul"). Gerçek bilgilerle değiştirilmeli.
 - **Form teslimatı**: İletişim formu (`src/app/iletisim/actions.ts`) ve
   demo formu (`src/app/qr-menu-sistemleri/demo/actions.ts`) şu an yalnızca
   sunucu loguna yazıyor. Gerçek e-posta/CRM entegrasyonu (ör. Resend,
   SendGrid, HubSpot webhook) API anahtarı sağlanınca bağlanmalı.
 - **Sosyal medya linkleri**: `SOCIAL_LINKS` içindeki URL'ler
-  (linkedin.com/company/obsoft vb.) gerçek hesaplar açılınca
+  (linkedin.com/company/literaphy vb.) gerçek hesaplar açılınca
   güncellenmeli; şu an tahmini/placeholder.
 
 ## Orta Öncelik

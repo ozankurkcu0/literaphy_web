@@ -5,7 +5,7 @@ export const teamMembers: TeamMember[] = [
   {
     name: "Onur Baş",
     role: "Kurucu Ortak & Teknik Direktör",
-    bio: "12 yıllık yazılım mimarisi deneyimiyle OBSoft'un teknik vizyonunu yönetiyor; büyük ölçekli entegrasyon projelerine liderlik ediyor.",
+    bio: "12 yıllık yazılım mimarisi deneyimiyle Literaphy'nin teknik vizyonunu yönetiyor; büyük ölçekli entegrasyon projelerine liderlik ediyor.",
   },
   {
     name: "Elif Sancak",
@@ -20,7 +20,7 @@ export const teamMembers: TeamMember[] = [
   {
     name: "Naz Ergin",
     role: "Müşteri Başarı Yöneticisi",
-    bio: "Proje süreçlerinin şeffaf ilerlemesinden ve teslim sonrası destekten sorumlu; müşterilerin OBSoft ile çalışma deneyimini yönetiyor.",
+    bio: "Proje süreçlerinin şeffaf ilerlemesinden ve teslim sonrası destekten sorumlu; müşterilerin Literaphy ile çalışma deneyimini yönetiyor.",
   },
 ];
 
@@ -53,6 +53,6 @@ export const companyValues = [
 export const companyStory = {
   eyebrow: "HAKKIMIZDA",
   lead:
-    "OBSoft, işletmelerin dijitalleşme sürecinde tekrar eden, zaman alan ve hataya açık iş yüklerini teknolojiyle ortadan kaldırmak için kuruldu.",
+    "Literaphy, işletmelerin dijitalleşme sürecinde tekrar eden, zaman alan ve hataya açık iş yüklerini teknolojiyle ortadan kaldırmak için kuruldu.",
   body: "Web geliştirmeden AI otomasyonuna, WhatsApp entegrasyonundan QR menü sistemlerine kadar attığımız her adımın ortak paydası aynı: doğru teknolojiyi doğru sürece uygulayarak ölçülebilir bir sonuç üretmek. Küçük bir ekip olarak kalmayı bilinçli olarak tercih ediyoruz — bu sayede her projeye kurucu seviyesinde teknik dikkat ayırabiliyoruz.",
 };

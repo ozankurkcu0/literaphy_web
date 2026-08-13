@@ -3,7 +3,7 @@ import type { FaqItem } from "@/types";
 export const faqItems: FaqItem[] = [
   {
     category: "Genel",
-    question: "OBSoft hangi hizmetleri sunuyor?",
+    question: "Literaphy hangi hizmetleri sunuyor?",
     answer:
       "Web geliştirme, özel yazılım geliştirme, AI otomasyonları, WhatsApp Business otomasyonu, API entegrasyonları ve QR menü sistemleri sunuyoruz. Detaylar için Hizmetler sayfamızı inceleyebilirsiniz.",
   },
