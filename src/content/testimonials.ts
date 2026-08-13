@@ -10,36 +10,12 @@ export const testimonials: Testimonial[] = [
     tag: "kurumsal",
   },
   {
-    name: "Selin Aydoğan",
-    role: "Operasyon Direktörü",
-    company: "Lupa Lojistik",
-    quote:
-      "Excel'den gerçek bir operasyon paneline geçiş, ekibimizin günlük çalışma şeklini kökten değiştirdi. Literaphy ekibi ihtiyacımızı bizden bile daha net anladı.",
-    tag: "kurumsal",
-  },
-  {
     name: "Barış Ünal",
     role: "Kurucu Ortak",
     company: "Meva Finans",
     quote:
       "Belge işleme otomasyonu ilk ayda kendini amorti etti. En değerlisi, ekibimizin artık tekrar eden işler yerine katma değerli işlere odaklanabilmesi oldu.",
     tag: "kurumsal",
-  },
-  {
-    name: "Derya Tan",
-    role: "İşletme Sahibi",
-    company: "Kahve Durağı",
-    quote:
-      "8 şubede fiyat güncellemesi artık tek tuşla oluyor. QR menüye geçtiğimizden beri hem baskı maliyetimiz sıfırlandı hem müşteriler menüyü çok daha rahat inceliyor.",
-    tag: "qr-menu",
-  },
-  {
-    name: "Onur Sezgin",
-    role: "İşletme Sahibi",
-    company: "Fırın Sokağı",
-    quote:
-      "Kurulumu bir günden kısa sürdü, ekibim hiç eğitim almadan kullanmaya başladı. Analitik panelinden en çok satan ürünleri görmek menü tasarımımızı bile değiştirdi.",
-    tag: "qr-menu",
   },
   {
     name: "Ceyda Aksoy",
