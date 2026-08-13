@@ -91,16 +91,13 @@ export function HeroScrollShowcase({ children }: { children: React.ReactNode }) 
           aria-hidden
         />
 
-        {/* okunabilirlik scrim'i — placeholder görseller (koyu proje fotoğrafları,
-            üstünde kendi yazıları olan ekran görüntüleri) çok değişken kontrastta
-            olduğu için önceki soft-shader arka plana göre belirgin güçlendirildi;
-            gerçek Flow klipleri gelince (daha sade/stüdyo tonlu) gevşetilebilir. */}
+        {/* çok hafif alt-gölgeleme — video'nun kendi netliğini/parlaklığını bastırmaz,
+            sadece en alttaki "Kaydırın" göstergesinin her zaman okunur kalmasını
+            garantiler. Metin bloğu artık kendi kontrastını kendi kartından alıyor,
+            burada ağır bir beyaz yıkama yok. */}
         <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(ellipse 75% 70% at 50% 45%, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.75) 45%, rgba(255,255,255,0.45) 75%, rgba(255,255,255,0.25) 100%)",
-          }}
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-40"
+          style={{ background: "linear-gradient(to bottom, transparent, rgba(255,255,255,0.35))" }}
           aria-hidden
         />
 
