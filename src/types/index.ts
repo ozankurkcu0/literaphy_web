@@ -62,6 +62,10 @@ export interface BlogPost {
   authorRole: string;
   publishedAt: string;
   coverTone: CoverTone;
+  /** Optional real cover image (from public/blog), 16:9 crop for cards. Falls back to the generated CoverArt when absent. */
+  image?: string;
+  /** 16:7 crop for the blog detail page hero. Required alongside `image` if that hero should use a real photo. */
+  imageWide?: string;
   relatedHref?: { label: string; href: string };
 }
 

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { blogPosts, getBlogPostBySlug, getRelatedPosts } from "@/content/blog";
 import { buildMetadata, breadcrumbJsonLd, articleJsonLd, JsonLd } from "@/lib/seo";
@@ -81,7 +82,20 @@ export default async function BlogDetailPage({ params }: PageParams) {
 
       <Section tone="base" padding="none" className="-mt-10">
         <Reveal>
-          <CoverArt tone={post.coverTone} ratio="wide" className="mx-auto max-w-4xl" />
+          {post.imageWide ? (
+            <div className="relative mx-auto aspect-[16/7] max-w-4xl overflow-hidden rounded-lg">
+              <Image
+                src={post.imageWide}
+                alt={post.title}
+                fill
+                sizes="(min-width: 1024px) 896px, 100vw"
+                className="object-cover"
+                priority
+              />
+            </div>
+          ) : (
+            <CoverArt tone={post.coverTone} ratio="wide" className="mx-auto max-w-4xl" />
+          )}
         </Reveal>
       </Section>
 

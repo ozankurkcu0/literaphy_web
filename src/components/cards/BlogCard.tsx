@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { motion } from "motion/react";
 import type { BlogPost } from "@/types";
@@ -14,7 +15,19 @@ export function BlogCard({ post, featured = false }: { post: BlogPost; featured?
     <article className={featured ? "grid gap-6 lg:grid-cols-2 lg:items-center lg:gap-10" : ""}>
       <Link href={`/blog/${post.slug}`} className="group block overflow-hidden rounded-lg">
         <motion.div whileHover={{ scale: 1.04 }} transition={{ duration: 0.4, ease: EASE_PREMIUM }}>
-          <CoverArt tone={post.coverTone} ratio="video" label={post.category} />
+          {post.image ? (
+            <div className="relative aspect-video overflow-hidden rounded-lg">
+              <Image
+                src={post.image}
+                alt={post.title}
+                fill
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                className="object-cover"
+              />
+            </div>
+          ) : (
+            <CoverArt tone={post.coverTone} ratio="video" label={post.category} />
+          )}
         </motion.div>
       </Link>
       <div className="flex flex-col gap-3 pt-4">
