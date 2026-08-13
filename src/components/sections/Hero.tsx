@@ -43,28 +43,28 @@ export function Hero() {
             neredeyse şeffaf, video panelin arkasında camsı bir kırılmayla
             görünüyor; okunabilirlik ince bir karartma katmanı + yazı
             gölgesinden geliyor. */}
-        <Container className="relative z-10 pt-24 sm:pt-28">
-          <LiquidGlassPanel className="mx-auto max-w-2xl rounded-[24px] px-6 py-7 text-center sm:px-10 sm:py-8">
+        <Container className="relative z-10 pt-16 sm:pt-20">
+          <LiquidGlassPanel className="mx-auto max-w-3xl rounded-[28px] px-6 py-9 text-center sm:px-14 sm:py-12">
             <motion.div initial="hidden" animate="visible" variants={container}>
               {/* Plain h1 (not animated): this is the page's LCP candidate — fading it in via
                   framer-motion would render it opacity:0 in the SSR HTML and delay the browser's
                   LCP timestamp until after hydration + animation. */}
-              <h1 className="balance text-[32px] leading-[1.08] font-bold tracking-[-0.02em] text-white [text-shadow:0_1px_16px_rgba(0,0,0,0.35)] sm:text-[42px] lg:text-[52px]">
+              <h1 className="balance text-[40px] leading-[1.05] font-bold tracking-[-0.02em] text-white [text-shadow:0_1px_16px_rgba(0,0,0,0.35)] sm:text-[56px] lg:text-[76px]">
                 İşletmenizi teknolojiyle{" "}
                 <span className="text-icon-tint">büyüten</span> yazılım ortağınız
               </h1>
 
               <motion.p
                 variants={item}
-                className="mx-auto mt-4 max-w-lg text-[15px] leading-relaxed text-white/90 [text-shadow:0_1px_10px_rgba(0,0,0,0.35)] sm:text-[16px]"
+                className="mx-auto mt-6 max-w-xl text-[17px] leading-relaxed text-white/90 [text-shadow:0_1px_10px_rgba(0,0,0,0.35)] lg:text-xl"
               >
                 Literaphy; web geliştirme, özel yazılım, N8N otomasyonları ve QR menü sistemleriyle operasyonunuzu hızlandırır.
               </motion.p>
 
-              <motion.div variants={item} className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+              <motion.div variants={item} className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
                 <MagneticWrap>
                   <LiquidButton
-                    size="lg"
+                    size="xl"
                     onClick={() => router.push("/hizmetler")}
                     className="group !rounded-full gap-2 bg-accent-soft text-accent shadow-[0_0_28px_-10px_var(--color-accent-glow)] hover:shadow-[0_0_36px_-8px_var(--color-accent-glow)]"
                   >
@@ -74,7 +74,7 @@ export function Hero() {
                 </MagneticWrap>
                 <MagneticWrap>
                   <LiquidButton
-                    size="default"
+                    size="lg"
                     onClick={() => router.push("/hizmetler/ai-otomasyon")}
                     className="group !rounded-full gap-2 text-accent-product shadow-[0_0_20px_-12px_var(--color-accent-product-glow)] hover:bg-accent-product-soft hover:shadow-[0_0_28px_-8px_var(--color-accent-product-glow)]"
                   >
