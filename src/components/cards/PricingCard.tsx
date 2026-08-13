@@ -18,6 +18,7 @@ export function PricingCard({ plan, billing }: PricingCardProps) {
 
   return (
     <motion.div
+      layout
       whileHover={!plan.highlighted ? { y: -4, borderColor: "var(--color-strong)" } : undefined}
       transition={{ duration: 0.25, ease: EASE_STANDARD }}
       className={cn(
@@ -50,23 +51,40 @@ export function PricingCard({ plan, billing }: PricingCardProps) {
         <p className="text-sm text-foreground-muted">{plan.description}</p>
       </div>
 
-      <div className="flex items-end gap-1.5">
-        <span className="relative block h-11 overflow-hidden font-mono text-[40px] leading-none font-semibold text-foreground">
-          <AnimatePresence mode="popLayout" initial={false}>
-            <motion.span
-              key={billing}
-              initial={{ y: 28, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: -28, opacity: 0 }}
-              transition={{ duration: 0.28, ease: EASE_STANDARD }}
-              className="block"
+      <motion.div layout transition={{ duration: 0.25, ease: EASE_STANDARD }} className="flex flex-col gap-1.5">
+        <div className="flex items-end gap-1.5">
+          <span className="relative block h-11 overflow-hidden font-mono text-[40px] leading-none font-semibold text-foreground">
+            <AnimatePresence mode="popLayout" initial={false}>
+              <motion.span
+                key={billing}
+                initial={{ y: 28, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: -28, opacity: 0 }}
+                transition={{ duration: 0.28, ease: EASE_STANDARD }}
+                className="block"
+              >
+                ₺{price}
+              </motion.span>
+            </AnimatePresence>
+          </span>
+          <span className="pb-1 text-sm text-foreground-muted">/ ay</span>
+        </div>
+
+        <AnimatePresence mode="wait" initial={false}>
+          {billing === "yearly" && (
+            <motion.p
+              key="yearly-total"
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.2, ease: EASE_STANDARD }}
+              className="font-mono text-xs text-foreground-muted"
             >
-              ₺{price}
-            </motion.span>
-          </AnimatePresence>
-        </span>
-        <span className="pb-1 text-sm text-foreground-muted">/ ay</span>
-      </div>
+              Yıllık ₺{(plan.yearlyPrice * 12).toLocaleString("tr-TR")} olarak faturalandırılır
+            </motion.p>
+          )}
+        </AnimatePresence>
+      </motion.div>
 
       <ButtonLink
         href="/iletisim"
