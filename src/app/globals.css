@@ -1,0 +1,161 @@
+@import "tailwindcss";
+
+/* Dokunmatik cihazlarda `hover:` class'ları tap ile yanlışlıkla tetiklenmesin diye
+   Tailwind'in yerleşik hover variant'ını gerçek "fare + hassas işaretçi" cihazlarla
+   sınırlıyoruz. Bu, kod tabanındaki mevcut tüm `hover:` kullanımlarına otomatik uygulanır. */
+@custom-variant hover {
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      @slot;
+    }
+  }
+}
+
+@theme {
+  /* ---- Fonts ---- */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, "SF Mono", monospace;
+
+  /* ---- Color: surfaces (dark-first, tek tema) ---- */
+  --color-deep: #020203;
+  --color-base: #050506;
+  --color-elevated: #0a0a0c;
+  --color-surface: rgba(255, 255, 255, 0.03);
+  --color-surface-hover: rgba(255, 255, 255, 0.06);
+  --color-hairline: rgba(255, 255, 255, 0.08);
+  --color-strong: rgba(255, 255, 255, 0.14);
+
+  /* ---- Color: foreground ---- */
+  --color-foreground: #ededef;
+  --color-foreground-secondary: #c4c4c9;
+  --color-foreground-muted: #8a8f98;
+  --color-foreground-faint: #55575e;
+
+  /* ---- Color: brand accent (OBSoft indigo) ----
+     #6570d6 (not #5e6ad2) is intentional: at 4.33:1 the original Linear
+     indigo fails WCAG AA (4.5:1) for small text; this value holds ~4.7:1
+     as text on --color-base while staying in the same hue family. */
+  --color-accent: #6570d6;
+  --color-accent-hover: #7c86e2;
+  --color-accent-glow: rgba(101, 112, 214, 0.25);
+  --color-accent-soft: rgba(101, 112, 214, 0.1);
+
+  /* ---- Color: product accent (QR Menu Sistemleri) ---- */
+  --color-accent-product: #f5a623;
+  --color-accent-product-hover: #ffb840;
+  --color-accent-product-glow: rgba(245, 166, 35, 0.22);
+  --color-accent-product-soft: rgba(245, 166, 35, 0.1);
+
+  /* ---- Color: status ---- */
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+
+  /* ---- Radius ---- */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  /* ---- Easing ---- */
+  --ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-standard: cubic-bezier(0.33, 1, 0.68, 1);
+  --ease-in-out-soft: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* ---- Breakpoints (Tailwind v4 defaults kept, container custom) ---- */
+  --container-content: 1200px;
+  --container-wide: 1440px;
+
+  /* ---- Ambient motion ---- */
+  --animate-drift: drift 14s ease-in-out infinite alternate;
+}
+
+@keyframes drift {
+  0% {
+    transform: translate(-6%, -4%) scale(1);
+  }
+  100% {
+    transform: translate(6%, 5%) scale(1.08);
+  }
+}
+
+@layer base {
+  * {
+    border-color: var(--color-hairline);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: var(--color-base);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background-color: var(--color-accent-glow);
+    color: var(--color-foreground);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  a {
+    color: inherit;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-base);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-strong);
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-foreground-faint);
+  }
+}
+
+@layer utilities {
+  .balance {
+    text-wrap: balance;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
