@@ -1,30 +1,37 @@
 "use client";
 
 import { useRef } from "react";
-import Image from "next/image";
 import { motion, useScroll, useTransform } from "motion/react";
+import { ScrollFrameSequence } from "@/components/sections/ScrollFrameSequence";
 
-// PLACEHOLDER görseller — Google Flow'dan gelen gerçek klipler/foto hazır
-// olunca burayı (ve <video> geçişini) güncelle. Şimdilik elimizdeki gerçek
-// site/proje ekran görüntüleriyle mekanizmayı test ediyoruz.
+// Üç ayrı Google Flow videosu, ezgif ile kareye bölünüp scroll-scrub
+// tekniğiyle oynatılıyor: laptop (Web Geliştirme) exploded oluyor, sonra
+// bir geçiş sekansıyla telefona/QR koda dönüşüyor, sonra QR Menü kendi
+// exploded görünümünü tamamlıyor. N8N Otomasyonları henüz bu sıraya
+// eklenmedi — kendi kare dizisi hazır olunca aynı şekilde eklenecek.
 const slides = [
   {
     label: "Web Geliştirme",
-    src: "/projects/vento-yapi-kurumsal-site-wide.jpg",
+    framesBasePath: "/scroll-frames/laptop",
+    frameCount: 180,
   },
   {
-    label: "N8N Otomasyonları",
-    src: "/n8n-workflow.jpg",
+    label: "Web'den QR Menü'ye geçiş",
+    framesBasePath: "/scroll-frames/laptop-to-qr",
+    frameCount: 240,
   },
   {
     label: "QR Menü Sistemleri",
-    src: "/projects/kahve-duragi-qr-menu-wide.jpg",
+    framesBasePath: "/scroll-frames/qr",
+    frameCount: 180,
   },
 ];
 
 const SEGMENT = 1 / slides.length;
-// Her segmentin ne kadarı crossfade'e ayrılsın (segment genişliğinin oranı).
-const FADE = SEGMENT * 0.25;
+// Segment sınırındaki kare-seti değişimini yumuşatan küçük bir crossfade —
+// sekanslar zaten kendi içinde akıcı video olduğu için önceki 3-statik-görsel
+// halindeki geniş crossfade'e artık ihtiyaç yok, sadece dikişi gizliyor.
+const FADE = SEGMENT * 0.08;
 
 /**
  * Hero'nun arkasında oturan, scroll'a bağlı gorsel vitrin. Dış wrapper
@@ -56,16 +63,16 @@ export function HeroScrollShowcase({ children }: { children: React.ReactNode }) 
                 : [start, start + FADE, end - FADE, end],
             index === 0 ? [1, 1, 0] : index === slides.length - 1 ? [0, 1, 1] : [0, 1, 1, 0],
           );
+          // Segment içi ilerleme (0-1) — scroll-scrub kare dizisi için.
+          const segmentProgress = useTransform(scrollYProgress, [start, end], [0, 1]);
 
           return (
-            <motion.div key={slide.src} style={{ opacity }} className="absolute inset-0">
-              <Image
-                src={slide.src}
-                alt={slide.label}
-                fill
-                priority={index === 0}
-                sizes="100vw"
-                className="object-cover"
+            <motion.div key={slide.label} style={{ opacity }} className="absolute inset-0">
+              <ScrollFrameSequence
+                basePath={slide.framesBasePath}
+                frameCount={slide.frameCount}
+                progress={segmentProgress}
+                className="h-full w-full"
               />
             </motion.div>
           );
@@ -111,7 +118,7 @@ export function HeroScrollShowcase({ children }: { children: React.ReactNode }) 
             );
             return (
               <motion.span
-                key={slide.src}
+                key={slide.label}
                 style={{ opacity: activeOpacity }}
                 className="h-1.5 w-6 rounded-full bg-accent"
               />
