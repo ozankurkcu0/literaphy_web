@@ -2,8 +2,7 @@ import {
   BrainCircuit,
   Globe,
   MessageCircle,
-  TerminalSquare,
-  Webhook,
+  QrCode,
 } from "lucide-react";
 import type { Service } from "@/types";
 
@@ -118,42 +117,53 @@ export const services: Service[] = [
   },
   {
     slug: "qr-menu-sistemleri",
-    category: "whatsapp-otomasyonu",
-    icon: MessageCircle,
-    name: "WhatsApp Otomasyonu",
+    category: "qr-menu",
+    icon: QrCode,
+    name: "QR Menü Sistemleri",
     shortDescription:
-      "WhatsApp Business API ile satış, destek ve sipariş süreçlerini otomatikleştirin.",
+      "Cafe ve restoranlar için temassız, anlık güncellenebilir dijital menü sistemleri.",
     heroLead:
-      "WhatsApp Business API üzerinden otomatik yanıt akışları, sipariş takibi, randevu hatırlatmaları ve müşteri destek botları kuruyoruz — müşterileriniz en çok kullandıkları kanaldan, zaman kaybetmeden yanıt alır.",
+      "Basılı menü maliyetini ortadan kaldıran, QR kod okutulduğunda uygulama indirmeden anında açılan dijital menüler kuruyoruz. Fiyat ve ürün değişikliklerini yönetim panelinden saniyeler içinde tüm şubelerinize yayabilirsiniz.",
     scope: [
-      "WhatsApp Business API kurulumu ve onay süreci yönetimi",
-      "Otomatik sipariş, randevu ve rezervasyon akışları",
-      "AI destekli müşteri destek botu geliştirme",
-      "Toplu bildirim ve kampanya mesajlaşma altyapısı",
-      "CRM ve sipariş sistemleriyle çift yönlü entegrasyon",
+      "Temassız, uygulama gerektirmeyen QR menü deneyimi",
+      "Yönetim panelinden anlık fiyat ve ürün güncelleme",
+      "Çoklu dil desteği ile otomatik menü sunumu",
+      "Marka kimliğine birebir uyumlu tasarım",
+      "Ziyaretçi analitiği ve çoklu şube yönetimi",
     ],
-    techStack: ["WhatsApp Business API", "Node.js", "Webhook", "OpenAI API", "PostgreSQL"],
+    techStack: ["Next.js", "QR Kod Üretimi", "Çoklu Dil Desteği", "Yönetim Paneli"],
     faq: [
       {
-        question: "WhatsApp Business API onayını siz mi alıyorsunuz?",
+        question: "Kurulum ne kadar sürer, ücreti var mı?",
         answer:
-          "Evet, Meta iş hesabı doğrulaması ve WhatsApp Business API başvuru sürecinin tamamını sizin adınıza yönetiyoruz.",
+          "Kurulum ücretsizdir; menünüzü birlikte tasarlayıp 24-48 saat içinde yayına alıyoruz.",
       },
       {
-        question: "Botun yanıtlayamadığı durumlarda ne oluyor?",
+        question: "Menüyü kendim güncelleyebilir miyim?",
         answer:
-          "Otomasyon akışı, botun yanıtlayamadığı veya müşterinin talep ettiği durumlarda konuşmayı sorunsuzca bir temsilciye devreder (human handoff).",
+          "Evet, size özel yönetim panelinden ürün, fiyat ve kategori güncellemelerini teknik bilgiye gerek kalmadan kendiniz yapabilirsiniz.",
       },
       {
-        question: "Mevcut sipariş/randevu sistemimizle entegre olur mu?",
+        question: "Birden fazla şubem var, tek panelden yönetebilir miyim?",
         answer:
-          "Evet, mevcut CRM, e-ticaret veya rezervasyon sisteminize API üzerinden entegre ederek WhatsApp'ı ek bir sipariş/randevu kanalına dönüştürüyoruz.",
+          "Evet, tüm şubelerinizi tek panelden yönetip fiyat güncellemelerini tek seferde tüm şubelere anında yayabilirsiniz.",
       },
     ],
-    relatedCoverTone: "emerald",
-  }
+    relatedCoverTone: "amber",
+    // Zaten kendi zengin landing page'i var (hero, özellikler, fiyatlandırma,
+    // SSS) — burada ikinci, daha sade bir /hizmetler/qr-menu-sistemleri
+    // sayfası oluşturmak yerine oraya yönlendiriyoruz.
+    href: "/qr-menu-sistemleri",
+  },
 ];
 
 export function getServiceBySlug(slug: string): Service | undefined {
   return services.find((service) => service.slug === slug);
+}
+
+/** Where a service's "İncele" / nav link should point: its own dedicated
+ * page (e.g. QR Menü Sistemleri) if it has one, otherwise the generic
+ * /hizmetler/{slug} detail page. */
+export function getServiceHref(service: Service): string {
+  return service.href ?? `/hizmetler/${service.slug}`;
 }
