@@ -39,7 +39,12 @@ export function PricingSection({ plans }: { plans: PricingPlan[] }) {
         </div>
       </div>
 
-      <RevealGroup className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+      <RevealGroup
+        className={cn(
+          "grid grid-cols-1 gap-8",
+          plans.length >= 4 ? "sm:grid-cols-2 xl:grid-cols-4" : "lg:grid-cols-3",
+        )}
+      >
         {plans.map((plan) => (
           <RevealItem key={plan.name}>
             <PricingCard plan={plan} billing={billing} />

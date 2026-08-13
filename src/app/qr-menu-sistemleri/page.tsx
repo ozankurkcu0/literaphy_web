@@ -77,7 +77,7 @@ export default function QrMenuLandingPage() {
       <HowItWorksSteps />
       <FeatureSummaryGrid />
 
-      <Section tone="base" padding="standard">
+      <Section tone="base" padding="standard" wide>
         <SectionHeading
           eyebrow="Fiyatlandırma"
           title="İşletmenize uygun paketi seçin"

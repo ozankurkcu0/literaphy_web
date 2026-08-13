@@ -87,6 +87,10 @@ export interface PricingPlan {
   name: string;
   monthlyPrice: number;
   yearlyPrice: number;
+  /** "4000+" gibi açık uçlu bir fiyatsa true — fiyatın sonuna "+" eklenir,
+   * yıllık toplam satırı da buna göre işaretlenir. Fiyatlar yine sayı
+   * kalmalı (yıllık toplam hesaplaması fiyat * 12 yapıyor). */
+  startingAt?: boolean;
   description: string;
   features: string[];
   highlighted: boolean;

@@ -32,7 +32,7 @@ export default function QrMenuPricingPage() {
         lead="İşletmenizin büyüklüğüne uygun bir paket seçin, istediğiniz zaman yükseltin."
         align="center"
       />
-      <Section tone="base" padding="standard">
+      <Section tone="base" padding="standard" wide>
         <PricingSection plans={qrMenuPricing} />
       </Section>
       <PricingComparisonTable />

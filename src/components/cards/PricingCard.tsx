@@ -64,6 +64,7 @@ export function PricingCard({ plan, billing }: PricingCardProps) {
                 className="block"
               >
                 ₺{price}
+                {plan.startingAt && "+"}
               </motion.span>
             </AnimatePresence>
           </span>
@@ -80,7 +81,8 @@ export function PricingCard({ plan, billing }: PricingCardProps) {
               transition={{ duration: 0.2, ease: EASE_STANDARD }}
               className="font-mono text-xs text-foreground-muted"
             >
-              Yıllık ₺{(plan.yearlyPrice * 12).toLocaleString("tr-TR")} olarak faturalandırılır
+              Yıllık ₺{(plan.yearlyPrice * 12).toLocaleString("tr-TR")}
+              {plan.startingAt && "+"} olarak faturalandırılır
             </motion.p>
           )}
         </AnimatePresence>
