@@ -7,6 +7,7 @@ import { EASE_PREMIUM } from "@/lib/motion";
 import { HeroScrollShowcase } from "@/components/sections/HeroScrollShowcase";
 import { MagneticWrap } from "@/components/ui/MagneticWrap";
 import { LiquidButton } from "@/components/ui/liquid-glass-button";
+import { LiquidGlassPanel } from "@/components/ui/LiquidGlassPanel";
 import { Container } from "@/components/ui/Container";
 import { cardSurfaceClass, cn } from "@/lib/utils";
 
@@ -37,52 +38,53 @@ export function Hero() {
             panel halinde üste, navbar'ın hemen altına sabitlendi — geri kalan
             ekranın büyük kısmı ürün için boş bir "sahne" olarak kalıyor.
             Özellik şeridi de artık burada değil, hero'nun hemen altında kendi
-            (video'suz) bölümünde — vitrin ekranını tek bir mesaja indirgiyor. */}
+            (video'suz) bölümünde — vitrin ekranını tek bir mesaja indirgiyor.
+            Panel artık opak bir kart değil — "liquid glass" denemesi: zemin
+            neredeyse şeffaf, video panelin arkasında camsı bir kırılmayla
+            görünüyor; okunabilirlik ince bir karartma katmanı + yazı
+            gölgesinden geliyor. */}
         <Container className="relative z-10 pt-24 sm:pt-28">
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={container}
-            className="mx-auto max-w-2xl rounded-[24px] border border-hairline bg-base/85 px-6 py-7 text-center shadow-[0_24px_60px_-24px_rgba(0,0,0,0.25)] backdrop-blur-xl sm:px-10 sm:py-8"
-          >
-            {/* Plain h1 (not animated): this is the page's LCP candidate — fading it in via
-                framer-motion would render it opacity:0 in the SSR HTML and delay the browser's
-                LCP timestamp until after hydration + animation. */}
-            <h1 className="balance text-[32px] leading-[1.08] font-bold tracking-[-0.02em] text-foreground sm:text-[42px] lg:text-[52px]">
-              İşletmenizi teknolojiyle{" "}
-              <span className="text-icon-tint">büyüten</span> yazılım ortağınız
-            </h1>
+          <LiquidGlassPanel className="mx-auto max-w-2xl rounded-[24px] px-6 py-7 text-center sm:px-10 sm:py-8">
+            <motion.div initial="hidden" animate="visible" variants={container}>
+              {/* Plain h1 (not animated): this is the page's LCP candidate — fading it in via
+                  framer-motion would render it opacity:0 in the SSR HTML and delay the browser's
+                  LCP timestamp until after hydration + animation. */}
+              <h1 className="balance text-[32px] leading-[1.08] font-bold tracking-[-0.02em] text-white [text-shadow:0_1px_16px_rgba(0,0,0,0.35)] sm:text-[42px] lg:text-[52px]">
+                İşletmenizi teknolojiyle{" "}
+                <span className="text-icon-tint">büyüten</span> yazılım ortağınız
+              </h1>
 
-            <motion.p
-              variants={item}
-              className="mx-auto mt-4 max-w-lg text-[15px] leading-relaxed text-foreground-secondary sm:text-[16px]"
-            >
-              Literaphy; web geliştirme, özel yazılım, N8N otomasyonları ve QR menü sistemleriyle operasyonunuzu hızlandırır.
-            </motion.p>
+              <motion.p
+                variants={item}
+                className="mx-auto mt-4 max-w-lg text-[15px] leading-relaxed text-white/90 [text-shadow:0_1px_10px_rgba(0,0,0,0.35)] sm:text-[16px]"
+              >
+                Literaphy; web geliştirme, özel yazılım, N8N otomasyonları ve QR menü sistemleriyle operasyonunuzu hızlandırır.
+              </motion.p>
 
-            <motion.div variants={item} className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-              <MagneticWrap>
-                <LiquidButton
-                  size="lg"
-                  onClick={() => router.push("/hizmetler")}
-                  className="group !rounded-full gap-2 bg-accent-soft text-accent shadow-[0_0_28px_-10px_var(--color-accent-glow)] hover:shadow-[0_0_36px_-8px_var(--color-accent-glow)]"
-                >
-                  Hizmetlerimizi İnceleyin
-                  <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" aria-hidden />
-                </LiquidButton>
-              </MagneticWrap>
-              <MagneticWrap>
-                <LiquidButton
-                  size="default"
-                  onClick={() => router.push("/hizmetler/ai-otomasyon")}
-                  className="group !rounded-full gap-2 text-accent-product shadow-[0_0_20px_-12px_var(--color-accent-product-glow)] hover:bg-accent-product-soft hover:shadow-[0_0_28px_-8px_var(--color-accent-product-glow)]"
-                >
-                  N8N Otomasyonlarını Keşfedin
-                  <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" aria-hidden />
-                </LiquidButton>
-              </MagneticWrap>
+              <motion.div variants={item} className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+                <MagneticWrap>
+                  <LiquidButton
+                    size="lg"
+                    onClick={() => router.push("/hizmetler")}
+                    className="group !rounded-full gap-2 bg-accent-soft text-accent shadow-[0_0_28px_-10px_var(--color-accent-glow)] hover:shadow-[0_0_36px_-8px_var(--color-accent-glow)]"
+                  >
+                    Hizmetlerimizi İnceleyin
+                    <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" aria-hidden />
+                  </LiquidButton>
+                </MagneticWrap>
+                <MagneticWrap>
+                  <LiquidButton
+                    size="default"
+                    onClick={() => router.push("/hizmetler/ai-otomasyon")}
+                    className="group !rounded-full gap-2 text-accent-product shadow-[0_0_20px_-12px_var(--color-accent-product-glow)] hover:bg-accent-product-soft hover:shadow-[0_0_28px_-8px_var(--color-accent-product-glow)]"
+                  >
+                    N8N Otomasyonlarını Keşfedin
+                    <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" aria-hidden />
+                  </LiquidButton>
+                </MagneticWrap>
+              </motion.div>
             </motion.div>
-          </motion.div>
+          </LiquidGlassPanel>
         </Container>
 
         {/* eases the hero into the feature strip instead of a hard cut */}
