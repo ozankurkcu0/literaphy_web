@@ -56,8 +56,15 @@ const sizeClass: Record<Size, string> = {
   lg: "h-13 px-7 text-[16px] rounded-full",
 };
 
+// `isolate` is load-bearing: FillLayers paints its gradient at -z-10, which only
+// stays contained inside the button if the button itself owns a stacking context.
+// Without it, that context came from whatever ambient `transform` happened to be
+// on an ancestor (e.g. a Reveal animation mid-flight) — present while animating,
+// gone once it settles to `transform: none`, at which point the gradient escaped
+// behind the page background and left bare white-on-white text. `isolate` makes
+// the button own its context unconditionally, independent of animation state.
 const baseClass =
-  "relative inline-flex items-center justify-center gap-2 font-semibold whitespace-nowrap transition-[transform,background-color,border-color,box-shadow,opacity] duration-200 ease-standard cursor-pointer select-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:pointer-events-none disabled:opacity-40 group overflow-hidden";
+  "relative isolate inline-flex items-center justify-center gap-2 font-semibold whitespace-nowrap transition-[transform,background-color,border-color,box-shadow,opacity] duration-200 ease-standard cursor-pointer select-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:pointer-events-none disabled:opacity-40 group overflow-hidden";
 
 function FillLayers({ variant, tone }: { variant: Variant; tone: Tone }) {
   if (!isFilled(variant)) return null;
