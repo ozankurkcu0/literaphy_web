@@ -4,7 +4,7 @@ import { motion } from "motion/react";
 import { ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { EASE_PREMIUM } from "@/lib/motion";
-import { LiquidMetalBackground } from "@/components/ui/LiquidMetalBackground";
+import { HeroScrollShowcase } from "@/components/sections/HeroScrollShowcase";
 import { MagneticWrap } from "@/components/ui/MagneticWrap";
 import { LiquidButton } from "@/components/ui/liquid-glass-button";
 import { Container } from "@/components/ui/Container";
@@ -30,34 +30,8 @@ export function Hero() {
   const router = useRouter();
 
   return (
-    <section className="relative flex min-h-[88vh] items-center overflow-hidden bg-deep pt-28 pb-24 lg:pt-20">
-      {/* liquid metal shader sits first so it paints as the base layer */}
-      <LiquidMetalBackground />
-
-      {/* engineered-canvas grid, fading toward the edges — overlays the shader, not the other way round */}
-      <div
-        className="absolute inset-0"
-        style={{
-          backgroundImage:
-            "linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,0,0,0.05) 1px, transparent 1px)",
-          backgroundSize: "64px 64px",
-          maskImage: "radial-gradient(ellipse 60% 55% at 50% 40%, black 10%, transparent 75%)",
-          WebkitMaskImage: "radial-gradient(ellipse 60% 55% at 50% 40%, black 10%, transparent 75%)",
-        }}
-        aria-hidden
-      />
-
-      {/* readability scrim — guarantees text contrast no matter what the shader is doing underneath */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(ellipse 70% 65% at 50% 45%, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.3) 55%, rgba(255,255,255,0.08) 100%)",
-        }}
-        aria-hidden
-      />
-
-      <Container className="relative">
+    <HeroScrollShowcase>
+      <Container className="relative z-10">
         <motion.div
           initial="hidden"
           animate="visible"
@@ -131,23 +105,6 @@ export function Hero() {
         style={{ background: "linear-gradient(to bottom, transparent, var(--color-base))" }}
         aria-hidden
       />
-
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.3, duration: 0.6 }}
-        className="absolute bottom-8 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 sm:flex"
-        aria-hidden
-      >
-        <span className="font-mono text-[11px] tracking-[0.14em] text-foreground-muted uppercase">Kaydırın</span>
-        <motion.div
-          animate={{ y: [0, 6, 0] }}
-          transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-          className="flex h-8 w-5 items-start justify-center rounded-full border border-hairline p-1"
-        >
-          <span className="size-1 rounded-full bg-accent" />
-        </motion.div>
-      </motion.div>
-    </section>
+    </HeroScrollShowcase>
   );
 }
