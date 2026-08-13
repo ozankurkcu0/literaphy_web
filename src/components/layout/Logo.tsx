@@ -6,7 +6,7 @@ export function Logo({ className }: { className?: string }) {
     <Link
       href="/"
       className={cn(
-        "font-mono text-lg font-semibold tracking-tight text-foreground transition-opacity hover:opacity-80",
+        "font-mono text-xl font-semibold tracking-tight text-foreground transition-opacity hover:opacity-80",
         className,
       )}
       aria-label="Literaphy anasayfa"
