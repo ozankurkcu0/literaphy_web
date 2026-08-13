@@ -11,6 +11,8 @@ export const blogPosts: BlogPost[] = [
     authorRole: "Yazılım & AI Danışmanlığı",
     publishedAt: "2026-06-02",
     coverTone: "cyan",
+    image: "/blog/isletmeler-icin-ai-otomasyonu-nereden-baslanir.jpg",
+    imageWide: "/blog/isletmeler-icin-ai-otomasyonu-nereden-baslanir-wide.jpg",
     relatedHref: { label: "N8N Otomasyonları hizmetimizi inceleyin", href: "/hizmetler/ai-otomasyon" },
     content: [
       "Yapay zeka otomasyonuna geçmek isteyen işletmelerin en sık yaptığı hata, en 'gösterişli' süreci değil, en fazla zaman kaybettiren süreci hedeflemek yerine tam tersini yapmaktır. Doğru başlangıç noktası her zaman ölçülebilir ve tekrarlayan bir iş yüküdür.",
@@ -30,6 +32,8 @@ export const blogPosts: BlogPost[] = [
     authorRole: "Entegrasyon Mühendisliği",
     publishedAt: "2026-05-18",
     coverTone: "emerald",
+    image: "/blog/whatsapp-business-api-nedir-nasil-kurulur.jpg",
+    imageWide: "/blog/whatsapp-business-api-nedir-nasil-kurulur-wide.jpg",
     relatedHref: { label: "Hizmetlerimizi inceleyin", href: "/hizmetler" },
     content: [
       "WhatsApp Business API, standart WhatsApp Business uygulamasından farklı olarak, otomasyon, çoklu kullanıcı erişimi ve sistem entegrasyonuna izin veren kurumsal bir altyapıdır. Tek bir telefon yerine, birden fazla temsilcinin ve otomasyon akışının aynı hattı yönetmesine olanak tanır.",
@@ -49,6 +53,8 @@ export const blogPosts: BlogPost[] = [
     authorRole: "Ürün Ekibi",
     publishedAt: "2026-04-27",
     coverTone: "amber",
+    image: "/blog/restoranlar-icin-dijital-menu-donusumu.jpg",
+    imageWide: "/blog/restoranlar-icin-dijital-menu-donusumu-wide.jpg",
     relatedHref: { label: "QR Menü Sistemleri sayfamızı inceleyin", href: "/qr-menu-sistemleri" },
     content: [
       "Basılı menüden dijital menüye geçiş, çoğu işletme sahibinin düşündüğünden daha fazla stratejik karar barındırır. En sık yapılan hata, dijital menüyü sadece 'PDF'i QR koduna bağlamak' olarak görmektir — oysa doğru kurgulandığında dijital menü, satışları doğrudan etkileyen bir araca dönüşür.",
@@ -68,6 +74,8 @@ export const blogPosts: BlogPost[] = [
     authorRole: "Yazılım Danışmanlığı",
     publishedAt: "2026-03-14",
     coverTone: "violet",
+    image: "/blog/kobiler-icin-ozel-yazilim-mi-hazir-yazilim-mi.jpg",
+    imageWide: "/blog/kobiler-icin-ozel-yazilim-mi-hazir-yazilim-mi-wide.jpg",
     relatedHref: { label: "Hizmetlerimizi inceleyin", href: "/hizmetler" },
     content: [
       "Hazır yazılımlar hızlı başlangıç sağlar ama iş sürecinizi yazılıma uydurmanızı gerektirir. Özel yazılım ise geliştirme süresi ister ama yazılımı tamamen sürecinize uydurur. Doğru karar, işletmenizin büyüklüğüne değil, sürecinizin standart olup olmadığına bağlıdır.",
@@ -87,6 +95,8 @@ export const blogPosts: BlogPost[] = [
     authorRole: "Entegrasyon Mühendisliği",
     publishedAt: "2026-02-09",
     coverTone: "rose",
+    image: "/blog/api-entegrasyonu-ile-manuel-veri-girisini-bitirmek.jpg",
+    imageWide: "/blog/api-entegrasyonu-ile-manuel-veri-girisini-bitirmek-wide.jpg",
     relatedHref: { label: "Hizmetlerimizi inceleyin", href: "/hizmetler" },
     content: [
       "Bir işletme büyüdükçe kullandığı yazılım sayısı da artar: e-ticaret paneli, muhasebe programı, kargo sistemi, CRM... Bu sistemler birbirleriyle konuşmadığında, aradaki boşluğu genellikle bir çalışan elle doldurur. Bu, görünmeyen ama gerçek bir maliyettir.",
@@ -106,6 +116,8 @@ export const blogPosts: BlogPost[] = [
     authorRole: "Dijital Strateji",
     publishedAt: "2026-01-21",
     coverTone: "indigo",
+    image: "/blog/kurumsal-web-sitesi-neden-hala-en-onemli-yatirim.jpg",
+    imageWide: "/blog/kurumsal-web-sitesi-neden-hala-en-onemli-yatirim-wide.jpg",
     relatedHref: { label: "Web Geliştirme hizmetimizi inceleyin", href: "/hizmetler/web-gelistirme" },
     content: [
       "Sosyal medya hesapları güçlü bir erişim kanalıdır ama sizin sahibi olmadığınız bir platform üzerine kuruludur. Algoritma değişikliği, hesap askıya alma veya platformun kendisinin önem kaybetmesi, o kanaldaki tüm görünürlüğünüzü bir gecede etkileyebilir.",
