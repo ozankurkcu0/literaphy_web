@@ -8,8 +8,7 @@ import { HowItWorksSteps } from "@/components/sections/HowItWorksSteps";
 import { FeatureSummaryGrid } from "@/components/sections/FeatureSummaryGrid";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { RevealGroup, RevealItem } from "@/components/ui/Reveal";
-import { PricingCard } from "@/components/cards/PricingCard";
+import { PricingSection } from "@/components/features/PricingSection";
 import { TestimonialSlider } from "@/components/sections/TestimonialSlider";
 import { MiniFAQ } from "@/components/sections/MiniFAQ";
 import { CTABand } from "@/components/sections/CTABand";
@@ -90,13 +89,7 @@ export default function QrMenuLandingPage() {
           }
           className="mb-14"
         />
-        <RevealGroup className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-          {qrMenuPricing.map((plan) => (
-            <RevealItem key={plan.name}>
-              <PricingCard plan={plan} billing="monthly" />
-            </RevealItem>
-          ))}
-        </RevealGroup>
+        <PricingSection plans={qrMenuPricing} />
       </Section>
 
       {testimonials.length > 0 && (
