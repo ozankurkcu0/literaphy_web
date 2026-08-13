@@ -11,7 +11,7 @@ export const blogPosts: BlogPost[] = [
     authorRole: "Yazılım & AI Danışmanlığı",
     publishedAt: "2026-06-02",
     coverTone: "cyan",
-    relatedHref: { label: "AI Otomasyonları hizmetimizi inceleyin", href: "/hizmetler/ai-otomasyon" },
+    relatedHref: { label: "N8N Otomasyonları hizmetimizi inceleyin", href: "/hizmetler/ai-otomasyon" },
     content: [
       "Yapay zeka otomasyonuna geçmek isteyen işletmelerin en sık yaptığı hata, en 'gösterişli' süreci değil, en fazla zaman kaybettiren süreci hedeflemek yerine tam tersini yapmaktır. Doğru başlangıç noktası her zaman ölçülebilir ve tekrarlayan bir iş yüküdür.",
       "İlk adım, ekibinizin haftalık olarak en çok zaman harcadığı 3-5 tekrarlayan görevi listelemektir: fatura kontrolü, e-posta sınıflandırma, rapor hazırlama gibi. Bu görevlerden kural tabanlı ve yüksek hacimli olanlar, AI otomasyonu için en uygun adaylardır.",
@@ -30,7 +30,7 @@ export const blogPosts: BlogPost[] = [
     authorRole: "Entegrasyon Mühendisliği",
     publishedAt: "2026-05-18",
     coverTone: "emerald",
-    relatedHref: { label: "WhatsApp Otomasyonu hizmetimizi inceleyin", href: "/hizmetler/whatsapp-otomasyonu" },
+    relatedHref: { label: "Hizmetlerimizi inceleyin", href: "/hizmetler" },
     content: [
       "WhatsApp Business API, standart WhatsApp Business uygulamasından farklı olarak, otomasyon, çoklu kullanıcı erişimi ve sistem entegrasyonuna izin veren kurumsal bir altyapıdır. Tek bir telefon yerine, birden fazla temsilcinin ve otomasyon akışının aynı hattı yönetmesine olanak tanır.",
       "Kurulum süreci Meta iş hesabı doğrulaması ile başlar; işletme belgeleriniz ve marka bilgileriniz Meta tarafından incelenir. Bu süreç genellikle birkaç iş günü sürer ve doğru şekilde hazırlanmadığında gecikebilir.",

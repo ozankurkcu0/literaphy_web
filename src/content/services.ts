@@ -1,9 +1,4 @@
-import {
-  BrainCircuit,
-  Globe,
-  MessageCircle,
-  QrCode,
-} from "lucide-react";
+import { BrainCircuit, Globe, QrCode } from "lucide-react";
 import type { Service } from "@/types";
 
 export const services: Service[] = [
@@ -47,7 +42,7 @@ export const services: Service[] = [
     slug: "ai-otomasyon",
     category: "ai-otomasyon",
     icon: BrainCircuit,
-    name: "AI Otomasyonları",
+    name: "N8N Otomasyonları",
     shortDescription:
       "Yapay zeka ile tekrar eden iş süreçlerinizi otomatikleştiriyoruz.",
     heroLead:
@@ -78,42 +73,6 @@ export const services: Service[] = [
       },
     ],
     relatedCoverTone: "cyan",
-  },
-  {
-    slug: "whatsapp-otomasyonu",
-    category: "whatsapp-otomasyonu",
-    icon: MessageCircle,
-    name: "WhatsApp Otomasyonu",
-    shortDescription:
-      "WhatsApp Business API ile satış, destek ve sipariş süreçlerini otomatikleştirin.",
-    heroLead:
-      "WhatsApp Business API üzerinden otomatik yanıt akışları, sipariş takibi, randevu hatırlatmaları ve müşteri destek botları kuruyoruz — müşterileriniz en çok kullandıkları kanaldan, zaman kaybetmeden yanıt alır.",
-    scope: [
-      "WhatsApp Business API kurulumu ve onay süreci yönetimi",
-      "Otomatik sipariş, randevu ve rezervasyon akışları",
-      "AI destekli müşteri destek botu geliştirme",
-      "Toplu bildirim ve kampanya mesajlaşma altyapısı",
-      "CRM ve sipariş sistemleriyle çift yönlü entegrasyon",
-    ],
-    techStack: ["WhatsApp Business API", "Node.js", "Webhook", "OpenAI API", "PostgreSQL"],
-    faq: [
-      {
-        question: "WhatsApp Business API onayını siz mi alıyorsunuz?",
-        answer:
-          "Evet, Meta iş hesabı doğrulaması ve WhatsApp Business API başvuru sürecinin tamamını sizin adınıza yönetiyoruz.",
-      },
-      {
-        question: "Botun yanıtlayamadığı durumlarda ne oluyor?",
-        answer:
-          "Otomasyon akışı, botun yanıtlayamadığı veya müşterinin talep ettiği durumlarda konuşmayı sorunsuzca bir temsilciye devreder (human handoff).",
-      },
-      {
-        question: "Mevcut sipariş/randevu sistemimizle entegre olur mu?",
-        answer:
-          "Evet, mevcut CRM, e-ticaret veya rezervasyon sisteminize API üzerinden entegre ederek WhatsApp'ı ek bir sipariş/randevu kanalına dönüştürüyoruz.",
-      },
-    ],
-    relatedCoverTone: "emerald",
   },
   {
     slug: "qr-menu-sistemleri",
