@@ -64,8 +64,8 @@ export const qrMenuFeatures = [
 export const qrMenuPricing: PricingPlan[] = [
   {
     name: "Başlangıç",
-    monthlyPrice: 349,
-    yearlyPrice: 279,
+    monthlyPrice: 600,
+    yearlyPrice: 480,
     description: "Tek şube, temel dijital menü ihtiyacı olan işletmeler için.",
     features: [
       "1 şube / 1 QR menü",
@@ -79,8 +79,8 @@ export const qrMenuPricing: PricingPlan[] = [
   },
   {
     name: "Standart",
-    monthlyPrice: 649,
-    yearlyPrice: 519,
+    monthlyPrice: 1000,
+    yearlyPrice: 800,
     description: "Büyüyen cafe ve restoranlar için en çok tercih edilen paket.",
     features: [
       "3 şubeye kadar",
@@ -95,8 +95,8 @@ export const qrMenuPricing: PricingPlan[] = [
   },
   {
     name: "Premium",
-    monthlyPrice: 1190,
-    yearlyPrice: 950,
+    monthlyPrice: 1500,
+    yearlyPrice: 1200,
     description: "Çoklu şube zincirleri ve özel entegrasyon ihtiyacı olan işletmeler için.",
     features: [
       "Sınırsız şube",

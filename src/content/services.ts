@@ -2,8 +2,7 @@ import {
   BrainCircuit,
   Globe,
   MessageCircle,
-  TerminalSquare,
-  Webhook,
+  QrCode,
 } from "lucide-react";
 import type { Service } from "@/types";
 
@@ -43,42 +42,6 @@ export const services: Service[] = [
       },
     ],
     relatedCoverTone: "indigo",
-  },
-  {
-    slug: "yazilim-gelistirme",
-    category: "yazilim-gelistirme",
-    icon: TerminalSquare,
-    name: "Yazılım Geliştirme",
-    shortDescription:
-      "İş süreçlerinize özel, ölçeklenebilir web uygulamaları ve iç sistemler.",
-    heroLead:
-      "Hazır yazılımların karşılayamadığı ihtiyaçlar için sıfırdan özel yazılım geliştiriyoruz: iç operasyon panelleri, SaaS ürünleri, mobil uyumlu web uygulamaları ve mevcut sistemlerinizle konuşan entegre çözümler.",
-    scope: [
-      "Özel iş uygulamaları ve operasyon panelleri geliştirme",
-      "SaaS ürün geliştirme (MVP'den ölçeklenebilir mimariye)",
-      "Veritabanı tasarımı ve backend mimarisi kurulumu",
-      "Mevcut sistemlerle entegrasyon ve veri göçü (migration)",
-      "Kod kalitesi, test ve CI/CD süreçlerinin kurulması",
-    ],
-    techStack: ["TypeScript", "Node.js", "PostgreSQL", "React", "Docker", "AWS"],
-    faq: [
-      {
-        question: "Fikir aşamasında bir MVP geliştirebilir misiniz?",
-        answer:
-          "Evet, erken aşama girişimler için önce en kritik özellikleri barındıran bir MVP geliştirip pazara hızlı çıkmanızı sağlıyoruz, ardından ölçeklenebilir mimariye taşıyoruz.",
-      },
-      {
-        question: "Çalışma modeliniz sabit fiyat mı, saatlik mi?",
-        answer:
-          "Kapsamı net projelerde sabit fiyat, gelişen/değişken kapsamlı projelerde ise zaman & malzeme (time & material) modeliyle çalışıyoruz. Hangi modelin uygun olduğuna keşif görüşmesinde karar veriyoruz.",
-      },
-      {
-        question: "Geliştirdiğiniz yazılımın kaynak kodu bize mi ait oluyor?",
-        answer:
-          "Evet, proje tesliminde tüm kaynak kodu ve dokümantasyon eksiksiz şekilde size teslim edilir; kod üzerinde tam mülkiyet hakkına sahip olursunuz.",
-      },
-    ],
-    relatedCoverTone: "violet",
   },
   {
     slug: "ai-otomasyon",
@@ -153,43 +116,54 @@ export const services: Service[] = [
     relatedCoverTone: "emerald",
   },
   {
-    slug: "api-entegrasyonlari",
-    category: "api-entegrasyonu",
-    icon: Webhook,
-    name: "API Entegrasyonları",
+    slug: "qr-menu-sistemleri",
+    category: "qr-menu",
+    icon: QrCode,
+    name: "QR Menü Sistemleri",
     shortDescription:
-      "Kullandığınız araçları birbirine bağlayarak veri akışını otomatikleştiriyoruz.",
+      "Cafe ve restoranlar için temassız, anlık güncellenebilir dijital menü sistemleri.",
     heroLead:
-      "Muhasebe, CRM, e-ticaret, kargo ve ödeme sistemleriniz arasında güvenli, hataya dayanıklı veri akışları kuruyoruz — manuel veri girişini ortadan kaldırıp sistemlerinizin birbiriyle gerçek zamanlı konuşmasını sağlıyoruz.",
+      "Basılı menü maliyetini ortadan kaldıran, QR kod okutulduğunda uygulama indirmeden anında açılan dijital menüler kuruyoruz. Fiyat ve ürün değişikliklerini yönetim panelinden saniyeler içinde tüm şubelerinize yayabilirsiniz.",
     scope: [
-      "Üçüncü parti API entegrasyonları (ödeme, kargo, muhasebe, CRM)",
-      "Özel REST/webhook API tasarımı ve geliştirmesi",
-      "Sistemler arası veri senkronizasyonu ve otomasyon",
-      "Legacy sistemlerin modern API katmanıyla modernizasyonu",
-      "API güvenliği, hız sınırlama ve izleme altyapısı",
+      "Temassız, uygulama gerektirmeyen QR menü deneyimi",
+      "Yönetim panelinden anlık fiyat ve ürün güncelleme",
+      "Çoklu dil desteği ile otomatik menü sunumu",
+      "Marka kimliğine birebir uyumlu tasarım",
+      "Ziyaretçi analitiği ve çoklu şube yönetimi",
     ],
-    techStack: ["REST API", "GraphQL", "Node.js", "Webhook", "PostgreSQL", "Redis"],
+    techStack: ["Next.js", "QR Kod Üretimi", "Çoklu Dil Desteği", "Yönetim Paneli"],
     faq: [
       {
-        question: "Hangi platformlarla entegrasyon yapabiliyorsunuz?",
+        question: "Kurulum ne kadar sürer, ücreti var mı?",
         answer:
-          "Yaygın kullanılan CRM (HubSpot, Salesforce), muhasebe (Logo, Paraşüt), e-ticaret (Shopify, Ticimax), kargo ve ödeme sağlayıcılarının yanı sıra özel/legacy sistemlerle de entegrasyon geliştirebiliyoruz.",
+          "Kurulum ücretsizdir; menünüzü birlikte tasarlayıp 24-48 saat içinde yayına alıyoruz.",
       },
       {
-        question: "API'si olmayan eski bir sistemimiz varsa ne yapılabilir?",
+        question: "Menüyü kendim güncelleyebilir miyim?",
         answer:
-          "Bu tür sistemler için mevcut veritabanı veya dosya çıktıları üzerinden bir köprü (middleware) API katmanı geliştirip modern sistemlerinize bağlayabiliyoruz.",
+          "Evet, size özel yönetim panelinden ürün, fiyat ve kategori güncellemelerini teknik bilgiye gerek kalmadan kendiniz yapabilirsiniz.",
       },
       {
-        question: "Entegrasyon sonrası veri hatalarını nasıl önlüyorsunuz?",
+        question: "Birden fazla şubem var, tek panelden yönetebilir miyim?",
         answer:
-          "Tüm entegrasyonlarda hata yakalama, yeniden deneme (retry) mekanizmaları ve izleme/alarm altyapısı kuruyoruz; herhangi bir senkronizasyon sorununda ekibiniz anında haberdar olur.",
+          "Evet, tüm şubelerinizi tek panelden yönetip fiyat güncellemelerini tek seferde tüm şubelere anında yayabilirsiniz.",
       },
     ],
-    relatedCoverTone: "rose",
+    relatedCoverTone: "amber",
+    // Zaten kendi zengin landing page'i var (hero, özellikler, fiyatlandırma,
+    // SSS) — burada ikinci, daha sade bir /hizmetler/qr-menu-sistemleri
+    // sayfası oluşturmak yerine oraya yönlendiriyoruz.
+    href: "/qr-menu-sistemleri",
   },
 ];
 
 export function getServiceBySlug(slug: string): Service | undefined {
   return services.find((service) => service.slug === slug);
+}
+
+/** Where a service's "İncele" / nav link should point: its own dedicated
+ * page (e.g. QR Menü Sistemleri) if it has one, otherwise the generic
+ * /hizmetler/{slug} detail page. */
+export function getServiceHref(service: Service): string {
+  return service.href ?? `/hizmetler/${service.slug}`;
 }

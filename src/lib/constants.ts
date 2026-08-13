@@ -1,3 +1,5 @@
+import { services, getServiceHref } from "@/content/services";
+
 export const SITE_NAME = "OBSoft";
 export const SITE_LEGAL_NAME = "OBSoft Yazılım Teknolojileri";
 export const SITE_TAGLINE = "Yazılım, otomasyon ve dijital altyapı ortağınız";
@@ -35,14 +37,12 @@ export const NAV_LINKS = [
 ];
 
 export const FOOTER_LINKS = {
-  hizmetler: [
-    { label: "Web Geliştirme", href: "/hizmetler/web-gelistirme" },
-    { label: "Yazılım Geliştirme", href: "/hizmetler/yazilim-gelistirme" },
-    { label: "AI Otomasyonları", href: "/hizmetler/ai-otomasyon" },
-    { label: "WhatsApp Otomasyonu", href: "/hizmetler/whatsapp-otomasyonu" },
-    { label: "API Entegrasyonları", href: "/hizmetler/api-entegrasyonlari" },
-    { label: "QR Menü Sistemleri", href: "/qr-menu-sistemleri" },
-  ],
+  // src/content/services.ts'den türetilir — elle kopyalanmış bir liste değil,
+  // bir hizmet eklenip/silindiğinde burası otomatik güncel kalır.
+  hizmetler: services.map((service) => ({
+    label: service.name,
+    href: getServiceHref(service),
+  })),
   kurumsal: [
     { label: "Hakkımızda", href: "/hakkimizda" },
     { label: "Projeler", href: "/projeler" },

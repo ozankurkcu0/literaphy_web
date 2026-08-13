@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getServiceBySlug, services } from "@/content/services";
 import { getRelatedProjects } from "@/content/projects";
 import { buildMetadata, breadcrumbJsonLd, serviceJsonLd, faqJsonLd, JsonLd } from "@/lib/seo";
@@ -15,7 +15,10 @@ import { CoverArt } from "@/components/ui/CoverArt";
 import { AutomationFlowVisual } from "@/components/features/AutomationFlowVisual";
 
 export function generateStaticParams() {
-  return services.map((service) => ({ slug: service.slug }));
+  // Kendi harici sayfası olan hizmetler (href set edilmiş, örn. QR Menü
+  // Sistemleri) burada statik olarak üretilmez — o slug'a bu jenerik
+  // şablonla değil, kendi zengin sayfasıyla karşılık verilir.
+  return services.filter((service) => !service.href).map((service) => ({ slug: service.slug }));
 }
 
 type PageParams = { params: Promise<{ slug: string }> };
@@ -37,6 +40,9 @@ export default async function ServiceDetailPage({ params }: PageParams) {
   const { slug } = await params;
   const service = getServiceBySlug(slug);
   if (!service) notFound();
+  // Kendi harici sayfası olan bir hizmete biri doğrudan bu URL'den gelirse
+  // (örn. eski bir link), jenerik şablonu render etmek yerine oraya yönlendir.
+  if (service.href) redirect(service.href);
 
   const relatedProjects = getRelatedProjects(service.slug, service.category);
 

@@ -19,6 +19,16 @@ export interface Service {
   techStack: string[];
   faq: { question: string; answer: string }[];
   relatedCoverTone: CoverTone;
+  /**
+   * Set when this service already has its own dedicated landing page
+   * elsewhere on the site (e.g. a product line like QR Menü Sistemleri
+   * living at /qr-menu-sistemleri). When present, every place that would
+   * normally link to /hizmetler/{slug} links here instead, and the generic
+   * /hizmetler/[slug] detail page is skipped entirely for this service
+   * (excluded from static generation, redirects here if visited directly)
+   * so the two pages never compete with duplicate content.
+   */
+  href?: string;
 }
 
 export type CoverTone = "indigo" | "violet" | "cyan" | "amber" | "emerald" | "rose";

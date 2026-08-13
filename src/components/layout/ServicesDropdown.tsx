@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import { Wrench } from "lucide-react";
-import { services } from "@/content/services";
+import { services, getServiceHref } from "@/content/services";
 import { DockIcon, DockItem } from "@/components/ui/dock";
 import { cn } from "@/lib/utils";
 
@@ -74,7 +74,7 @@ export function ServicesDropdown() {
                 return (
                   <Link
                     key={service.slug}
-                    href={`/hizmetler/${service.slug}`}
+                    href={getServiceHref(service)}
                     className="flex items-start gap-3 rounded-md p-3 transition-colors duration-150 hover:bg-surface-hover"
                   >
                     <div className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-md bg-accent-soft text-accent">

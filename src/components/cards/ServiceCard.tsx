@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
-import { getServiceBySlug } from "@/content/services";
+import { getServiceBySlug, getServiceHref } from "@/content/services";
 import { Badge } from "@/components/ui/Badge";
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -65,7 +65,7 @@ export function ServiceCard({ slug, detailed = false }: ServiceCardProps) {
 
       <CardFooter className="p-3 pt-0">
         <Link
-          href={`/hizmetler/${service.slug}`}
+          href={getServiceHref(service)}
           className="flex items-center gap-1.5 text-sm font-semibold text-accent transition-colors duration-150 hover:text-accent-hover"
         >
           İncele

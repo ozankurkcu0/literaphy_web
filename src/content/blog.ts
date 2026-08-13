@@ -68,7 +68,7 @@ export const blogPosts: BlogPost[] = [
     authorRole: "Yazılım Danışmanlığı",
     publishedAt: "2026-03-14",
     coverTone: "violet",
-    relatedHref: { label: "Yazılım Geliştirme hizmetimizi inceleyin", href: "/hizmetler/yazilim-gelistirme" },
+    relatedHref: { label: "Hizmetlerimizi inceleyin", href: "/hizmetler" },
     content: [
       "Hazır yazılımlar hızlı başlangıç sağlar ama iş sürecinizi yazılıma uydurmanızı gerektirir. Özel yazılım ise geliştirme süresi ister ama yazılımı tamamen sürecinize uydurur. Doğru karar, işletmenizin büyüklüğüne değil, sürecinizin standart olup olmadığına bağlıdır.",
       "Eğer süreciniz sektörünüzdeki diğer işletmelerle büyük ölçüde aynıysa (ör. genel muhasebe, temel stok takibi), hazır bir yazılım büyük olasılıkla daha hızlı ve ekonomik bir çözümdür.",
@@ -87,7 +87,7 @@ export const blogPosts: BlogPost[] = [
     authorRole: "Entegrasyon Mühendisliği",
     publishedAt: "2026-02-09",
     coverTone: "rose",
-    relatedHref: { label: "API Entegrasyonları hizmetimizi inceleyin", href: "/hizmetler/api-entegrasyonlari" },
+    relatedHref: { label: "Hizmetlerimizi inceleyin", href: "/hizmetler" },
     content: [
       "Bir işletme büyüdükçe kullandığı yazılım sayısı da artar: e-ticaret paneli, muhasebe programı, kargo sistemi, CRM... Bu sistemler birbirleriyle konuşmadığında, aradaki boşluğu genellikle bir çalışan elle doldurur. Bu, görünmeyen ama gerçek bir maliyettir.",
       "Manuel veri girişinin asıl riski zaman kaybı değil, tutarsızlıktır: bir sistemde güncellenen bir bilgi diğerine yansımadığında stok hataları, yanlış faturalama veya kayıp siparişler ortaya çıkar.",
