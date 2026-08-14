@@ -69,6 +69,7 @@ export const projects: Project[] = [
     coverTone: "rose",
     image: "/projects/orkide-market-entegrasyon.jpg",
     imageWide: "/projects/orkide-market-entegrasyon-wide.jpg",
+    liveUrl: "https://ozsu-bakim.vercel.app/",
     featured: false,
   },
   {
