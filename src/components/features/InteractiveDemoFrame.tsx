@@ -26,9 +26,11 @@ const steps = [
 
 const menuItems = [
   { name: "Filtre Kahve", price: "₺95" },
+  { name: "Iced Latte", price: "₺140" },
   { name: "Flat White", price: "₺120" },
   { name: "Cheesecake", price: "₺140" },
   { name: "Avokado Tost", price: "₺160" },
+
 ];
 
 export function InteractiveDemoFrame() {
@@ -101,8 +103,8 @@ export function InteractiveDemoFrame() {
                 transition={{ duration: 0.3 }}
                 className="flex h-full flex-col gap-3 bg-base p-5"
               >
-                <p className="mb-1 font-mono text-xs tracking-[0.1em] text-accent-product uppercase">Kahve Durağı</p>
-                <p className="mb-3 text-lg font-semibold text-foreground">Menü</p>
+                <p className="mb-1 font-mono text-xs tracking-[0.1em] text-accent-product uppercase">Coffee Shop</p>
+                <p className="mb-3 text-lg font-semibold text-foreground">Menu</p>
                 {menuItems.map((item, i) => (
                   <motion.div
                     key={item.name}

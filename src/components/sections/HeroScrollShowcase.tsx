@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useScroll, useTransform } from "motion/react";
+import { motion, useScroll, useTransform, type MotionValue } from "motion/react";
 import { ScrollFrameSequence } from "@/components/sections/ScrollFrameSequence";
 
 // Üç ayrı Google Flow videosu, ezgif ile kareye bölünüp scroll-scrub
@@ -52,32 +52,9 @@ export function HeroScrollShowcase({ children }: { children: React.ReactNode }) 
     <div ref={wrapperRef} className="relative h-[300vh]">
       <section className="sticky top-0 flex h-screen overflow-hidden bg-deep">
         {/* görsel katmanları */}
-        {slides.map((slide, index) => {
-          const start = index * SEGMENT;
-          const end = start + SEGMENT;
-          const opacity = useTransform(
-            scrollYProgress,
-            index === 0
-              ? [start, end - FADE, end]
-              : index === slides.length - 1
-                ? [start, start + FADE, end]
-                : [start, start + FADE, end - FADE, end],
-            index === 0 ? [1, 1, 0] : index === slides.length - 1 ? [0, 1, 1] : [0, 1, 1, 0],
-          );
-          // Segment içi ilerleme (0-1) — scroll-scrub kare dizisi için.
-          const segmentProgress = useTransform(scrollYProgress, [start, end], [0, 1]);
-
-          return (
-            <motion.div key={slide.label} style={{ opacity }} className="absolute inset-0">
-              <ScrollFrameSequence
-                basePath={slide.framesBasePath}
-                frameCount={slide.frameCount}
-                progress={segmentProgress}
-                className="h-full w-full"
-              />
-            </motion.div>
-          );
-        })}
+        {slides.map((slide, index) => (
+          <SlideLayer key={slide.label} slide={slide} index={index} scrollYProgress={scrollYProgress} />
+        ))}
 
         {/* engineered-canvas grid, görsellerin üstünde */}
         <div
@@ -106,22 +83,9 @@ export function HeroScrollShowcase({ children }: { children: React.ReactNode }) 
 
         {/* aktif segmenti gösteren küçük nokta göstergesi */}
         <div className="absolute bottom-24 left-1/2 z-10 hidden -translate-x-1/2 items-center gap-2 sm:flex">
-          {slides.map((slide, index) => {
-            const start = index * SEGMENT;
-            const end = start + SEGMENT;
-            const activeOpacity = useTransform(
-              scrollYProgress,
-              [start, start + FADE, end - FADE, end],
-              [0.3, 1, 1, 0.3],
-            );
-            return (
-              <motion.span
-                key={slide.label}
-                style={{ opacity: activeOpacity }}
-                className="h-1.5 w-6 rounded-full bg-accent"
-              />
-            );
-          })}
+          {slides.map((slide, index) => (
+            <SegmentDot key={slide.label} index={index} scrollYProgress={scrollYProgress} />
+          ))}
         </div>
 
         <motion.div
@@ -143,4 +107,50 @@ export function HeroScrollShowcase({ children }: { children: React.ReactNode }) 
       </section>
     </div>
   );
+}
+
+// `useTransform` bir .map() callback'i içinden değil, kendi component'inin
+// gövdesinden çağrılmalı (react-hooks/rules-of-hooks) — bu yüzden her
+// görsel katman ve her nokta gösterge kendi bileşenine ayrıldı.
+function SlideLayer({
+  slide,
+  index,
+  scrollYProgress,
+}: {
+  slide: (typeof slides)[number];
+  index: number;
+  scrollYProgress: MotionValue<number>;
+}) {
+  const start = index * SEGMENT;
+  const end = start + SEGMENT;
+  const opacity = useTransform(
+    scrollYProgress,
+    index === 0
+      ? [start, end - FADE, end]
+      : index === slides.length - 1
+        ? [start, start + FADE, end]
+        : [start, start + FADE, end - FADE, end],
+    index === 0 ? [1, 1, 0] : index === slides.length - 1 ? [0, 1, 1] : [0, 1, 1, 0],
+  );
+  // Segment içi ilerleme (0-1) — scroll-scrub kare dizisi için.
+  const segmentProgress = useTransform(scrollYProgress, [start, end], [0, 1]);
+
+  return (
+    <motion.div style={{ opacity }} className="absolute inset-0">
+      <ScrollFrameSequence
+        basePath={slide.framesBasePath}
+        frameCount={slide.frameCount}
+        progress={segmentProgress}
+        className="h-full w-full"
+      />
+    </motion.div>
+  );
+}
+
+function SegmentDot({ index, scrollYProgress }: { index: number; scrollYProgress: MotionValue<number> }) {
+  const start = index * SEGMENT;
+  const end = start + SEGMENT;
+  const activeOpacity = useTransform(scrollYProgress, [start, start + FADE, end - FADE, end], [0.3, 1, 1, 0.3]);
+
+  return <motion.span style={{ opacity: activeOpacity }} className="h-1.5 w-6 rounded-full bg-accent" />;
 }

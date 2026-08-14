@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { buildMetadata, breadcrumbJsonLd, productJsonLd, JsonLd } from "@/lib/seo";
 import { qrMenuFaq, qrMenuFeatures, qrMenuHowItWorks, qrMenuPricing } from "@/content/qr-menu";
 import { getTestimonialsByTag } from "@/content/testimonials";
 import { PageHero } from "@/components/sections/PageHero";
+import { QrMenuHeroVisual } from "@/components/features/QrMenuHeroVisual";
 import { HowItWorksSteps } from "@/components/sections/HowItWorksSteps";
 import { FeatureSummaryGrid } from "@/components/sections/FeatureSummaryGrid";
 import { Section } from "@/components/ui/Section";
@@ -60,18 +60,7 @@ export default function QrMenuLandingPage() {
             </ButtonLink>
           </>
         }
-        visual={
-          <div className="relative mx-auto aspect-[3/4] max-w-sm overflow-hidden rounded-lg shadow-[inset_0_0_0_1px_rgba(255,255,255,0.07)]">
-            <Image
-              src="/projects/kahve-duragi-qr-menu-portrait.jpg"
-              alt="Örnek bir QR menü sitesinin karşılama ekranı"
-              fill
-              sizes="(min-width: 1024px) 24rem, 100vw"
-              className="object-cover"
-              priority
-            />
-          </div>
-        }
+        visual={<QrMenuHeroVisual />}
       />
 
       <HowItWorksSteps steps={qrMenuHowItWorks} eyebrow="Nasıl Çalışır" title="Üç adımda temassız dijital menü" />

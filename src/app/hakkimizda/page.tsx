@@ -28,7 +28,7 @@ export default function AboutPage() {
       <StatsCounterBar tone="base" />
       <CTABand
         title="Ekibimizle tanışın"
-        lead="Projenizi anlatın, ihtiyacınıza en uygun ekip arkadaşımız sizinle iletişime geçsin."
+        lead="Projenizi anlatın, sizinle birlikte en uygun çözümü tasarlayalım."
         ctaLabel="İletişime Geçin"
       />
     </>

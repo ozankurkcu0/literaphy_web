@@ -22,7 +22,7 @@ const item = {
 };
 
 const features = [
-  "Web'den AI Otomasyonuna 6 Hizmet",
+  "Web'den AI Otomasyonlarına Tek Noktadan Çözüm",
   "Ortalama 24 Saatte Geri Dönüş",
   "Teslim Sonrası Destek Dahil",
 ];

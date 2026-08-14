@@ -10,12 +10,11 @@ export const SITE_DESCRIPTION =
 // Gerçek alan adı belirlendiğinde tek bu satırı güncellemeniz yeterli.
 export const SITE_URL = "https://literaphy.com";
 
-// Gerçek iletişim bilgileri netleşince bu blok güncellenmeli — bkz. TODO.md.
 export const CONTACT = {
   email: "iletisim@literaphy.com",
-  phone: "+90 850 000 00 00",
-  phoneDisplay: "0850 000 00 00",
-  whatsapp: "https://wa.me/908500000000",
+  phone: "+90 542 461 96 30",
+  phoneDisplay: "0542 461 96 30",
+  whatsapp: "https://wa.me/905424619630",
   addressLine: "Kartepe, Kocaeli, Türkiye",
   workingHours: "Pazartesi – Cumartesi, 09:00 – 20:00",
 };

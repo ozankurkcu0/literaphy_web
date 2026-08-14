@@ -86,7 +86,7 @@ export default async function ServiceDetailPage({ params }: PageParams) {
           )
         }
       />
-      <ScopeList scope={service.scope} />
+      <ScopeList scope={service.scope} title={service.scopeTitle} />
       <TechStackBadges stack={service.techStack} tone="elevated" />
       <ProcessSteps tone="base" />
       <RelatedProjects projects={relatedProjects} title={`${service.name} projelerimiz`} tone="elevated" />

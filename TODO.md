@@ -11,9 +11,9 @@ sebep olmamak için akış durdurulmadı; aşağıdakiler devreye alınmadan
   `https://literaphy.com.tr` olarak varsayıldı (metadata, sitemap, robots,
   JSON-LD, OG görselleri bu değeri kullanıyor). Gerçek domain
   belirlenince tek bu satır güncellenmeli.
-- **İletişim bilgileri**: `CONTACT` bloğundaki e-posta, telefon ve adres
-  placeholder değerlerdir (`merhaba@literaphy.com.tr`, `0850 000 00 00`,
-  "Levent, İstanbul"). Gerçek bilgilerle değiştirilmeli.
+- **İletişim bilgileri**: Telefon/WhatsApp gerçek numarayla güncellendi
+  (`0542 461 96 30`). E-posta ve adres (`Kartepe, Kocaeli`) hâlâ
+  placeholder olabilir — netleşince `CONTACT` bloğu güncellenmeli.
 - **Form teslimatı**: İletişim formu (`src/app/iletisim/actions.ts`) ve
   demo formu (`src/app/qr-menu-sistemleri/demo/actions.ts`) şu an yalnızca
   sunucu loguna yazıyor. Gerçek e-posta/CRM entegrasyonu (ör. Resend,
@@ -51,8 +51,11 @@ sebep olmamak için akış durdurulmadı; aşağıdakiler devreye alınmadan
 
 ## Düşük Öncelik / Faz 5+ (roadmap'te zaten planlı)
 
-- Analytics (GA4 veya alternatif) ve Search Console entegrasyonu
-  yapılmadı — `docs/PLANNING.md` Faz 5 kapsamında.
+- **Analytics (GA4)**: Altyapı hazır (`src/components/layout/Analytics.tsx`,
+  `.env.example`) ama `NEXT_PUBLIC_GA_MEASUREMENT_ID` henüz set edilmedi —
+  ID'siz iken bileşen sessizce hiçbir şey render etmiyor. GA4'te property
+  oluşturulup ID env değişkenine eklenince ek kod değişikliği gerekmeden
+  devreye girer. Search Console entegrasyonu da hâlâ yapılmadı.
 - Lighthouse CI / Core Web Vitals izleme pipeline'a eklenmedi.
 - Açık tema (light mode) toggle'ı bilinçli olarak uygulanmadı —
   `docs/PLANNING.md` roadmap'inde Faz 4'te "kapsam netleşince karar

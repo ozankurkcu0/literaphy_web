@@ -6,6 +6,8 @@ import { organizationJsonLd, JsonLd } from "@/lib/seo";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { SkipLink } from "@/components/layout/SkipLink";
+import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
+import { Analytics } from "@/components/layout/Analytics";
 import "./globals.css";
 
 const inter = Inter({
@@ -71,7 +73,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             {children}
           </main>
           <Footer />
+          <WhatsAppButton />
         </MotionConfig>
+        <Analytics />
       </body>
     </html>
   );

@@ -2,14 +2,12 @@ import { Check } from "lucide-react";
 import { Section } from "@/components/ui/Section";
 import { Reveal, RevealGroup, RevealItem } from "@/components/ui/Reveal";
 
-export function ScopeList({ scope }: { scope: string[] }) {
+export function ScopeList({ scope, title = "Bu hizmet neleri kapsıyor?" }: { scope: string[]; title?: string }) {
   return (
     <Section tone="base" padding="standard">
       <div className="grid gap-10 lg:grid-cols-12 lg:gap-16">
         <Reveal className="lg:col-span-4">
-          <h2 className="text-[28px] leading-tight font-bold text-foreground md:text-[34px]">
-            Bu hizmet neleri kapsıyor?
-          </h2>
+          <h2 className="text-[28px] leading-tight font-bold text-foreground md:text-[34px]">{title}</h2>
         </Reveal>
         <RevealGroup className="flex flex-col lg:col-span-8">
           {scope.map((item) => (
