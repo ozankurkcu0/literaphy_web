@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import { ExternalLink } from "lucide-react";
 import { getProjectBySlug, getRelatedProjects, projects } from "@/content/projects";
 import { buildMetadata, breadcrumbJsonLd, JsonLd } from "@/lib/seo";
 import { Section } from "@/components/ui/Section";
 import { Reveal } from "@/components/ui/Reveal";
 import { Badge } from "@/components/ui/Badge";
 import { CoverArt } from "@/components/ui/CoverArt";
+import { ButtonLink } from "@/components/ui/Button";
 import { ProblemSolutionBlock } from "@/components/sections/ProblemSolutionBlock";
 import { ResultMetricsRow } from "@/components/sections/ResultMetricsRow";
 import { TechStackBadges } from "@/components/sections/TechStackBadges";
@@ -65,6 +67,14 @@ export default async function ProjectDetailPage({ params }: PageParams) {
           <Reveal delay={0.2}>
             <p className="font-mono text-sm text-foreground-muted">Müşteri: {project.client}</p>
           </Reveal>
+          {project.liveUrl && (
+            <Reveal delay={0.26}>
+              <ButtonLink href={project.liveUrl} external variant="secondary" size="md" className="mt-1 w-fit">
+                <ExternalLink className="size-4" aria-hidden />
+                Canlı Siteyi Görüntüle
+              </ButtonLink>
+            </Reveal>
+          )}
         </div>
         <Reveal delay={0.12} className="lg:col-span-6">
           {project.imageWide ? (

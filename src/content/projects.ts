@@ -22,6 +22,7 @@ export const projects: Project[] = [
     coverTone: "indigo",
     image: "/projects/vento-yapi-kurumsal-site.jpg",
     imageWide: "/projects/vento-yapi-kurumsal-site-wide.jpg",
+    liveUrl: "https://vento-build.vercel.app/",
     featured: true,
   },
   {
@@ -50,11 +51,11 @@ export const projects: Project[] = [
   {
     slug: "orkide-market-entegrasyon",
     title: "E-Ticaret Sitesi",
-    client: "",
+    client: "Özsu Bakım",
     category: "web-gelistirme",
     categoryLabel: "WEB Geliştirme",
     summary:
-      "Orkide Market'in kendi e-ticaret sitesi ile 3 farklı pazaryeri arasındaki stok ve fiyat senkronizasyonunu otomatikleştirdik.",
+      "Özsu Bakım'ın kendi e-ticaret sitesi ile 3 farklı pazaryeri arasındaki stok ve fiyat senkronizasyonunu otomatikleştirdik.",
     problem:
       "Stok ve fiyat güncellemeleri her pazaryerinde ayrı ayrı elle yapılıyor, senkronizasyon eksikliği yüzünden sık sık stokta olmayan ürün satışı yaşanıyordu.",
     solution:

@@ -51,6 +51,9 @@ export interface Project {
   image?: string;
   /** 16:7 crop for the project detail page hero. Required alongside `image` if that hero should use a real photo. */
   imageWide?: string;
+  /** Projenin gerçekten yayında olduğu canlı URL — verilirse detay sayfasında
+   * "Canlı Siteyi Görüntüle" butonu gösterilir (yeni sekmede açılır). */
+  liveUrl?: string;
   featured: boolean;
 }
 
