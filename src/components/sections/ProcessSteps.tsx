@@ -1,11 +1,11 @@
 "use client";
 
-import { useRef } from "react";
-import { motion, useScroll, useTransform } from "motion/react";
+import { motion } from "motion/react";
 import { processSteps } from "@/content/process";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { RevealGroup, RevealItem } from "@/components/ui/Reveal";
+import { EASE_STANDARD, viewportOnce } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
 type Tone = "deep" | "base" | "elevated";
@@ -20,23 +20,24 @@ const circleBgClass: Record<Tone, string> = {
 };
 
 export function ProcessSteps({ tone = "elevated" as const }: { tone?: Tone }) {
-  const trackRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: trackRef,
-    offset: ["start 75%", "end 65%"],
-  });
-  const scaleX = useTransform(scrollYProgress, [0, 1], [0, 1]);
-
   return (
     <Section tone={tone} padding="standard">
       <SectionHeading eyebrow="Süreç" title="Birlikte nasıl çalışıyoruz" className="mb-14" />
       <RevealGroup className="relative grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
-        {/* Adım rozetlerinin merkezlerini birleştiren tek, sürekli çizgi —
-            eskiden her adımdan sonra ayrı ayrı çizilen düz gri segmentler
-            yerine, scroll ilerledikçe soldan sağa dolan tek bir iz. */}
-        <div ref={trackRef} className="absolute top-5 right-[12.5%] left-[12.5%] hidden h-px bg-hairline lg:block">
-          <motion.div style={{ scaleX, transformOrigin: "left" }} className="h-full bg-accent" aria-hidden />
-        </div>
+        {/* Adım rozetlerinin merkezlerini birleştiren tek çizgi — eskiden
+            scroll pozisyonuna bağlı sürekli dolan bir izdi, bu da bölüme tam
+            kaydırılmadan görüldüğünde yarım/soluk gri takılı kalabiliyordu.
+            Artık görünüme girince bir kere soldan sağa çizilip tam dolu
+            (bg-accent) halde kalıyor — her zaman aynı, kesin sonuç. */}
+        <motion.div
+          initial={{ scaleX: 0 }}
+          whileInView={{ scaleX: 1 }}
+          viewport={viewportOnce}
+          transition={{ duration: 0.7, ease: EASE_STANDARD, delay: 0.15 }}
+          style={{ transformOrigin: "left" }}
+          className="absolute top-5 right-[12.5%] left-[12.5%] hidden h-px bg-accent lg:block"
+          aria-hidden
+        />
         {processSteps.map((step) => (
           <RevealItem key={step.number} className="group relative flex flex-col gap-4">
             <span
