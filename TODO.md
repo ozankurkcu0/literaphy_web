@@ -14,10 +14,13 @@ sebep olmamak için akış durdurulmadı; aşağıdakiler devreye alınmadan
 - **İletişim bilgileri**: Telefon/WhatsApp gerçek numarayla güncellendi
   (`0542 461 96 30`). E-posta ve adres (`Kartepe, Kocaeli`) hâlâ
   placeholder olabilir — netleşince `CONTACT` bloğu güncellenmeli.
-- **Form teslimatı**: İletişim formu (`src/app/iletisim/actions.ts`) ve
-  demo formu (`src/app/qr-menu-sistemleri/demo/actions.ts`) şu an yalnızca
-  sunucu loguna yazıyor. Gerçek e-posta/CRM entegrasyonu (ör. Resend,
-  SendGrid, HubSpot webhook) API anahtarı sağlanınca bağlanmalı.
+- **Form teslimatı (e-posta)**: Altyapı hazır (`src/lib/email.ts`, Resend
+  üzerinden) ve üç forma da (İletişim, QR Menü demo, N8N demo) bağlandı; ama
+  `RESEND_API_KEY` henüz set edilmedi — ID'siz iken sadece sunucu loguna
+  yazıyor. resend.com'da hesap açılıp API key `.env`'e (ve deploy ortamına)
+  eklenince ek kod değişikliği gerekmeden devreye girer. Bildirimler
+  `literaphy@gmail.com` adresine gidecek şekilde ayarlandı (`CONTACT_NOTIFY_EMAIL`
+  ile değiştirilebilir).
 - **Sosyal medya linkleri**: `SOCIAL_LINKS` içindeki URL'ler
   (linkedin.com/company/literaphy vb.) gerçek hesaplar açılınca
   güncellenmeli; şu an tahmini/placeholder.

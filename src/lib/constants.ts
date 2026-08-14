@@ -11,7 +11,7 @@ export const SITE_DESCRIPTION =
 export const SITE_URL = "https://literaphy.com";
 
 export const CONTACT = {
-  email: "iletisim@literaphy.com",
+  email: "literaphy@gmail.com",
   phone: "+90 542 461 96 30",
   phoneDisplay: "0542 461 96 30",
   whatsapp: "https://wa.me/905424619630",

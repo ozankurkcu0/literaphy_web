@@ -1,6 +1,7 @@
 "use server";
 
 import { z } from "zod";
+import { sendNotificationEmail } from "@/lib/email";
 
 const contactSchema = z.object({
   name: z.string().trim().min(2, "Adınızı ve soyadınızı giriniz."),
@@ -41,9 +42,19 @@ export async function submitContactForm(
     return { status: "error", errors, message: "Lütfen formu kontrol edin." };
   }
 
-  // NOT: E-posta/CRM entegrasyonu (ör. Resend, HubSpot) bağlanana kadar
-  // talep sunucu loglarına düşer. Bkz. proje kökündeki TODO.md.
   console.info("[iletisim] yeni talep:", parsed.data);
+
+  await sendNotificationEmail({
+    subject: `Yeni iletişim talebi — ${parsed.data.name}`,
+    sourceLabel: "İletişim Formu",
+    rows: [
+      { label: "Ad Soyad", value: parsed.data.name },
+      { label: "E-posta", value: parsed.data.email },
+      { label: "Telefon", value: parsed.data.phone },
+      { label: "Hizmet", value: parsed.data.service },
+      { label: "Mesaj", value: parsed.data.message },
+    ],
+  });
 
   return {
     status: "success",
