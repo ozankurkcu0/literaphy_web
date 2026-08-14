@@ -3,6 +3,8 @@ import { buildMetadata, breadcrumbJsonLd, JsonLd } from "@/lib/seo";
 import { qrMenuFaq, qrMenuPricing } from "@/content/qr-menu";
 import { PageHero } from "@/components/sections/PageHero";
 import { Section } from "@/components/ui/Section";
+import { SectionHeading } from "@/components/ui/SectionHeading";
+import { PricingCalculator } from "@/components/features/PricingCalculator";
 import { PricingSection } from "@/components/features/PricingSection";
 import { PricingComparisonTable } from "@/components/sections/PricingComparisonTable";
 import { MiniFAQ } from "@/components/sections/MiniFAQ";
@@ -32,6 +34,16 @@ export default function QrMenuPricingPage() {
         lead="İşletmenizin büyüklüğüne uygun bir paket seçin, istediğiniz zaman yükseltin."
         align="center"
       />
+      <Section tone="base" padding="compact" wide>
+        <SectionHeading
+          eyebrow="Hesaplayıcı"
+          title="Size uygun paketi 30 saniyede bulun"
+          lead="Şube sayınızı ve ihtiyaçlarınızı seçin, size uygun paketi ve tahmini fiyatı anında görün."
+          tone="product"
+          className="mb-10"
+        />
+        <PricingCalculator />
+      </Section>
       <Section tone="base" padding="standard" wide>
         <PricingSection plans={qrMenuPricing} />
       </Section>

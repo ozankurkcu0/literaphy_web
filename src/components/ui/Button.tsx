@@ -128,12 +128,13 @@ export function ButtonLink({
   className,
   children,
   external = false,
-}: BaseProps & { href: string; external?: boolean }) {
+  onClick,
+}: BaseProps & { href: string; external?: boolean; onClick?: () => void }) {
   const classes = cn(baseClass, variantClass(variant), sizeClass[size], toneVars[tone].ring, className);
 
   if (external) {
     return (
-      <a href={href} target="_blank" rel="noopener noreferrer" className={classes}>
+      <a href={href} target="_blank" rel="noopener noreferrer" className={classes} onClick={onClick}>
         <FillLayers variant={variant} tone={tone} />
         <Content withArrow={withArrow}>{children}</Content>
       </a>
@@ -141,7 +142,7 @@ export function ButtonLink({
   }
 
   return (
-    <Link href={href} className={classes}>
+    <Link href={href} className={classes} onClick={onClick}>
       <FillLayers variant={variant} tone={tone} />
       <Content withArrow={withArrow}>{children}</Content>
     </Link>
