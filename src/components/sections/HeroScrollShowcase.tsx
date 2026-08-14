@@ -5,24 +5,25 @@ import { motion, useScroll, useTransform } from "motion/react";
 import { ScrollFrameSequence } from "@/components/sections/ScrollFrameSequence";
 
 // Üç ayrı Google Flow videosu, ezgif ile kareye bölünüp scroll-scrub
-// tekniğiyle oynatılıyor: laptop (Web Geliştirme) exploded oluyor, sonra
-// bir geçiş sekansıyla telefona/QR koda dönüşüyor, sonra QR Menü kendi
-// exploded görünümünü tamamlıyor. N8N Otomasyonları henüz bu sıraya
-// eklenmedi — kendi kare dizisi hazır olunca aynı şekilde eklenecek.
+// tekniğiyle oynatılıyor: N8N otomasyon hub'ı beliriyor, sonra bir geçiş
+// sekansıyla telefona/QR koda dönüşüyor, sonra QR Menü kendi ekranında
+// kahve temalı dijital menüyü açıyor. Bu, aynı kurgunun 2. render'ı (v2) —
+// önceki render (n8n / n8n-to-qr / qr klasörleri) public/scroll-frames
+// altında duruyor, silinmedi, sadece artık kullanılmıyor.
 const slides = [
   {
-    label: "Web Geliştirme",
-    framesBasePath: "/scroll-frames/laptop",
+    label: "N8N Otomasyonları",
+    framesBasePath: "/scroll-frames/n8n-v2",
     frameCount: 180,
   },
   {
-    label: "Web'den QR Menü'ye geçiş",
-    framesBasePath: "/scroll-frames/laptop-to-qr",
-    frameCount: 240,
+    label: "N8N'den QR Menü'ye geçiş",
+    framesBasePath: "/scroll-frames/n8n-to-qr-v2",
+    frameCount: 180,
   },
   {
     label: "QR Menü Sistemleri",
-    framesBasePath: "/scroll-frames/qr",
+    framesBasePath: "/scroll-frames/qr-v2",
     frameCount: 180,
   },
 ];
