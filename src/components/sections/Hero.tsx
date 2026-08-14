@@ -66,7 +66,7 @@ export function Hero() {
                   <LiquidButton
                     size="xl"
                     onClick={() => router.push("/hizmetler")}
-                    className="group !rounded-full gap-2 bg-accent-soft text-accent shadow-[0_0_28px_-10px_var(--color-accent-glow)] hover:shadow-[0_0_36px_-8px_var(--color-accent-glow)]"
+                    className="group !rounded-full gap-2 bg-white text-foreground shadow-[0_10px_28px_-8px_rgba(0,0,0,0.4),0_1px_0_rgba(255,255,255,0.6)_inset] hover:-translate-y-0.5 hover:shadow-[0_14px_34px_-6px_rgba(0,0,0,0.5),0_1px_0_rgba(255,255,255,0.6)_inset]"
                   >
                     Hizmetlerimizi İnceleyin
                     <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" aria-hidden />
@@ -76,10 +76,10 @@ export function Hero() {
                   <LiquidButton
                     size="lg"
                     onClick={() => router.push("/hizmetler/ai-otomasyon")}
-                    className="group !rounded-full gap-2 text-accent-product shadow-[0_0_20px_-12px_var(--color-accent-product-glow)] hover:bg-accent-product-soft hover:shadow-[0_0_28px_-8px_var(--color-accent-product-glow)]"
+                    className="group !rounded-full gap-2 bg-white/90 text-foreground shadow-[0_8px_22px_-8px_rgba(0,0,0,0.35),0_1px_0_rgba(255,255,255,0.6)_inset] hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_12px_28px_-6px_rgba(0,0,0,0.45),0_1px_0_rgba(255,255,255,0.6)_inset]"
                   >
                     N8N Otomasyonlarını Keşfedin
-                    <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" aria-hidden />
+                    <ArrowRight className="size-4 text-icon-tint transition-transform duration-300 group-hover:translate-x-1" aria-hidden />
                   </LiquidButton>
                 </MagneticWrap>
               </motion.div>
