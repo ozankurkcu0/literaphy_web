@@ -25,52 +25,6 @@ export const projects: Project[] = [
     featured: true,
   },
   {
-    slug: "lupa-lojistik-operasyon-paneli",
-    title: "Operasyon Yönetim Paneli",
-    client: "",
-    category: "yazilim-gelistirme",
-    categoryLabel: "Yazılım Geliştirme",
-    summary:
-      "Lupa Lojistik için Excel tabanlı sevkiyat takibini ortadan kaldıran, gerçek zamanlı bir operasyon yönetim paneli geliştirdik.",
-    problem:
-      "Sevkiyat, araç ve sürücü verileri farklı Excel dosyalarında tutuluyor, operasyon ekibi güncel durumu takip etmekte zorlanıyor ve raporlama saatler sürüyordu.",
-    solution:
-      "Tüm sevkiyat verilerini tek bir merkezi panelde birleştiren, rol bazlı yetkilendirmeye sahip özel bir web uygulaması geliştirdik; canlı harita takibi ve otomatik raporlama modülü ekledik.",
-    results: [
-      { label: "Raporlama süresi", value: "6 saatten 10 dakikaya" },
-      { label: "Veri hatası", value: "%90 azalma" },
-      { label: "Operasyon ekibi verimliliği", value: "%45 artış" },
-    ],
-    techStack: ["React", "Node.js", "PostgreSQL", "WebSocket"],
-    coverTone: "violet",
-    image: "/projects/lupa-lojistik-operasyon-paneli.jpg",
-    imageWide: "/projects/lupa-lojistik-operasyon-paneli-wide.jpg",
-    featured: true,
-  },
-  {
-    slug: "meva-finans-belge-otomasyonu",
-    title: "AI Destekli Belge İşleme Otomasyonu",
-    client: "",
-    category: "ai-otomasyon",
-    categoryLabel: "AI Otomasyonu",
-    summary:
-      "Meva Finans'ın fatura ve sözleşme belgelerini manuel olarak sisteme işleyen ekibi için AI destekli otomatik veri çıkarma sistemi kurduk.",
-    problem:
-      "Ekip, günde yüzlerce fatura ve sözleşmeyi elle inceleyip muhasebe sistemine giriyor; bu süreç hem zaman alıyor hem de veri girişi hatalarına yol açıyordu.",
-    solution:
-      "Gelen belgeleri otomatik sınıflandıran, kritik alanları (tutar, tarih, vergi numarası vb.) çıkaran ve doğrudan muhasebe sistemine aktaran bir AI otomasyon hattı kurduk; şüpheli durumlar otomatik olarak insan onayına yönlendiriliyor.",
-    results: [
-      { label: "İşlem süresi", value: "%80 azalma" },
-      { label: "Veri girişi hatası", value: "%95 azalma" },
-      { label: "Aylık tasarruf edilen mesai", value: "120 saat" },
-    ],
-    techStack: ["OpenAI API", "Python", "LangChain", "PostgreSQL"],
-    coverTone: "cyan",
-    image: "/projects/meva-finans-belge-otomasyonu.jpg",
-    imageWide: "/projects/meva-finans-belge-otomasyonu-wide.jpg",
-    featured: true,
-  },
-  {
     slug: "cizgi-mobilya-whatsapp-satis",
     title: "WhatsApp Üzerinden Sipariş Otomasyonu",
     client: "",

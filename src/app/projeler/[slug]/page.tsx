@@ -8,7 +8,6 @@ import { Reveal } from "@/components/ui/Reveal";
 import { Badge } from "@/components/ui/Badge";
 import { CoverArt } from "@/components/ui/CoverArt";
 import { ProblemSolutionBlock } from "@/components/sections/ProblemSolutionBlock";
-import { ProjectGallery } from "@/components/sections/ProjectGallery";
 import { ResultMetricsRow } from "@/components/sections/ResultMetricsRow";
 import { TechStackBadges } from "@/components/sections/TechStackBadges";
 import { RelatedProjects } from "@/components/sections/RelatedProjects";
@@ -86,7 +85,6 @@ export default async function ProjectDetailPage({ params }: PageParams) {
       </Section>
 
       <ProblemSolutionBlock problem={project.problem} solution={project.solution} />
-      <ProjectGallery tone={project.coverTone} />
       <ResultMetricsRow results={project.results} />
       <TechStackBadges stack={project.techStack} tone="base" />
       <RelatedProjects projects={related} tone="elevated" />
