@@ -21,6 +21,10 @@ export interface Service {
   techStack: string[];
   faq: { question: string; answer: string }[];
   relatedCoverTone: CoverTone;
+  /** Opsiyonel gerçek hero görseli (16:7 crop, public/services/ altından).
+   * Verilirse hizmet detay sayfasının hero'sunda CoverArt yerine bu görsel
+   * gösterilir. */
+  heroImage?: string;
   /**
    * Set when this service already has its own dedicated landing page
    * elsewhere on the site (e.g. a product line like QR Menü Sistemleri

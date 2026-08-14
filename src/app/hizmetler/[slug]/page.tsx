@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { notFound, redirect } from "next/navigation";
 import { getServiceBySlug, services } from "@/content/services";
 import { getRelatedProjects } from "@/content/projects";
@@ -81,6 +82,17 @@ export default async function ServiceDetailPage({ params }: PageParams) {
         visual={
           service.slug === "ai-otomasyon" ? (
             <AutomationFlowVisual />
+          ) : service.heroImage ? (
+            <div className="relative aspect-[16/7] overflow-hidden rounded-lg shadow-[inset_0_0_0_1px_rgba(255,255,255,0.07)]">
+              <Image
+                src={service.heroImage}
+                alt={service.name}
+                fill
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                className="object-cover"
+                priority
+              />
+            </div>
           ) : (
             <CoverArt tone={service.relatedCoverTone} icon={service.icon} ratio="wide" />
           )

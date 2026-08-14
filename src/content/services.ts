@@ -37,6 +37,7 @@ export const services: Service[] = [
       },
     ],
     relatedCoverTone: "indigo",
+    heroImage: "/services/web-gelistirme-hero.jpg",
   },
   {
     slug: "ai-otomasyon",

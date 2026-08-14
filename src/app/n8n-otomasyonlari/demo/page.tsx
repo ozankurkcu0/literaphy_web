@@ -35,6 +35,19 @@ export default function N8nDemoPage() {
       </Section>
       <Section tone="base" padding="standard">
         <div className="mx-auto max-w-xl">
+          {/* N8N otomasyonu QR menüden farklı olarak "hazır bir ürün" değil,
+              işletmeye özel kurulan bir süreç — bu formun ne işe yaradığını
+              (hazır bir demo hesabı açmıyor) kısaca netleştiriyoruz. */}
+          <div className="mb-8 flex flex-col gap-2 text-center">
+            <span className="font-mono text-xs font-medium tracking-[0.1em] text-accent-product uppercase">
+              Bu talepte ne oluyor?
+            </span>
+            <p className="text-sm leading-relaxed text-foreground-muted">
+              Bu form hazır bir demo hesabı açmıyor — her N8N otomasyonu işletmenize özel kurulur. Talebinizi
+              aldıktan sonra ekibimiz sizi arar, mevcut sürecinizi dinler ve hangi adımların otomatikleştirilebileceğini
+              birlikte netleştirip size özel örnek bir akışla dönüş yapar.
+            </p>
+          </div>
           <DemoRequestForm
             action={submitN8nDemoRequest}
             title="Kendi otomasyonunuz için demo isteyin"
