@@ -5,6 +5,7 @@ import { Check } from "lucide-react";
 import type { PricingPlan } from "@/types";
 import { Badge } from "@/components/ui/Badge";
 import { ButtonLink } from "@/components/ui/Button";
+import { LiraSign } from "@/components/ui/LiraSign";
 import { cn } from "@/lib/utils";
 import { EASE_STANDARD } from "@/lib/motion";
 
@@ -63,7 +64,8 @@ export function PricingCard({ plan, billing }: PricingCardProps) {
                 transition={{ duration: 0.28, ease: EASE_STANDARD }}
                 className="block"
               >
-                ₺{price}
+                <LiraSign />
+                {price}
                 {plan.startingAt && "+"}
               </motion.span>
             </AnimatePresence>
@@ -81,7 +83,8 @@ export function PricingCard({ plan, billing }: PricingCardProps) {
               transition={{ duration: 0.2, ease: EASE_STANDARD }}
               className="font-mono text-xs text-foreground-muted"
             >
-              Yıllık ₺{(plan.yearlyPrice * 12).toLocaleString("tr-TR")}
+              Yıllık <LiraSign />
+              {(plan.yearlyPrice * 12).toLocaleString("tr-TR")}
               {plan.startingAt && "+"} olarak faturalandırılır
             </motion.p>
           )}

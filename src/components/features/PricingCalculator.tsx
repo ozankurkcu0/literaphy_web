@@ -5,6 +5,7 @@ import { motion } from "motion/react";
 import { Minus, Plus } from "lucide-react";
 import { qrMenuPricing } from "@/content/qr-menu";
 import { ButtonLink } from "@/components/ui/Button";
+import { LiraSign } from "@/components/ui/LiraSign";
 import { cn, cardSurfaceClass } from "@/lib/utils";
 import { EASE_STANDARD } from "@/lib/motion";
 import { trackEvent } from "@/lib/analytics";
@@ -160,7 +161,8 @@ export function PricingCalculator() {
           </div>
           <div className="flex items-end gap-1.5">
             <span className="font-mono text-[32px] leading-none font-semibold text-foreground">
-              ₺{price.toLocaleString("tr-TR")}
+              <LiraSign />
+              {price.toLocaleString("tr-TR")}
               {plan.startingAt && "+"}
             </span>
             <span className="pb-1 text-sm text-foreground-muted">/ ay</span>
