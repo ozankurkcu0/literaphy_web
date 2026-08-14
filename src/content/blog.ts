@@ -6,7 +6,7 @@ export const blogPosts: BlogPost[] = [
     title: "İşletmeler İçin AI Otomasyonuna Nereden Başlanır?",
     excerpt:
       "Yapay zeka otomasyonuna geçişte doğru ilk adım hangi süreç olmalı? İşletmenizde en yüksek etkiyi yaratacak alanları nasıl belirleyeceğinizi anlatıyoruz.",
-    category: "AI Otomasyonu",
+    category: "N8N Otomasyon",
     author: "Literaphy Ekibi",
     authorRole: "Yazılım & AI Danışmanlığı",
     publishedAt: "2026-06-02",
@@ -27,7 +27,7 @@ export const blogPosts: BlogPost[] = [
     title: "WhatsApp Business API Nedir, İşletmeniz İçin Nasıl Kurulur?",
     excerpt:
       "Kişisel WhatsApp ile WhatsApp Business API arasındaki fark nedir? İşletmenize otomasyon eklemeden önce bilmeniz gereken her şey.",
-    category: "WhatsApp Otomasyonu",
+    category: "N8N Otomasyon",
     author: "Literaphy Ekibi",
     authorRole: "Entegrasyon Mühendisliği",
     publishedAt: "2026-05-18",
@@ -48,7 +48,7 @@ export const blogPosts: BlogPost[] = [
     title: "Restoranlar İçin Dijital Menüye Geçiş: Nelere Dikkat Edilmeli?",
     excerpt:
       "Basılı menüden QR menüye geçerken maliyet, müşteri deneyimi ve marka tutarlılığı açısından dikkat edilmesi gereken noktalar.",
-    category: "QR Menü Sistemleri",
+    category: "QR Menü",
     author: "Literaphy Ekibi",
     authorRole: "Ürün Ekibi",
     publishedAt: "2026-04-27",
@@ -69,7 +69,7 @@ export const blogPosts: BlogPost[] = [
     title: "KOBİ'ler İçin Özel Yazılım mı, Hazır Yazılım mı?",
     excerpt:
       "Hazır bir SaaS ürünü mü kullanmalısınız yoksa özel yazılım mı geliştirmelisiniz? Karar verirken sormanız gereken sorular.",
-    category: "Yazılım Geliştirme",
+    category: "Diğer",
     author: "Literaphy Ekibi",
     authorRole: "Yazılım Danışmanlığı",
     publishedAt: "2026-03-14",
@@ -90,7 +90,7 @@ export const blogPosts: BlogPost[] = [
     title: "API Entegrasyonu ile Manuel Veri Girişini Nasıl Bitirirsiniz?",
     excerpt:
       "Farklı sistemler arasında elle veri taşımak, büyüyen işletmelerin en büyük gizli maliyetlerinden biridir. Çözüm nasıl kurulur?",
-    category: "API Entegrasyonu",
+    category: "N8N Otomasyon",
     author: "Literaphy Ekibi",
     authorRole: "Entegrasyon Mühendisliği",
     publishedAt: "2026-02-09",

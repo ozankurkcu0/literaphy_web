@@ -4,11 +4,18 @@ import { useMemo, useState } from "react";
 import { motion } from "motion/react";
 import type { BlogPost } from "@/types";
 import { BlogCard } from "@/components/cards/BlogCard";
-import { RevealGroup, RevealItem } from "@/components/ui/Reveal";
+import { fadeUp, staggerContainer } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
+const CATEGORY_ORDER = ["Tümü", "Web Geliştirme", "N8N Otomasyon", "QR Menü", "Diğer"];
+
 export function BlogExplorer({ posts }: { posts: BlogPost[] }) {
-  const categories = useMemo(() => ["Tümü", ...new Set(posts.map((post) => post.category))], [posts]);
+  // Veride bulunan kategorilerle sınırlı, ama her zaman CATEGORY_ORDER
+  // sırasında — yazı sırasına göre kayıp bir buton dizilimi olmasın diye.
+  const categories = useMemo(() => {
+    const present = new Set(posts.map((post) => post.category));
+    return CATEGORY_ORDER.filter((category) => category === "Tümü" || present.has(category));
+  }, [posts]);
   const [active, setActive] = useState("Tümü");
 
   const [featured, ...rest] = posts;
@@ -51,13 +58,25 @@ export function BlogExplorer({ posts }: { posts: BlogPost[] }) {
       {filtered.length === 0 ? (
         <p className="py-20 text-center text-foreground-muted">Bu kategoride henüz yazı bulunmuyor.</p>
       ) : (
-        <RevealGroup className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3">
+        // Filtre değiştikçe (kategori -> Tümü -> kategori) liste her seferinde
+        // yeniden mount oluyor; Reveal'ın whileInView + once:true davranışı bu
+        // durumda ekranın altında kalan kartları sonsuza dek görünmez
+        // bırakabiliyordu (bir daha viewport'a "giriş" tetiklenmiyordu). Mount
+        // anında oynayan (scroll'a bağlı olmayan) bir stagger fade-in'e
+        // geçildi, böylece her filtre değişiminde tüm kartlar güvenle görünür.
+        <motion.div
+          key={active}
+          initial="hidden"
+          animate="visible"
+          variants={staggerContainer(0.06)}
+          className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3"
+        >
           {filtered.map((post) => (
-            <RevealItem key={post.slug}>
+            <motion.div key={post.slug} variants={fadeUp}>
               <BlogCard post={post} />
-            </RevealItem>
+            </motion.div>
           ))}
-        </RevealGroup>
+        </motion.div>
       )}
     </div>
   );
