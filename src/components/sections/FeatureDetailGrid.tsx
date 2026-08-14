@@ -1,4 +1,4 @@
-import { qrMenuFeatures } from "@/content/qr-menu";
+import type { LucideIcon } from "lucide-react";
 import { Section } from "@/components/ui/Section";
 import { Reveal } from "@/components/ui/Reveal";
 import { CoverArt } from "@/components/ui/CoverArt";
@@ -6,10 +6,14 @@ import { cn } from "@/lib/utils";
 
 const tones = ["amber", "indigo", "cyan", "emerald", "violet", "rose"] as const;
 
-export function FeatureDetailGrid() {
+interface FeatureDetailGridProps {
+  features: { icon: LucideIcon; title: string; description: string }[];
+}
+
+export function FeatureDetailGrid({ features }: FeatureDetailGridProps) {
   return (
     <Section tone="base" padding="standard" innerClassName="flex flex-col gap-24">
-      {qrMenuFeatures.map((feature, index) => {
+      {features.map((feature, index) => {
         const reversed = index % 2 === 1;
         const Icon = feature.icon;
         return (

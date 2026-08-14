@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { buildMetadata, breadcrumbJsonLd, JsonLd } from "@/lib/seo";
+import { qrMenuFeatures } from "@/content/qr-menu";
 import { PageHero } from "@/components/sections/PageHero";
 import { FeatureDetailGrid } from "@/components/sections/FeatureDetailGrid";
 import { ScreenshotGallery } from "@/components/sections/ScreenshotGallery";
@@ -34,7 +35,7 @@ export default function QrMenuFeaturesPage() {
           </ButtonLink>
         }
       />
-      <FeatureDetailGrid />
+      <FeatureDetailGrid features={qrMenuFeatures} />
       <ScreenshotGallery />
       <CTABand
         title="Özellikleri kendi menünüzde görün"

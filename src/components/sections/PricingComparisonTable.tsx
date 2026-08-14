@@ -9,13 +9,14 @@ export function PricingComparisonTable() {
       <SectionHeading eyebrow="Karşılaştırma" title="Paketleri detaylı karşılaştırın" tone="product" className="mb-12" />
       <Reveal>
         <div className="overflow-x-auto rounded-lg border border-hairline">
-          <table className="w-full min-w-[560px] border-collapse text-left text-sm">
+          <table className="w-full min-w-[680px] border-collapse text-left text-sm">
             <thead>
               <tr className="border-b border-hairline bg-surface">
                 <th className="px-6 py-4 font-semibold text-foreground">Özellik</th>
                 <th className="px-6 py-4 font-semibold text-foreground">Başlangıç</th>
                 <th className="px-6 py-4 font-semibold text-accent-product">Standart</th>
                 <th className="px-6 py-4 font-semibold text-foreground">Premium</th>
+                <th className="px-6 py-4 font-semibold text-foreground">Expert</th>
               </tr>
             </thead>
             <tbody>
@@ -25,6 +26,7 @@ export function PricingComparisonTable() {
                   <td className="px-6 py-4 text-foreground-muted">{row.starter}</td>
                   <td className="px-6 py-4 font-medium text-foreground">{row.standard}</td>
                   <td className="px-6 py-4 text-foreground-muted">{row.premium}</td>
+                  <td className="px-6 py-4 text-foreground-muted">{row.expert}</td>
                 </tr>
               ))}
             </tbody>

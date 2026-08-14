@@ -47,12 +47,14 @@ export const services: Service[] = [
       "Yapay zeka ile tekrar eden iş süreçlerinizi otomatikleştiriyoruz.",
     heroLead:
       "Manuel olarak yürütülen, zaman alan ve hataya açık iş süreçlerinizi yapay zeka destekli otomasyonlarla yeniden tasarlıyoruz — müşteri desteğinden veri işlemeye, raporlamadan içerik üretimine kadar geniş bir yelpazede.",
+    scopeTitle: "N8N otomasyonları neler yapabilir?",
     scope: [
       "Özel AI destekli chatbot ve müşteri asistanı geliştirme",
       "İş süreci otomasyonu (belge işleme, veri girişi, raporlama)",
       "AI destekli veri analizi ve karar destek sistemleri",
-      "Mevcut araçlarınıza (CRM, e-posta, tablo) AI entegrasyonu",
-      "Özel büyük dil modeli (LLM) entegrasyonları ve prompt mühendisliği",
+      "Mevcut araçlarınıza (CRM, e-posta, tablo, veri tabanı) AI entegrasyonu",
+      "WhatsApp ve diğer mesajlaşma platformları için otomatik yanıt sistemleri",
+      "Sosyal medya içerik üretimi ve otomatik paylaşım iş akışları",
     ],
     techStack: ["OpenAI API", "LangChain", "Python", "Vector Database", "n8n", "Node.js"],
     faq: [
@@ -67,12 +69,17 @@ export const services: Service[] = [
           "Evet. Veri gizliliği önceliğimizdir; kurumsal verileriniz üzerinde çalışan izole ortamlar ve gerekli veri işleme sözleşmeleriyle ilerliyoruz.",
       },
       {
-        question: "Sonucu nasıl ölçüyoruz?",
+        question: "Otomasyonlarınız her sisteme entegre edilebilir mi?",
         answer:
-          "Her otomasyon projesinde başlangıçta net başarı metrikleri (işlem süresi azalması, hata oranı, tasarruf edilen kişi-saat) belirliyor ve teslim sonrası raporluyoruz.",
+          "Evet. Oluşturduğumuz otomasyonlar, mevcut sistemlerinize entegre edilerek iş süreçlerinizi daha verimli hale getirir.",
       },
+
     ],
     relatedCoverTone: "cyan",
+    // Zaten kendi zengin landing page'i var (hero, özellikler, fiyatlandırma,
+    // SSS) — burada ikinci, daha sade bir /hizmetler/ai-otomasyon sayfası
+    // oluşturmak yerine oraya yönlendiriyoruz (bkz. qr-menu-sistemleri).
+    href: "/n8n-otomasyonlari",
   },
   {
     slug: "qr-menu-sistemleri",

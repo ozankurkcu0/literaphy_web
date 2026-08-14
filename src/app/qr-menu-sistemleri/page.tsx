@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { buildMetadata, breadcrumbJsonLd, productJsonLd, JsonLd } from "@/lib/seo";
-import { qrMenuFaq, qrMenuPricing } from "@/content/qr-menu";
+import { qrMenuFaq, qrMenuFeatures, qrMenuHowItWorks, qrMenuPricing } from "@/content/qr-menu";
 import { getTestimonialsByTag } from "@/content/testimonials";
 import { PageHero } from "@/components/sections/PageHero";
 import { HowItWorksSteps } from "@/components/sections/HowItWorksSteps";
@@ -74,8 +74,12 @@ export default function QrMenuLandingPage() {
         }
       />
 
-      <HowItWorksSteps />
-      <FeatureSummaryGrid />
+      <HowItWorksSteps steps={qrMenuHowItWorks} eyebrow="Nasıl Çalışır" title="Üç adımda temassız dijital menü" />
+      <FeatureSummaryGrid
+        features={qrMenuFeatures}
+        title="İşletmenizi büyütecek her şey standart pakette"
+        moreHref="/qr-menu-sistemleri/ozellikler"
+      />
 
       <Section tone="base" padding="standard" wide>
         <SectionHeading

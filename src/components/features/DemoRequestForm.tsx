@@ -3,14 +3,20 @@
 import { useActionState } from "react";
 import { motion } from "motion/react";
 import { CheckCircle2 } from "lucide-react";
-import { submitDemoRequest, type DemoFormState } from "@/app/qr-menu-sistemleri/demo/actions";
+import type { DemoFormState } from "@/lib/demo-request";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 
 const initialState: DemoFormState = { status: "idle" };
 
-export function DemoRequestForm() {
-  const [state, formAction, isPending] = useActionState(submitDemoRequest, initialState);
+interface DemoRequestFormProps {
+  action: (state: DemoFormState, formData: FormData) => Promise<DemoFormState>;
+  title: string;
+  submitLabel: string;
+}
+
+export function DemoRequestForm({ action, title, submitLabel }: DemoRequestFormProps) {
+  const [state, formAction, isPending] = useActionState(action, initialState);
 
   if (state.status === "success") {
     return (
@@ -31,12 +37,12 @@ export function DemoRequestForm() {
       action={formAction}
       className="flex flex-col gap-5 rounded-xl border border-hairline bg-surface p-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
     >
-      <h3 className="text-lg font-semibold text-foreground">Kendi menünüz için demo isteyin</h3>
+      <h3 className="text-lg font-semibold text-foreground">{title}</h3>
       <Input
         label="İşletme Adı"
         name="business"
         autoComplete="organization"
-        placeholder="Kahve Durağı"
+        placeholder="İşletmeniz"
         error={state.errors?.business}
         required
       />
@@ -61,7 +67,7 @@ export function DemoRequestForm() {
         />
       </div>
       <Button type="submit" tone="product" size="lg" disabled={isPending} className="w-full">
-        {isPending ? "Gönderiliyor..." : "Kendi Menünüzü Oluşturun"}
+        {isPending ? "Gönderiliyor..." : submitLabel}
       </Button>
     </form>
   );

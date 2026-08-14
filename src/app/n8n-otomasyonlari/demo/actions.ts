@@ -4,7 +4,7 @@ import { parseDemoRequest, type DemoFormState } from "@/lib/demo-request";
 
 export type { DemoFormState };
 
-export async function submitDemoRequest(
+export async function submitN8nDemoRequest(
   _prevState: DemoFormState,
   formData: FormData,
 ): Promise<DemoFormState> {
@@ -14,10 +14,10 @@ export async function submitDemoRequest(
     return { status: "error", errors: result.errors, message: "Lütfen formu kontrol edin." };
   }
 
-  console.info("[qr-menu-demo] yeni talep:", result.data);
+  console.info("[n8n-demo] yeni talep:", result.data);
 
   return {
     status: "success",
-    message: "Talebiniz alındı, QR menünüzü kurmak için sizi arayacağız.",
+    message: "Talebiniz alındı, otomasyon ihtiyacınızı konuşmak için sizi arayacağız.",
   };
 }

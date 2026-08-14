@@ -29,10 +29,7 @@ export const SOCIAL_LINKS = [
 
 export const NAV_LINKS = [
   { label: "Hizmetler", href: "/hizmetler" },
-  // Gerçek sayfa /hizmetler/ai-otomasyon'da yaşıyor (slug değişmedi, sadece
-  // görünen ad "N8N Otomasyonları" oldu) — "/ai-otomasyon" böyle bir sayfa
-  // olmadığı için 404 verirdi.
-  { label: "N8N Otomasyonları", href: "/hizmetler/ai-otomasyon" },
+  { label: "N8N Otomasyonları", href: "/n8n-otomasyonlari" },
   { label: "Projeler", href: "/projeler" },
   { label: "Blog", href: "/blog" },
   { label: "Hakkımızda", href: "/hakkimizda" },
