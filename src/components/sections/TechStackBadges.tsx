@@ -14,12 +14,13 @@ import {
   SiWhatsapp,
 } from "react-icons/si";
 import { Section } from "@/components/ui/Section";
-import { Badge } from "@/components/ui/Badge";
 import { RevealGroup, RevealItem } from "@/components/ui/Reveal";
 
 // Gerçek marka logosu bulunan teknolojiler — geri kalanı (ör. "Headless CMS",
 // "Yönetim Paneli", "QR Kod Üretimi") somut bir ürün/marka değil, kavramsal
-// bir yetenek tanımı olduğu için logosu yok; bunlar Badge fallback'ine düşer.
+// bir yetenek tanımı olduğu için logosu yok; bunlar satırdan tamamen elenir
+// (eskiden metin rozeti fallback'i vardı, artık gösterilmiyor — logo şeridi
+// sadece gerçek logolardan oluşuyor).
 const TECH_ICONS: Record<string, IconType> = {
   "Next.js": SiNextdotjs,
   React: SiReact,
@@ -36,26 +37,23 @@ const TECH_ICONS: Record<string, IconType> = {
 };
 
 export function TechStackBadges({ stack, tone = "base" as const }: { stack: string[]; tone?: "deep" | "base" | "elevated" }) {
+  const items = stack.filter((tech) => TECH_ICONS[tech]);
+  if (items.length === 0) return null;
+
   return (
     <Section tone={tone} padding="compact">
       <RevealGroup className="flex flex-wrap items-center justify-center gap-x-8 gap-y-5">
-        {stack.map((tech) => {
-          const Icon = TECH_ICONS[tech];
+        {items.map((tech) => {
+          const Icon = TECH_ICONS[tech]!;
           return (
             <RevealItem key={tech}>
-              {Icon ? (
-                <div
-                  title={tech}
-                  className="flex h-9 items-center justify-center text-foreground-muted transition-colors duration-150 ease-standard hover:text-foreground"
-                >
-                  <Icon className="size-7" aria-hidden />
-                  <span className="sr-only">{tech}</span>
-                </div>
-              ) : (
-                <div className="flex h-9 items-center justify-center">
-                  <Badge tone="neutral">{tech}</Badge>
-                </div>
-              )}
+              <div
+                title={tech}
+                className="flex h-9 items-center justify-center text-foreground-muted transition-colors duration-150 ease-standard hover:text-foreground"
+              >
+                <Icon className="size-7" aria-hidden />
+                <span className="sr-only">{tech}</span>
+              </div>
             </RevealItem>
           );
         })}

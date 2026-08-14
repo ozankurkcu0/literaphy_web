@@ -39,7 +39,7 @@ export function ProcessSteps({ tone = "elevated" as const }: { tone?: Tone }) {
           aria-hidden
         />
         {processSteps.map((step) => (
-          <RevealItem key={step.number} className="group relative flex flex-col gap-4">
+          <RevealItem key={step.number} className="group relative flex flex-col items-center gap-4 text-center">
             <span
               className={cn(
                 "relative z-10 flex size-10 items-center justify-center rounded-full border border-hairline font-mono text-sm font-semibold text-foreground-muted transition-colors duration-200 group-hover:border-accent group-hover:text-accent",
@@ -49,7 +49,7 @@ export function ProcessSteps({ tone = "elevated" as const }: { tone?: Tone }) {
               {step.number}
             </span>
             <h3 className="text-lg font-semibold text-foreground">{step.title}</h3>
-            <p className="text-sm leading-relaxed text-foreground-muted">{step.description}</p>
+            <p className="max-w-xs text-sm leading-relaxed text-foreground-muted">{step.description}</p>
           </RevealItem>
         ))}
       </RevealGroup>
