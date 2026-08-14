@@ -18,6 +18,20 @@ function frameSrc(basePath: string, index: number) {
   return `${basePath}/frame-${String(index + 1).padStart(3, "0")}.jpg`;
 }
 
+// Tüm kareleri mount anında aynı anda istemek yerine (bir segment 180 kare =
+// 180 eş zamanlı istek, sayfa başına 3 segment = 540) küçük gruplar halinde,
+// tarayıcı boştayken yüklüyoruz — kritik kaynaklarla (font, hydration JS)
+// yarışmasınlar diye. SEO performans denetiminde tespit edildi.
+const BATCH_SIZE = 24;
+
+function scheduleIdle(cb: () => void) {
+  if (typeof window.requestIdleCallback === "function") {
+    window.requestIdleCallback(cb, { timeout: 500 });
+  } else {
+    setTimeout(cb, 0);
+  }
+}
+
 /**
  * Apple ürün sayfalarındaki "scroll-scrub" tekniği: önceden video olarak
  * üretilip kare kare dışa aktarılmış bir dizi görseli, scroll pozisyonuna
@@ -28,16 +42,18 @@ function frameSrc(basePath: string, index: number) {
 export function ScrollFrameSequence({ basePath, frameCount, progress, className }: ScrollFrameSequenceProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imagesRef = useRef<HTMLImageElement[]>([]);
+  const cssSizeRef = useRef({ width: 0, height: 0 });
   const [firstFrameReady, setFirstFrameReady] = useState(false);
 
-  // Kareleri önceden yükle. İlk kare gelir gelmez hemen çiziyoruz ki boş
-  // canvas görünmesin; geri kalanı arka planda yüklenmeye devam ediyor.
+  // Kareleri gruplar halinde, boşta kaldıkça yükle. İlk kare gelir gelmez
+  // hemen çiziyoruz ki boş canvas görünmesin; geri kalanı arka planda,
+  // ana thread'i/ağı bloklamadan yüklenmeye devam ediyor.
   useEffect(() => {
     let cancelled = false;
     const images: HTMLImageElement[] = new Array(frameCount);
     imagesRef.current = images;
 
-    for (let i = 0; i < frameCount; i += 1) {
+    function loadFrame(i: number) {
       const img = new window.Image();
       img.src = frameSrc(basePath, i);
       if (i === 0) {
@@ -47,6 +63,22 @@ export function ScrollFrameSequence({ basePath, frameCount, progress, className 
       }
       images[i] = img;
     }
+
+    // İlk grup (kullanıcı sayfayı açar açmaz görebileceği kareler) hemen,
+    // gerisi requestIdleCallback ile küçük gruplar halinde.
+    for (let i = 0; i < Math.min(BATCH_SIZE, frameCount); i += 1) {
+      loadFrame(i);
+    }
+
+    let next = BATCH_SIZE;
+    function loadNextBatch() {
+      if (cancelled) return;
+      const end = Math.min(next + BATCH_SIZE, frameCount);
+      for (let i = next; i < end; i += 1) loadFrame(i);
+      next = end;
+      if (next < frameCount) scheduleIdle(loadNextBatch);
+    }
+    if (next < frameCount) scheduleIdle(loadNextBatch);
 
     return () => {
       cancelled = true;
@@ -62,11 +94,13 @@ export function ScrollFrameSequence({ basePath, frameCount, progress, className 
     if (!ctx) return;
 
     const dpr = window.devicePixelRatio || 1;
-    const cssWidth = canvas.clientWidth;
-    const cssHeight = canvas.clientHeight;
-    if (canvas.width !== cssWidth * dpr || canvas.height !== cssHeight * dpr) {
-      canvas.width = cssWidth * dpr;
-      canvas.height = cssHeight * dpr;
+    const { width: cssWidth, height: cssHeight } = cssSizeRef.current;
+    if (cssWidth === 0 || cssHeight === 0) return;
+    const targetWidth = cssWidth * dpr;
+    const targetHeight = cssHeight * dpr;
+    if (canvas.width !== targetWidth || canvas.height !== targetHeight) {
+      canvas.width = targetWidth;
+      canvas.height = targetHeight;
     }
 
     // object-fit: cover mantığını elle uyguluyoruz — canvas'ın kendi CSS
@@ -95,13 +129,33 @@ export function ScrollFrameSequence({ basePath, frameCount, progress, className 
     drawFrame(index);
   });
 
-  // İlk kare yüklendiğinde ve pencere yeniden boyutlandığında da çiz.
+  // Canvas'ın CSS boyutunu sadece gerçek boyut değişikliklerinde (ResizeObserver)
+  // ölçüp cache'liyoruz — her scroll/drawFrame çağrısında clientWidth/clientHeight
+  // okumak (layout'u zorlayabilir) yerine buradan okunuyor.
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const measure = () => {
+      cssSizeRef.current = { width: canvas.clientWidth, height: canvas.clientHeight };
+    };
+    measure();
+
+    const observer = new ResizeObserver(() => {
+      measure();
+      if (firstFrameReady) {
+        drawFrame(Math.round(Math.min(Math.max(progress.get(), 0), 1) * (frameCount - 1)));
+      }
+    });
+    observer.observe(canvas);
+    return () => observer.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // İlk kare yüklendiğinde çiz.
   useEffect(() => {
     if (!firstFrameReady) return;
     drawFrame(Math.round(Math.min(Math.max(progress.get(), 0), 1) * (frameCount - 1)));
-    const onResize = () => drawFrame(Math.round(Math.min(Math.max(progress.get(), 0), 1) * (frameCount - 1)));
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [firstFrameReady]);
 

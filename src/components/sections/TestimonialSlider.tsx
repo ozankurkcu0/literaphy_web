@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { Pause, Play } from "lucide-react";
 import type { Testimonial } from "@/types";
@@ -26,6 +26,14 @@ export function TestimonialSlider({
   const [hovered, setHovered] = useState(false);
   const [manuallyPaused, setManuallyPaused] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
+  // İlk render'da gösterilen tek testimonial'ın SSR HTML'de opacity:0 ile
+  // (yani JS'siz AI crawler'lar için "gizli") çıkmaması için — sadece
+  // slaytlar arası geçişte gerçek bir fade-in uygulanıyor, ilk yüklemede
+  // içerik baştan tam opak. SEO denetiminde tespit edildi.
+  const isFirstRender = useRef(true);
+  useEffect(() => {
+    isFirstRender.current = false;
+  }, []);
 
   useEffect(() => {
     const query = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -60,7 +68,7 @@ export function TestimonialSlider({
         <AnimatePresence mode="wait">
           <motion.div
             key={current.name}
-            initial={{ opacity: 0 }}
+            initial={isFirstRender.current ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4 }}

@@ -1,0 +1,25 @@
+# Literaphy
+
+> Literaphy; web geliştirme, özel yazılım, N8N otomasyonları ve QR menü sistemleriyle işletmelerin operasyonunu hızlandıran bir yazılım ve dijital altyapı ajansıdır. Türkiye merkezlidir (Kartepe, Kocaeli).
+
+Literaphy dört ana hizmet alanında çalışır: kurumsal web geliştirme, özel yazılım geliştirme, N8N tabanlı iş süreci otomasyonları (AI destekli chatbot, veri işleme, WhatsApp otomasyonu, API entegrasyonları dahil) ve restoran/kafe zincirleri için QR menü sistemleri.
+
+## Hizmetler
+
+- [Web Geliştirme](/hizmetler/web-gelistirme): Kurumsal web sitesi ve landing page tasarımı, marka kimliğine uygun tasarım sistemi, CMS entegrasyonu, SEO altyapısı.
+- [N8N Otomasyonları](/n8n-otomasyonlari): AI destekli chatbot, iş süreci otomasyonu, WhatsApp otomasyonu, veri analizi ve API entegrasyonları.
+- [QR Menü Sistemleri](/qr-menu-sistemleri): Restoran ve kafeler için temassız, anlık güncellenebilir, çoklu dilli dijital menü sistemi.
+- [Tüm Hizmetler](/hizmetler)
+
+## Fiyatlandırma
+
+- [QR Menü Fiyatlandırma](/qr-menu-sistemleri/fiyatlandirma)
+- [N8N Otomasyonları Fiyatlandırma](/n8n-otomasyonlari/fiyatlandirma)
+
+## Kaynaklar
+
+- [Projeler / Vaka Çalışmaları](/projeler)
+- [Blog](/blog)
+- [Sıkça Sorulan Sorular](/sss)
+- [Hakkımızda](/hakkimizda)
+- [İletişim](/iletisim)

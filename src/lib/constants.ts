@@ -7,8 +7,13 @@ export const SITE_TAGLINE = "Yazılım, otomasyon ve dijital altyapı ortağın�
 export const SITE_DESCRIPTION =
   "Literaphy; web geliştirme, özel yazılım, AI otomasyonları, WhatsApp otomasyonu, API entegrasyonları ve QR menü sistemleriyle operasyonunuzu hızlandırır.";
 
-// Gerçek alan adı belirlendiğinde tek bu satırı güncellemeniz yeterli.
-export const SITE_URL = "https://literaphy.com";
+// Gerçek alan adı (literaphy.com) alınıp DNS/Vercel'e bağlanana kadar GEÇİCİ
+// olarak canlı Vercel adresini kullanıyoruz — SEO denetiminde tespit edildi:
+// literaphy.com hiç DNS'e sahip değilken canonical/OG/JSON-LD/sitemap onu
+// gösteriyordu, bu da sitenin hiç indexlenememesine yol açıyordu. Domain
+// gelince NEXT_PUBLIC_SITE_URL env değişkenini set edin (öncelikli) ya da
+// bu satırı geri değiştirin — bkz. TODO.md.
+export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://literaphy-web.vercel.app";
 
 export const CONTACT = {
   email: "literaphy@gmail.com",

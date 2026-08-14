@@ -46,7 +46,7 @@ export function organizationJsonLd() {
     "@type": "Organization",
     name: SITE_NAME,
     url: SITE_URL,
-    logo: `${SITE_URL}/icon.svg`,
+    logo: `${SITE_URL}/logo-icon.png`,
     description: SITE_DESCRIPTION,
     sameAs: [
       "https://linkedin.com/company/literaphy",
@@ -124,7 +124,7 @@ export function articleJsonLd(input: {
     publisher: {
       "@type": "Organization",
       name: SITE_NAME,
-      logo: { "@type": "ImageObject", url: `${SITE_URL}/icon.svg` },
+      logo: { "@type": "ImageObject", url: `${SITE_URL}/logo-icon.png` },
     },
   };
 }

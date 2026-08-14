@@ -18,8 +18,15 @@ export function Reveal({ children, className, delay = 0, y = 24, as = "div" }: R
   return (
     <Component
       className={className}
-      initial={{ opacity: 0, y }}
-      whileInView={{ opacity: 1, y: 0 }}
+      // opacity kasıtlı olarak animasyona dahil DEĞİL — SSR HTML'de
+      // `opacity:0` inline style olarak render edilirse (framer-motion'ın
+      // `initial` prop'u tam bunu yapar), JS çalıştırmayan AI crawler'lar
+      // (GPTBot, ClaudeBot, PerplexityBot vb.) bu içeriği "gizli" sayıp
+      // tamamen atlıyor — SEO denetiminde site genelinde 46 örnekte tespit
+      // edildi. Sadece y-transform ile aynı "yukarı kayarak beliren" his
+      // korunuyor, metin ise JS'siz de her zaman tam opak ve okunabilir.
+      initial={{ y }}
+      whileInView={{ y: 0 }}
       viewport={viewportOnce}
       transition={{ duration: 0.5, ease: EASE_STANDARD, delay }}
     >
@@ -55,9 +62,10 @@ export function RevealItem({ children, className, y = 24 }: RevealProps) {
   return (
     <motion.div
       className={className}
+      // bkz. Reveal() içindeki not — opacity kasıtlı olarak yok, sadece y.
       variants={{
-        hidden: { opacity: 0, y },
-        visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE_STANDARD } },
+        hidden: { y },
+        visible: { y: 0, transition: { duration: 0.5, ease: EASE_STANDARD } },
       }}
     >
       {children}

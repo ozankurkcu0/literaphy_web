@@ -16,9 +16,11 @@ const container = {
   visible: { transition: { delayChildren: 0.2, staggerChildren: 0.15 } },
 };
 
+// opacity kasıtlı olarak yok (bkz. Reveal.tsx'teki aynı not) — JS'siz AI
+// crawler'ların bu alt başlık/CTA metnini "gizli" sayıp atlamaması için.
 const item = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: EASE_PREMIUM } },
+  hidden: { y: 20 },
+  visible: { y: 0, transition: { duration: 0.7, ease: EASE_PREMIUM } },
 };
 
 const features = [

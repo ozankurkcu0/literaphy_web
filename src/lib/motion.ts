@@ -3,19 +3,20 @@ import type { Variants } from "motion/react";
 export const EASE_PREMIUM: [number, number, number, number] = [0.16, 1, 0.3, 1];
 export const EASE_STANDARD: [number, number, number, number] = [0.33, 1, 0.68, 1];
 
+// opacity kasıtlı olarak yok — SSR HTML'de gerçek içerik metnini JS'siz AI
+// crawler'lardan (GPTBot, ClaudeBot, PerplexityBot vb.) gizlememek için,
+// bkz. src/components/ui/Reveal.tsx'teki aynı not.
 export const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 24 },
+  hidden: { y: 24 },
   visible: {
-    opacity: 1,
     y: 0,
     transition: { duration: 0.5, ease: EASE_STANDARD },
   },
 };
 
 export const fadeUpSmall: Variants = {
-  hidden: { opacity: 0, y: 12 },
+  hidden: { y: 12 },
   visible: {
-    opacity: 1,
     y: 0,
     transition: { duration: 0.35, ease: EASE_STANDARD },
   },
@@ -41,9 +42,8 @@ export const scaleIn: Variants = {
 };
 
 export const heroItem: Variants = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { y: 20 },
   visible: {
-    opacity: 1,
     y: 0,
     transition: { duration: 0.7, ease: EASE_PREMIUM },
   },

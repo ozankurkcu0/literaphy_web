@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { ArrowUpRight } from "lucide-react";
 import { NAV_LINKS } from "@/lib/constants";
 import { NAV_ICONS } from "@/lib/nav-icons";
 import { Logo } from "@/components/layout/Logo";
@@ -86,6 +87,16 @@ export function Header() {
               Teklif Alın
             </LiquidButton>
           </div>
+          {/* Mobilde "Teklif Alın" masaüstü butonuyla birlikte gizleniyordu,
+              tek eylem hamburger menüsüne kalıyordu (SEO/UX denetiminde
+              tespit edildi) — kompakt bir ikon buton her zaman görünür. */}
+          <Link
+            href="/iletisim"
+            aria-label="Teklif Alın"
+            className="flex size-11 items-center justify-center rounded-full bg-accent text-white transition-transform duration-150 ease-standard active:scale-95 lg:hidden"
+          >
+            <ArrowUpRight className="size-5" aria-hidden />
+          </Link>
           <MobileMenu />
         </div>
       </div>

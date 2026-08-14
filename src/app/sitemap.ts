@@ -25,14 +25,16 @@ const staticRoutes = [
   "/kvkk-aydinlatma-metni",
 ];
 
+// Not: priority/changeFrequency kasıtlı olarak yok — Google ikisini de yok
+// sayıyor (SEO denetiminde teyit edildi), dosyayı gereksiz büyütüyorlardı.
+// lastModified de statik/hizmet/proje sayfalarında YOK — her build'de "şimdi"
+// yazmak (eskiden `now` kullanılıyordu) gerçek bir değişiklik sinyali
+// taşımıyordu; Google'ın kendi önerisi, güvenilir bir tarih yoksa alanı hiç
+// göndermemek. Blog yazılarında gerçek `publishedAt` verisi olduğu için o
+// korunuyor.
 export default function sitemap(): MetadataRoute.Sitemap {
-  const now = new Date();
-
   const staticEntries: MetadataRoute.Sitemap = staticRoutes.map((path) => ({
     url: `${SITE_URL}${path}`,
-    lastModified: now,
-    changeFrequency: path === "" ? "weekly" : "monthly",
-    priority: path === "" ? 1 : 0.7,
   }));
 
   // href set edilmiş hizmetler (QR Menü, N8N Otomasyonları) kendi sayfalarına
@@ -43,23 +45,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
     .filter((service) => !service.href)
     .map((service) => ({
       url: `${SITE_URL}/hizmetler/${service.slug}`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.8,
     }));
 
   const projectEntries: MetadataRoute.Sitemap = projects.map((project) => ({
     url: `${SITE_URL}/projeler/${project.slug}`,
-    lastModified: now,
-    changeFrequency: "monthly",
-    priority: 0.6,
   }));
 
   const blogEntries: MetadataRoute.Sitemap = blogPosts.map((post) => ({
     url: `${SITE_URL}/blog/${post.slug}`,
     lastModified: post.publishedAt,
-    changeFrequency: "monthly",
-    priority: 0.6,
   }));
 
   return [...staticEntries, ...serviceEntries, ...projectEntries, ...blogEntries];
