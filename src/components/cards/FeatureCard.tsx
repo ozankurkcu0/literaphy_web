@@ -12,7 +12,7 @@ export function FeatureCard({ feature }: FeatureCardProps) {
   const Icon = feature.icon;
 
   return (
-    <div className="group flex flex-col gap-4 rounded-lg border border-hairline bg-surface p-7 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] transition-transform duration-250 ease-out hover:-translate-y-1">
+    <div className="group flex h-full flex-col gap-4 rounded-lg border border-hairline bg-surface p-7 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] transition-transform duration-250 ease-out hover:-translate-y-1">
       <div className="flex size-11 items-center justify-center rounded-md bg-(--color-icon-tint-soft) text-icon-tint transition-colors duration-250 ease-out group-hover:bg-[rgba(10,132,255,0.16)]">
         <Icon className="size-5" aria-hidden strokeWidth={1.75} />
       </div>

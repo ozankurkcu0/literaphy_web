@@ -25,7 +25,7 @@ export function FeatureSummaryGrid({
       <SectionHeading eyebrow={eyebrow} title={title} tone="product" className="mb-14" />
       <RevealGroup className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {features.map((feature) => (
-          <RevealItem key={feature.title}>
+          <RevealItem key={feature.title} className="h-full">
             <FeatureCard feature={feature} />
           </RevealItem>
         ))}
