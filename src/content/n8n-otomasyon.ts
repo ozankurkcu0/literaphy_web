@@ -31,31 +31,37 @@ export const n8nFeatures = [
     icon: Bot,
     title: "AI Destekli Müşteri Asistanı",
     description: "Müşteri sorularını anlayan, doğru yönlendiren özel chatbot ve asistan sistemleri geliştiriyoruz.",
+    image: "/features/n8n-ai-asistan.jpg",
   },
   {
     icon: Workflow,
     title: "İş Süreci Otomasyonu",
     description: "Belge işleme, veri girişi ve raporlama gibi manuel süreçleri uçtan uca otomatikleştiriyoruz.",
+    image: "/features/n8n-is-sureci.jpg",
   },
   {
     icon: BarChart3,
     title: "Veri Analizi ve Karar Desteği",
     description: "Dağınık verilerinizi AI destekli analizlerle anlamlı, karar alınabilir raporlara dönüştürüyoruz.",
+    image: "/features/n8n-veri-analizi.jpg",
   },
   {
     icon: Database,
     title: "Mevcut Araçlarınıza Entegrasyon",
     description: "CRM, e-posta, tablo ve veri tabanlarınıza doğrudan bağlanan, elle veri taşımaya son veren akışlar kuruyoruz.",
+    image: "/features/n8n-entegrasyon.jpg",
   },
   {
     icon: MessageCircle,
     title: "WhatsApp ve Mesajlaşma Otomasyonu",
     description: "WhatsApp ve diğer mesajlaşma platformlarında otomatik, tutarlı ve hızlı yanıt sistemleri kuruyoruz.",
+    image: "/features/n8n-whatsapp.jpg",
   },
   {
     icon: Megaphone,
     title: "Sosyal Medya İçerik Akışları",
     description: "İçerik üretiminden paylaşım takvimine kadar sosyal medya sürecinizi otomatik akışlarla yönetiyoruz.",
+    image: "/features/n8n-sosyal-medya.jpg",
   },
 ];
 

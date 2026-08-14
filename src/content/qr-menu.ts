@@ -33,31 +33,37 @@ export const qrMenuFeatures = [
     icon: QrCode,
     title: "Temassız QR Menü",
     description: "Uygulama indirmeden, tek karede açılan hızlı ve hijyenik dijital menü deneyimi.",
+    image: "/features/qr-temassiz-menu.png",
   },
   {
     icon: RefreshCw,
     title: "Anlık Güncelleme",
     description: "Fiyat ve ürün değişikliklerini yönetim panelinden saniyeler içinde yayına alın, basım maliyeti ödemeyin.",
+    image: "/features/qr-anlik-guncelleme.jpg",
   },
   {
     icon: Languages,
     title: "Çoklu Dil Desteği",
     description: "Türkçe, İngilizce ve talep ettiğiniz diğer dillerde otomatik menü sunumu.",
+    image: "/features/qr-coklu-dil.jpg",
   },
   {
     icon: Palette,
     title: "Marka Kimliğine Uyumlu Tasarım",
     description: "Logonuz, renkleriniz ve fotoğraflarınızla marka kimliğinize birebir uyumlu menü teması.",
+    image: "/features/qr-marka-kimligi.png",
   },
   {
     icon: BarChart3,
     title: "Ziyaretçi Analitiği",
     description: "En çok görüntülenen ürünler, yoğun saatler ve müşteri davranışlarını panelden takip edin.",
+    image: "/features/qr-ziyaretci-analitigi.jpg",
   },
   {
     icon: Smartphone,
     title: "Her Cihazda Mükemmel Görünüm",
     description: "Mobil, tablet ve masaüstünde otomatik uyumlanan, hızlı yüklenen responsive tasarım.",
+    image: "/features/qr-her-cihaz.jpg",
   },
 ];
 
@@ -102,8 +108,8 @@ export const qrMenuPricing: PricingPlan[] = [
     features: [
       "Standart paketindeki tüm özellikler dahildir",
       "Sınırsız şube",
+      "QR Menü üzerinden sipariş (panele entegre)",
       "Sınırsız dil desteği",
-      "POS / sipariş sistemi entegrasyonu",
       "Gelişmiş analitik ve raporlama",
       "Özel alan adı (restoranadiniz.com gibi)",
       "Ürün yönetimi ve fiyat güncelleme",
@@ -119,6 +125,7 @@ export const qrMenuPricing: PricingPlan[] = [
     description: "Kendi özel ihtiyaçları olan, kurumsal ve çok şubeli işletmeler için.",
     features: [
       "Premium paketinden daha gelişmiş ve özelleştirilmiş çözümler",
+      "POS / sipariş sistemi entegrasyonu",
       "Markanıza özel tasarım ve geliştirme",
       "İsteklerinize göre özel entegrasyonlar",
       "Özel alan adı (restoranadiniz.com gibi)",
@@ -129,12 +136,12 @@ export const qrMenuPricing: PricingPlan[] = [
 ];
 
 export const qrMenuComparisonRows = [
-  { feature: "Şube sayısı", starter: "1", standard: "3'e kadar", premium: "Sınırsız" },
-  { feature: "Dil desteği", starter: "1 dil", standard: "3 dile kadar", premium: "Sınırsız" },
-  { feature: "Analitik paneli", starter: "—", standard: "✓", premium: "✓ (Gelişmiş)" },
-  { feature: "POS / sipariş entegrasyonu", starter: "—", standard: "—", premium: "✓" },
-  { feature: "Özel alan adı", starter: "—", standard: "—", premium: "✓" },
-  { feature: "Destek", starter: "E-posta", standard: "Öncelikli", premium: "Özel hesap yöneticisi" },
+  { feature: "Şube sayısı", starter: "1", standard: "3'e kadar", premium: "Sınırsız", expert: "Sınırsız" },
+  { feature: "Dil desteği", starter: "1 dil", standard: "3 dile kadar", premium: "Sınırsız", expert: "Sınırsız" },
+  { feature: "Analitik paneli", starter: "—", standard: "✓", premium: "✓ (Gelişmiş)", expert: "✓ İhtiyacınıza göre özelleştirilmiş" },
+  { feature: "POS / sipariş entegrasyonu", starter: "—", standard: "—", premium: "—", expert: "✓" },
+  { feature: "Özel alan adı", starter: "—", standard: "—", premium: "✓", expert: "✓" },
+  { feature: "Destek", starter: "E-posta", standard: "Öncelikli", premium: "Yükse Öncelikli", expert: "Özel Hesap Yöneticisi" },
 ];
 
 export const qrMenuFaq = [

@@ -1,4 +1,5 @@
 import type { LucideIcon } from "lucide-react";
+import Image from "next/image";
 import { Section } from "@/components/ui/Section";
 import { Reveal } from "@/components/ui/Reveal";
 import { CoverArt } from "@/components/ui/CoverArt";
@@ -7,7 +8,7 @@ import { cn } from "@/lib/utils";
 const tones = ["amber", "indigo", "cyan", "emerald", "violet", "rose"] as const;
 
 interface FeatureDetailGridProps {
-  features: { icon: LucideIcon; title: string; description: string }[];
+  features: { icon: LucideIcon; title: string; description: string; image?: string }[];
 }
 
 export function FeatureDetailGrid({ features }: FeatureDetailGridProps) {
@@ -22,7 +23,19 @@ export function FeatureDetailGrid({ features }: FeatureDetailGridProps) {
             className={cn("grid items-center gap-10 lg:grid-cols-2 lg:gap-16", reversed && "lg:[&>*:first-child]:order-2")}
           >
             <Reveal>
-              <CoverArt tone={tones[index % tones.length] ?? "indigo"} icon={Icon} ratio="wide" />
+              {feature.image ? (
+                <div className="relative aspect-[16/7] overflow-hidden rounded-lg shadow-[inset_0_0_0_1px_rgba(255,255,255,0.07)]">
+                  <Image
+                    src={feature.image}
+                    alt={feature.title}
+                    fill
+                    sizes="(min-width: 1024px) 50vw, 100vw"
+                    className="object-cover"
+                  />
+                </div>
+              ) : (
+                <CoverArt tone={tones[index % tones.length] ?? "indigo"} icon={Icon} ratio="wide" />
+              )}
             </Reveal>
             <Reveal delay={0.1} className="flex flex-col gap-4">
               <span className="font-mono text-xs font-medium tracking-[0.1em] text-accent-product uppercase">
