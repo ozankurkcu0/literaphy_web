@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { EASE_PREMIUM } from "@/lib/motion";
 import { HeroScrollShowcase } from "@/components/sections/HeroScrollShowcase";
@@ -100,11 +100,15 @@ export function Hero() {
           bilgi çubuğu olarak hero'nun hemen altında duruyor. */}
       <Container className="relative z-10 -mt-4 pb-16 sm:pb-20">
         <div className={cn(cardSurfaceClass, "mx-auto max-w-3xl bg-surface px-6 py-6 sm:px-10")}>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-6 sm:divide-x sm:divide-hairline">
+          <div className="grid grid-cols-1 divide-y divide-hairline sm:grid-cols-3 sm:divide-x sm:divide-y-0">
             {features.map((feature) => (
-              <p key={feature} className="text-sm font-medium text-foreground-secondary sm:px-4 sm:text-center">
-                {feature}
-              </p>
+              <div
+                key={feature}
+                className="flex items-center justify-center gap-2.5 py-3 first:pt-0 last:pb-0 sm:px-4 sm:py-0"
+              >
+                <Check className="size-4 shrink-0 text-success" aria-hidden />
+                <p className="text-center text-sm font-medium text-foreground-secondary">{feature}</p>
+              </div>
             ))}
           </div>
         </div>
