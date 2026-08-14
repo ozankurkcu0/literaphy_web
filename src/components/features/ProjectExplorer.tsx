@@ -9,10 +9,7 @@ import { cn } from "@/lib/utils";
 const filters: { label: string; value: ProjectCategory | "hepsi" }[] = [
   { label: "Tümü", value: "hepsi" },
   { label: "Web Geliştirme", value: "web-gelistirme" },
-  { label: "Yazılım Geliştirme", value: "yazilim-gelistirme" },
-  { label: "AI Otomasyonu", value: "ai-otomasyon" },
-  { label: "WhatsApp Otomasyonu", value: "whatsapp-otomasyonu" },
-  { label: "API Entegrasyonu", value: "api-entegrasyonu" },
+  { label: "N8N Otomasyonu", value: "ai-otomasyon" },
   { label: "QR Menü Sistemleri", value: "qr-menu" },
 ];
 
