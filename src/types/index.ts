@@ -16,6 +16,8 @@ export interface Service {
   shortDescription: string;
   heroLead: string;
   scope: string[];
+  /** Overrides ScopeList's default "Bu hizmet neleri kapsıyor?" heading for this service. */
+  scopeTitle?: string;
   techStack: string[];
   faq: { question: string; answer: string }[];
   relatedCoverTone: CoverTone;
@@ -104,6 +106,9 @@ export interface TeamMember {
   /** Opsiyonel profil fotoğrafı (public/team/ altından). Yoksa baş harflerden
    * üretilen renkli Avatar'a düşer. */
   avatar?: string;
+  /** Opsiyonel kişisel LinkedIn profili — verilirse isim/rolün altında küçük
+   * bir bağlantı olarak gösterilir (bkz. TeamCard). */
+  linkedin?: string;
 }
 
 export interface StatItem {

@@ -7,12 +7,14 @@ export const teamMembers: TeamMember[] = [
     role: "Kurucu Ortak & Geliştirici",
     bio: "6 yıllık yazılım mimarisi deneyimiyle Literaphy'nin teknik vizyonunu yönetiyor; web ve otomasyon projelerine liderlik ediyor.",
     avatar: "/team/ozan-kurkcu.jpg",
+    linkedin: "https://www.linkedin.com/in/mahmut-ozan-k%C3%BCrk%C3%A7%C3%BC-aaa54020b/",
   },
   {
     name: "Berat Alakuş",
     role: "Kurucu Ortak & Yönetici",
     bio: "Kurumsal Web ve QR Menü Sistemlerinin yönetiminden sorumlu; müşteri ilişkileri ve proje yönetimi süreçlerini yürütüyor.",
     avatar: "/team/berat-alakus.jpg",
+    linkedin: "https://www.linkedin.com/in/berat-alaku%C5%9F-197366419/",
   }
 ];
 
