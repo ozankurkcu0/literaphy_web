@@ -77,7 +77,35 @@ function getConfig() {
     );
   }
 
-  return { email, privateKey: privateKey.replace(/\\n/g, "\n"), sheetId, sheetName };
+  return { email, privateKey: normalizePrivateKey(privateKey), sheetId, sheetName };
+}
+
+/** GOOGLE_PRIVATE_KEY, ortama göre birkaç farklı şekilde gelebilir: gerçek
+ * satır sonlarıyla (Vercel'in çok satırlı env value kutusuna direkt
+ * yapıştırılmışsa), literal "\n" dizileriyle (tek satır .env formatı), ya
+ * da yanlışlıkla başında/sonunda tırnakla. Hepsini geçerli bir PEM'e
+ * normalize eder; olmuyorsa net bir hata fırlatır (Node'un ham
+ * "DECODER routines::unsupported" hatası yerine). */
+function normalizePrivateKey(raw: string): string {
+  let key = raw.trim();
+
+  if ((key.startsWith('"') && key.endsWith('"')) || (key.startsWith("'") && key.endsWith("'"))) {
+    key = key.slice(1, -1).trim();
+  }
+
+  if (key.includes("\\n")) {
+    key = key.replace(/\\n/g, "\n");
+  }
+
+  if (!key.includes("-----BEGIN PRIVATE KEY-----") || !key.includes("-----END PRIVATE KEY-----")) {
+    throw new Error(
+      "GOOGLE_PRIVATE_KEY geçerli bir PEM anahtarı gibi görünmüyor (BEGIN/END PRIVATE KEY satırları eksik). " +
+        "Değeri servis hesabı JSON dosyasındaki private_key alanından, başında/sonunda tırnak olmadan tekrar " +
+        "kopyalayıp Vercel'e yapıştırın — bkz. docs/admin-panel-kurulum.md",
+    );
+  }
+
+  return key;
 }
 
 async function getSheetsClient() {
