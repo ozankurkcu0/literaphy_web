@@ -16,6 +16,7 @@ const orderInputSchema = z.object({
   totalInstallments: z.string().optional().default(""),
   paidInstallments: z.string().optional().default(""),
   status: z.enum(STATUSES).optional().default("Aktif"),
+  note: z.string().optional().default(""),
 });
 
 const NOT_CONFIGURED_MESSAGE =

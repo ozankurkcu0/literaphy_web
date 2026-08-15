@@ -74,3 +74,72 @@ export async function verifyAdminCredentials(
 
   return { phone: account.phone, name: account.name };
 }
+
+// ---- Panel içinden hesap yönetimi ---------------------------------------
+// Aşağıdakiler admin panelindeki "Hesaplar" sayfası için — CLI script'in
+// (scripts/create-admin.mjs) yaptığının aynısını API üzerinden yapıyor.
+
+export type AdminAccountsSource = "file" | "env";
+
+/** ADMIN_ACCOUNTS_JSON set edilmişse (production/Vercel) kaynak "env" —
+ * bu durumda dosyaya yazamayız (Vercel'in dosya sistemi salt okunur ve her
+ * deploy'da sıfırlanır), sadece bellek içi listeyi güncelleyip kalıcı
+ * olması için gereken JSON'u kullanıcıya gösterebiliriz. */
+export function getAdminAccountsSource(): AdminAccountsSource {
+  return process.env.ADMIN_ACCOUNTS_JSON && process.env.ADMIN_ACCOUNTS_JSON.trim() ? "env" : "file";
+}
+
+export interface AdminAccountSummary {
+  phone: string;
+  name?: string;
+}
+
+export function listAdminAccountsSummary(): AdminAccountSummary[] {
+  return loadAccounts().map(({ phone, name }) => ({ phone, name }));
+}
+
+export interface PersistAdminAccountsResult {
+  accounts: AdminAccountSummary[];
+  accountsJson: string;
+  persisted: boolean;
+}
+
+function persistAccounts(next: AdminAccount[]): PersistAdminAccountsResult {
+  const source = getAdminAccountsSource();
+
+  if (source === "file") {
+    const filePath = path.join(process.cwd(), "data", "admins.local.json");
+    fs.mkdirSync(path.dirname(filePath), { recursive: true });
+    fs.writeFileSync(filePath, JSON.stringify(next, null, 2) + "\n", "utf-8");
+  }
+
+  cachedAccounts = next;
+
+  return {
+    accounts: next.map(({ phone, name }) => ({ phone, name })),
+    accountsJson: JSON.stringify(next),
+    persisted: source === "file",
+  };
+}
+
+export async function upsertAdminAccount(input: {
+  phone: string;
+  password: string;
+  name?: string;
+}): Promise<PersistAdminAccountsResult> {
+  const phone = normalizePhone(input.phone);
+  const passwordHash = await bcrypt.hash(input.password, 10);
+  const current = loadAccounts();
+  const next = [
+    ...current.filter((account) => account.phone !== phone),
+    { phone, passwordHash, ...(input.name ? { name: input.name } : {}) },
+  ];
+  return persistAccounts(next);
+}
+
+export function removeAdminAccount(phoneRaw: string): PersistAdminAccountsResult {
+  const phone = normalizePhone(phoneRaw);
+  const current = loadAccounts();
+  const next = current.filter((account) => account.phone !== phone);
+  return persistAccounts(next);
+}

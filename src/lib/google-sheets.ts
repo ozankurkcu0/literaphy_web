@@ -14,7 +14,7 @@ import { google } from "googleapis";
  *  D: Hizmet Türü        E: Hizmete Başlama Tarihi
  *  F: Hesap Kesim Tarihi G: Telefon           H: E-posta
  *  I: Ücret              J: Para Birimi       K: Toplam Taksit
- *  L: Ödenen Taksit       M: Durum
+ *  L: Ödenen Taksit       M: Durum             N: Not
  */
 
 const HEADER_ROW = [
@@ -31,9 +31,10 @@ const HEADER_ROW = [
   "Toplam Taksit",
   "Ödenen Taksit",
   "Durum",
+  "Not",
 ] as const;
 
-const DATA_RANGE_COLUMNS = "A:M";
+const DATA_RANGE_COLUMNS = "A:N";
 
 export const CURRENCIES = ["TRY", "USD", "EUR"] as const;
 export type Currency = (typeof CURRENCIES)[number];
@@ -56,10 +57,52 @@ export interface OrderInput {
   totalInstallments: string;
   paidInstallments: string;
   status: Status;
+  note: string;
 }
 
 export interface Order extends OrderInput {
   rowNumber: number;
+  orderNumber: string;
+}
+
+/**
+ * Sipariş başına giderler (hosting, domain, SMS gateway vb.) ayrı bir sheet
+ * sekmesinde ("Giderler") tutulur — bire-çok ilişki olduğu için ana sipariş
+ * satırına sığdırmak yerine kendi tablosu var. Sekme yoksa ilk kullanımda
+ * otomatik oluşturulur (bkz. ensureExpenseSheet).
+ * Sütunlar: A: Gider ID  B: Sipariş Numarası  C: Gider Adı  D: Tutar
+ *           E: Para Birimi  F: Ödeme Tarihi  G: Not  H: Tekrar
+ */
+const EXPENSE_SHEET_NAME = "Giderler";
+const EXPENSE_HEADER_ROW = [
+  "Gider ID",
+  "Sipariş Numarası",
+  "Gider Adı",
+  "Tutar",
+  "Para Birimi",
+  "Ödeme Tarihi",
+  "Not",
+  "Tekrar",
+] as const;
+const EXPENSE_DATA_COLUMNS = "A:H";
+
+export const EXPENSE_RECURRENCES = ["Tek seferlik", "Aylık", "Yıllık"] as const;
+export type ExpenseRecurrence = (typeof EXPENSE_RECURRENCES)[number];
+
+export interface ExpenseInput {
+  name: string;
+  amount: string;
+  currency: Currency;
+  recurrence: ExpenseRecurrence;
+  // Tek seferlik/Yıllık: yyyy-mm-dd (yıllıkta yıl sadece bilgi amaçlı, hatırlatma
+  // hesaplanırken sadece ay/gün kullanılır). Aylık: ayın günü, "1"–"31".
+  dueDate: string;
+  note: string;
+}
+
+export interface Expense extends ExpenseInput {
+  rowNumber: number;
+  expenseId: string;
   orderNumber: string;
 }
 
@@ -132,7 +175,7 @@ async function ensureHeaders(): Promise<void> {
 
   const { data } = await sheets.spreadsheets.values.get({
     spreadsheetId: sheetId,
-    range: `${sheetName}!A1:M1`,
+    range: `${sheetName}!A1:N1`,
   });
 
   const currentHeaders = data.values?.[0] ?? [];
@@ -141,7 +184,7 @@ async function ensureHeaders(): Promise<void> {
 
   await sheets.spreadsheets.values.update({
     spreadsheetId: sheetId,
-    range: `${sheetName}!A1:M1`,
+    range: `${sheetName}!A1:N1`,
     valueInputOption: "USER_ENTERED",
     requestBody: { values: [[...HEADER_ROW]] },
   });
@@ -198,6 +241,7 @@ function rowToOrder(row: string[], rowNumber: number): Order | null {
     totalInstallments: row[10] ?? "",
     paidInstallments: row[11] ?? "",
     status: toStatus(row[12]),
+    note: row[13] ?? "",
   };
 }
 
@@ -251,11 +295,12 @@ export async function createOrder(input: OrderInput): Promise<Order> {
     input.totalInstallments,
     input.paidInstallments,
     input.status,
+    protectFromFormula(input.note),
   ];
 
   await sheets.spreadsheets.values.append({
     spreadsheetId: sheetId,
-    range: `${sheetName}!A:M`,
+    range: `${sheetName}!A:N`,
     valueInputOption: "USER_ENTERED",
     insertDataOption: "INSERT_ROWS",
     requestBody: { values: [values] },
@@ -281,7 +326,7 @@ export async function updateOrder(orderNumber: string, patch: Partial<OrderInput
 
   const { data } = await sheets.spreadsheets.values.get({
     spreadsheetId: sheetId,
-    range: `${sheetName}!A${rowNumber}:M${rowNumber}`,
+    range: `${sheetName}!A${rowNumber}:N${rowNumber}`,
   });
   const current = rowToOrder((data.values?.[0] as string[]) ?? [], rowNumber);
   if (!current) {
@@ -303,11 +348,12 @@ export async function updateOrder(orderNumber: string, patch: Partial<OrderInput
     merged.totalInstallments,
     merged.paidInstallments,
     merged.status,
+    protectFromFormula(merged.note),
   ];
 
   await sheets.spreadsheets.values.update({
     spreadsheetId: sheetId,
-    range: `${sheetName}!A${rowNumber}:M${rowNumber}`,
+    range: `${sheetName}!A${rowNumber}:N${rowNumber}`,
     valueInputOption: "USER_ENTERED",
     requestBody: { values: [values] },
   });
@@ -315,16 +361,216 @@ export async function updateOrder(orderNumber: string, patch: Partial<OrderInput
   return merged;
 }
 
-async function getNumericSheetId(sheetName: string): Promise<number> {
+async function getNumericSheetId(sheetName: string): Promise<number | null> {
   const sheets = await getSheetsClient();
   const { sheetId } = getConfig();
   const { data } = await sheets.spreadsheets.get({ spreadsheetId: sheetId });
   const sheet = data.sheets?.find((item) => item.properties?.title === sheetName);
-  const numericId = sheet?.properties?.sheetId;
-  if (numericId === undefined || numericId === null) {
-    throw new Error(`"${sheetName}" adlı sayfa bulunamadı.`);
+  return sheet?.properties?.sheetId ?? null;
+}
+
+/** "Giderler" sekmesi yoksa oluşturur, başlık satırını yazar/tamamlar —
+ * kullanıcının elle hazırlamasına gerek kalmadan ilk gider eklendiğinde
+ * kendiliğinden hazır hale gelir. */
+async function ensureExpenseSheet(): Promise<void> {
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const existingSheetId = await getNumericSheetId(EXPENSE_SHEET_NAME);
+  if (existingSheetId === null) {
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId: sheetId,
+      requestBody: { requests: [{ addSheet: { properties: { title: EXPENSE_SHEET_NAME } } }] },
+    });
   }
-  return numericId;
+
+  const { data } = await sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range: `${EXPENSE_SHEET_NAME}!A1:H1`,
+  });
+  const currentHeaders = data.values?.[0] ?? [];
+  const needsUpdate = EXPENSE_HEADER_ROW.some((header, index) => currentHeaders[index] !== header);
+  if (!needsUpdate) return;
+
+  await sheets.spreadsheets.values.update({
+    spreadsheetId: sheetId,
+    range: `${EXPENSE_SHEET_NAME}!A1:H1`,
+    valueInputOption: "USER_ENTERED",
+    requestBody: { values: [[...EXPENSE_HEADER_ROW]] },
+  });
+}
+
+function toExpenseRecurrence(value: string | undefined): ExpenseRecurrence {
+  return (EXPENSE_RECURRENCES as readonly string[]).includes(value ?? "")
+    ? (value as ExpenseRecurrence)
+    : "Tek seferlik";
+}
+
+/** "Aylık" gider için Ödeme Tarihi sütunu bir tarih değil, sadece ayın günü
+ * (ör. "15") — bu yüzden tarih dönüşümü recurrence'a göre değişiyor. */
+function serializeExpenseDueDate(recurrence: ExpenseRecurrence, dueDate: string): string {
+  return recurrence === "Aylık" ? dueDate : isoToTurkishDate(dueDate);
+}
+
+function deserializeExpenseDueDate(recurrence: ExpenseRecurrence, raw: string): string {
+  return recurrence === "Aylık" ? raw : turkishDateToIso(raw);
+}
+
+function rowToExpense(row: string[], rowNumber: number): Expense | null {
+  const expenseId = row[0]?.trim();
+  if (!expenseId) return null;
+
+  const recurrence = toExpenseRecurrence(row[7]);
+
+  return {
+    rowNumber,
+    expenseId,
+    orderNumber: row[1] ?? "",
+    name: row[2] ?? "",
+    amount: row[3] ?? "",
+    currency: toCurrency(row[4]),
+    dueDate: deserializeExpenseDueDate(recurrence, row[5] ?? ""),
+    note: row[6] ?? "",
+    recurrence,
+  };
+}
+
+function generateExpenseId(existing: Set<string>): string {
+  for (let attempt = 0; attempt < 50; attempt++) {
+    const candidate = String(Math.floor(100000 + Math.random() * 900000));
+    if (!existing.has(candidate)) return candidate;
+  }
+  throw new Error("Benzersiz gider numarası üretilemedi, lütfen tekrar deneyin.");
+}
+
+export async function listExpenses(): Promise<Expense[]> {
+  await ensureExpenseSheet();
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const { data } = await sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range: `${EXPENSE_SHEET_NAME}!A2:${EXPENSE_DATA_COLUMNS.split(":")[1]}`,
+  });
+
+  const rows = data.values ?? [];
+  const expenses: Expense[] = [];
+  rows.forEach((row, index) => {
+    const expense = rowToExpense(row as string[], index + 2);
+    if (expense) expenses.push(expense);
+  });
+  return expenses;
+}
+
+export async function listExpensesForOrder(orderNumber: string): Promise<Expense[]> {
+  const all = await listExpenses();
+  return all.filter((expense) => expense.orderNumber === orderNumber).reverse();
+}
+
+export async function createExpense(orderNumber: string, input: ExpenseInput): Promise<Expense> {
+  await ensureExpenseSheet();
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const existing = await listExpenses();
+  const expenseId = generateExpenseId(new Set(existing.map((expense) => expense.expenseId)));
+
+  const values = [
+    expenseId,
+    orderNumber,
+    protectFromFormula(input.name),
+    input.amount,
+    input.currency,
+    serializeExpenseDueDate(input.recurrence, input.dueDate),
+    protectFromFormula(input.note),
+    input.recurrence,
+  ];
+
+  await sheets.spreadsheets.values.append({
+    spreadsheetId: sheetId,
+    range: `${EXPENSE_SHEET_NAME}!${EXPENSE_DATA_COLUMNS}`,
+    valueInputOption: "USER_ENTERED",
+    insertDataOption: "INSERT_ROWS",
+    requestBody: { values: [values] },
+  });
+
+  return { rowNumber: -1, expenseId, orderNumber, ...input };
+}
+
+export async function updateExpense(expenseId: string, patch: Partial<ExpenseInput>): Promise<Expense> {
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const all = await listExpenses();
+  const current = all.find((expense) => expense.expenseId === expenseId);
+  if (!current) {
+    throw new Error(`${expenseId} numaralı gider bulunamadı.`);
+  }
+
+  const merged: Expense = { ...current, ...patch };
+  const values = [
+    merged.expenseId,
+    merged.orderNumber,
+    protectFromFormula(merged.name),
+    merged.amount,
+    merged.currency,
+    serializeExpenseDueDate(merged.recurrence, merged.dueDate),
+    protectFromFormula(merged.note),
+    merged.recurrence,
+  ];
+
+  await sheets.spreadsheets.values.update({
+    spreadsheetId: sheetId,
+    range: `${EXPENSE_SHEET_NAME}!A${current.rowNumber}:H${current.rowNumber}`,
+    valueInputOption: "USER_ENTERED",
+    requestBody: { values: [values] },
+  });
+
+  return merged;
+}
+
+export async function deleteExpense(expenseId: string): Promise<void> {
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const all = await listExpenses();
+  const current = all.find((expense) => expense.expenseId === expenseId);
+  if (!current) {
+    throw new Error(`${expenseId} numaralı gider bulunamadı.`);
+  }
+
+  const numericSheetId = await getNumericSheetId(EXPENSE_SHEET_NAME);
+  if (numericSheetId === null) {
+    throw new Error(`"${EXPENSE_SHEET_NAME}" adlı sayfa bulunamadı.`);
+  }
+
+  await sheets.spreadsheets.batchUpdate({
+    spreadsheetId: sheetId,
+    requestBody: {
+      requests: [
+        {
+          deleteDimension: {
+            range: {
+              sheetId: numericSheetId,
+              dimension: "ROWS",
+              startIndex: current.rowNumber - 1,
+              endIndex: current.rowNumber,
+            },
+          },
+        },
+      ],
+    },
+  });
+}
+
+/** Bir siparişe bağlı tüm giderleri siler — sipariş silindiğinde "Giderler"
+ * sekmesinde sahipsiz kayıt kalmasın diye (bkz. deleteOrder). Giderler ayrı
+ * bir sheet'te olduğu için sipariş satırının silinmesinden bağımsız. */
+export async function deleteExpensesForOrder(orderNumber: string): Promise<void> {
+  const expenses = await listExpensesForOrder(orderNumber);
+  for (const expense of expenses) {
+    await deleteExpense(expense.expenseId);
+  }
 }
 
 export async function deleteOrder(orderNumber: string): Promise<void> {
@@ -336,7 +582,12 @@ export async function deleteOrder(orderNumber: string): Promise<void> {
     throw new Error(`${orderNumber} numaralı sipariş bulunamadı.`);
   }
 
+  await deleteExpensesForOrder(orderNumber);
+
   const numericSheetId = await getNumericSheetId(sheetName);
+  if (numericSheetId === null) {
+    throw new Error(`"${sheetName}" adlı sayfa bulunamadı.`);
+  }
 
   await sheets.spreadsheets.batchUpdate({
     spreadsheetId: sheetId,

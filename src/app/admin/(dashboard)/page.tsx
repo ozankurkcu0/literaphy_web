@@ -6,14 +6,20 @@ import { Button } from "@/components/ui/Button";
 import { OrdersTable } from "@/components/admin/OrdersTable";
 import { OrdersOverview } from "@/components/admin/OrdersOverview";
 import { OrderFormDialog } from "@/components/admin/OrderFormDialog";
+import { OrderDetailDialog } from "@/components/admin/OrderDetailDialog";
 import { SERVICE_TYPE_OPTIONS, STATUS_OPTIONS } from "@/lib/order-form-options";
 import { inputBaseClass } from "@/lib/utils";
-import type { Order, OrderInput } from "@/lib/google-sheets";
+import type { Expense, Order, OrderInput } from "@/lib/google-sheets";
 
-type DialogState = { mode: "create" } | { mode: "edit"; order: Order } | null;
+type DialogState =
+  | { mode: "create" }
+  | { mode: "edit"; order: Order }
+  | { mode: "detail"; order: Order }
+  | null;
 
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<Order[] | null>(null);
+  const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [configured, setConfigured] = useState(true);
   const [dialog, setDialog] = useState<DialogState>(null);
@@ -38,9 +44,23 @@ export default function AdminOrdersPage() {
     }
   }, []);
 
+  // Gider bildirimleri (Siparişler özetindeki "Gider" bölümü) için — tek
+  // seferde tüm siparişlerin giderlerini çeker, sessizce başarısız olur
+  // (siparişler zaten kendi hata mesajını gösteriyor).
+  const fetchExpenses = useCallback(async () => {
+    try {
+      const response = await fetch("/api/admin/expenses");
+      const data = await response.json();
+      if (response.ok) setExpenses(data.expenses ?? []);
+    } catch {
+      // sessiz — özet kartı sadece eksik veriyle gösterir
+    }
+  }, []);
+
   useEffect(() => {
     fetchOrders();
-  }, [fetchOrders]);
+    fetchExpenses();
+  }, [fetchOrders, fetchExpenses]);
 
   const filteredOrders = useMemo(() => {
     if (!orders) return [];
@@ -133,7 +153,9 @@ export default function AdminOrdersPage() {
         </div>
       ) : (
         <>
-          {orders && orders.length > 0 && <OrdersOverview orders={orders} />}
+          {orders && orders.length > 0 && (
+            <OrdersOverview orders={orders} expenses={expenses} onOrderUpdated={fetchOrders} />
+          )}
 
           {orders && orders.length > 0 && (
             <div className="flex flex-wrap items-center gap-3">
@@ -203,6 +225,7 @@ export default function AdminOrdersPage() {
 
           <OrdersTable
             orders={filteredOrders}
+            onViewDetail={(order) => setDialog({ mode: "detail", order })}
             onEdit={(order) => setDialog({ mode: "edit", order })}
             onDelete={handleDelete}
             emptyTitle={hasActiveFilters ? "Sonuç bulunamadı" : undefined}
@@ -221,6 +244,17 @@ export default function AdminOrdersPage() {
           order={dialog.order}
           onClose={() => setDialog(null)}
           onSubmit={(values) => handleUpdate(dialog.order.orderNumber, values)}
+        />
+      )}
+      {dialog?.mode === "detail" && (
+        <OrderDetailDialog
+          order={dialog.order}
+          onClose={() => {
+            setDialog(null);
+            fetchExpenses();
+          }}
+          onEdit={(order) => setDialog({ mode: "edit", order })}
+          onOrderUpdated={fetchOrders}
         />
       )}
     </div>

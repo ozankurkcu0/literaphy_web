@@ -108,17 +108,52 @@ Her yeni sipariş için 6 haneli (100000–999999 arası) rastgele bir numara
 üretilir ve mevcut kayıtlarla çakışmayana kadar tekrar denenir — elle girmenize
 gerek yok, sheet'teki A sütununa otomatik yazılır.
 
-## 5) Gelen Kutusu (Gmail) — henüz bağlı değil
+## 5) Giderler (hosting, domain vb.)
 
-Panelde bir "Gelen Kutusu" sekmesi hazır bekliyor ama Gmail'e henüz
-bağlanmadı. İleride `literaphy@gmail.com` adresine gelen mailleri sipariş
-gibi listetmek isterseniz iki yol var:
+Her siparişin ayrıntı ekranında (listede bir isme veya ⓘ ikonuna tıklayın)
+o müşteriyle ilgili giderleri (hosting, domain, SMS gateway vb.) ekleyip
+takip edebilirsiniz. Bunlar için "Sipariş Kayıtları" sheet'inde ayrıca
+**"Giderler"** adında bir sekme kullanılıyor — yoksa panel ilk gider
+eklendiğinde otomatik oluşturur, elle hazırlamanıza gerek yok.
 
-- **IMAP + Uygulama Şifresi** (daha basit): Google hesap ayarlarından bir
-  "Uygulama Şifresi" oluşturup env'e eklemek yeterli, Google Cloud projesi
-  gerekmez.
-- **Gmail API (OAuth2)** (daha "resmi"): Google Cloud Console'da OAuth izni
-  gerekir, ileride etiketleme/yanıtlama gibi ekstra özelliklere açık.
+Her gidere bir tekrar tipi seçilir: **Tek seferlik**, **Aylık** (sadece
+ayın günü sorulur, yıl gerekmez) veya **Yıllık** (tam tarih). Yaklaşan/geçmiş
+ödemeler, Siparişler sayfasının üstündeki özette gelir hatırlatmasının
+altında ayrı bir "Gider" bölümünde listelenir.
 
-Hangisini istediğinize karar verince haber verin, mevcut "Gelen Kutusu"
-sayfasına (`src/app/admin/(dashboard)/gelen-kutusu/page.tsx`) bağlarız.
+## 6) Gelen Kutusu (Gmail)
+
+"Gelen Kutusu" sekmesi, kutunuza (`GMAIL_IMAP_USER`) IMAP ile bağlanıp son
+30 mail arasından İletişim/N8N/QR Menü demo formlarından gelenleri tanır
+(bkz. src/lib/email.ts'teki ortak bildirim şablonu) ve içeriğini ("Ad
+Soyad", "Telefon" vb. alanlar) ayrıştırıp "Bekleyen Müşteriler" listesinde
+gösterir — ham mail listesi yerine düzenli kart görünümü. Google Cloud
+projesi/OAuth gerekmez.
+
+Panelden bir talebi **"Cevap verildi"** olarak işaretleyebilirsiniz — bu,
+standart IMAP `\Answered` bayrağını açar/kapatır, yani Gmail'in kendisinde
+de (herhangi bir mail istemcisinde) görünür. Mail gönderme/silme yapılmaz,
+tek yazma işlemi bu bayrak.
+
+### Uygulama şifresi oluşturma
+
+1. `myaccount.google.com/security` → **2 Adımlı Doğrulama**'nın açık
+   olduğundan emin olun (kapalıysa önce onu açmanız gerekir).
+2. Aynı sayfada **Uygulama Şifreleri** (App Passwords) → yeni bir şifre
+   oluşturun (uygulama adı olarak "Literaphy Admin" gibi bir şey yazabilirsiniz).
+   Google 16 haneli, boşluksuz bir kod verir (ör. `abcdabcdabcdabcd`) — bu
+   normal Gmail şifreniz **değil**, sadece bu entegrasyon için.
+3. `.env.local`'e (veya Vercel'e) ekleyin:
+
+```
+GMAIL_IMAP_USER=literaphy@gmail.com
+GMAIL_IMAP_APP_PASSWORD=abcdabcdabcdabcd
+```
+
+4. `npm run dev` → `/admin/gelen-kutusu` → mailler gelmeye başlar. Sağ
+   üstteki "Yenile" ile elle tazeleyebilirsiniz.
+
+Not: Google hesabında 2 Adımlı Doğrulama olmayan bir işletme/aile hesabı
+kullanıyorsanız (Workspace) yönetici "Daha az güvenli uygulama erişimi"ni
+ayrıca açmanız gerekebilir — Google bunu önermiyor, mümkünse 2FA + Uygulama
+Şifresi yöntemini kullanın.

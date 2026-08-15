@@ -4,6 +4,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { ChevronDown, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { Textarea } from "@/components/ui/Textarea";
 import { inputBaseClass } from "@/lib/utils";
 import { CURRENCY_OPTIONS, SERVICE_TYPE_OPTIONS, STATUS_OPTIONS } from "@/lib/order-form-options";
 import type { Currency, Order, OrderInput, Status } from "@/lib/google-sheets";
@@ -21,6 +22,7 @@ const EMPTY_FORM: OrderInput = {
   totalInstallments: "",
   paidInstallments: "",
   status: "Aktif",
+  note: "",
 };
 
 interface OrderFormDialogProps {
@@ -289,6 +291,15 @@ export function OrderFormDialog({ order, onClose, onSubmit }: OrderFormDialogPro
               </div>
             </div>
           </div>
+
+          <Textarea
+            label="Not"
+            name="note"
+            placeholder="Müşteriyle ilgili özel talepler, hatırlatmalar…"
+            rows={3}
+            value={values.note}
+            onChange={(event) => update("note", event.target.value)}
+          />
 
           {error && (
             <p role="alert" className="text-[13px] font-medium text-danger">

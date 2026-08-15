@@ -2,12 +2,15 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { ClipboardList, Inbox, LogOut } from "lucide-react";
+import { BarChart3, ClipboardList, Inbox, LogOut, Users, UserCog } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
   { label: "Siparişler", href: "/admin", icon: ClipboardList },
+  { label: "Müşteriler", href: "/admin/musteriler", icon: Users },
+  { label: "Analiz", href: "/admin/analiz", icon: BarChart3 },
   { label: "Gelen Kutusu", href: "/admin/gelen-kutusu", icon: Inbox },
+  { label: "Hesaplar", href: "/admin/hesaplar", icon: UserCog },
 ];
 
 export function AdminShell({ adminLabel, children }: { adminLabel: string; children: React.ReactNode }) {

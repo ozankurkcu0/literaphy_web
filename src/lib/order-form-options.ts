@@ -1,4 +1,4 @@
-import type { Currency, Status } from "@/lib/google-sheets";
+import type { Currency, ExpenseRecurrence, Status } from "@/lib/google-sheets";
 
 /** OrderFormDialog (giriş) ve admin sipariş sayfasındaki filtre dropdown'ı
  * arasında paylaşılan sabit seçenek listeleri. */
@@ -20,4 +20,10 @@ export const STATUS_OPTIONS: { label: string; value: Status }[] = [
   { label: "Aktif", value: "Aktif" },
   { label: "Tamamlandı", value: "Tamamlandı" },
   { label: "İptal", value: "İptal" },
+];
+
+export const EXPENSE_RECURRENCE_OPTIONS: { label: string; value: ExpenseRecurrence }[] = [
+  { label: "Tek seferlik", value: "Tek seferlik" },
+  { label: "Aylık", value: "Aylık" },
+  { label: "Yıllık", value: "Yıllık" },
 ];

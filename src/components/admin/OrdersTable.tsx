@@ -1,26 +1,17 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ArrowDown, ArrowUp, ArrowUpDown, Pencil, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, ArrowUpDown, Info, Pencil, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { Order, Status } from "@/lib/google-sheets";
-
-function formatDateDisplay(iso: string): string {
-  if (!iso) return "—";
-  const [year, month, day] = iso.split("-");
-  if (!year || !month || !day) return iso;
-  return `${day}.${month}.${year}`;
-}
+import { formatCurrencyAmount, formatDateDisplay } from "@/lib/order-format";
+import { StatusBadge } from "@/components/admin/StatusBadge";
+import type { Order } from "@/lib/google-sheets";
 
 function formatFee(order: Order): string {
   if (!order.fee) return "—";
   const numeric = Number(order.fee);
   if (Number.isNaN(numeric)) return order.fee;
-  try {
-    return new Intl.NumberFormat("tr-TR", { style: "currency", currency: order.currency }).format(numeric);
-  } catch {
-    return `${new Intl.NumberFormat("tr-TR").format(numeric)} ${order.currency}`;
-  }
+  return formatCurrencyAmount(numeric, order.currency);
 }
 
 function formatInstallments(order: Order): string {
@@ -29,25 +20,6 @@ function formatInstallments(order: Order): string {
   const paid = Number(order.paidInstallments) || 0;
   const remaining = Math.max(total - paid, 0);
   return `${paid}/${total} · ${remaining} kalan`;
-}
-
-const STATUS_BADGE_CLASS: Record<Status, string> = {
-  Aktif: "border-success/20 bg-success/10 text-success",
-  Tamamlandı: "border-hairline bg-surface text-foreground-muted",
-  İptal: "border-danger/20 bg-danger/10 text-danger",
-};
-
-function StatusBadge({ status }: { status: Status }) {
-  return (
-    <span
-      className={cn(
-        "inline-flex items-center rounded-full border px-2.5 py-0.5 text-[12px] font-medium whitespace-nowrap",
-        STATUS_BADGE_CLASS[status],
-      )}
-    >
-      {status}
-    </span>
-  );
 }
 
 /** Hesap kesim tarihi bugüne göre ne kadar yakın/geçmişse ona göre renk —
@@ -84,6 +56,7 @@ function compareOrders(a: Order, b: Order, key: SortKey): number {
 
 interface OrdersTableProps {
   orders: Order[];
+  onViewDetail: (order: Order) => void;
   onEdit: (order: Order) => void;
   onDelete: (order: Order) => void;
   emptyTitle?: string;
@@ -92,6 +65,7 @@ interface OrdersTableProps {
 
 export function OrdersTable({
   orders,
+  onViewDetail,
   onEdit,
   onDelete,
   emptyTitle = "Henüz sipariş kaydı yok",
@@ -145,8 +119,14 @@ export function OrdersTable({
               <td className="px-4 py-3 font-mono text-foreground-secondary">#{order.orderNumber}</td>
               <td className="px-4 py-3 text-foreground-secondary">{order.phone || "—"}</td>
               <td className="px-4 py-3 text-foreground-secondary">{order.email || "—"}</td>
-              <td className="px-4 py-3 text-foreground">
-                {order.firstName} {order.lastName}
+              <td className="px-4 py-3">
+                <button
+                  type="button"
+                  onClick={() => onViewDetail(order)}
+                  className="text-left text-foreground underline decoration-transparent underline-offset-2 transition-colors hover:decoration-foreground-muted"
+                >
+                  {order.firstName} {order.lastName}
+                </button>
               </td>
               <td className="px-4 py-3 text-foreground-secondary">{order.serviceType}</td>
               <td className="px-4 py-3 text-foreground-secondary">{formatDateDisplay(order.startDate)}</td>
@@ -158,6 +138,14 @@ export function OrdersTable({
               </td>
               <td className="px-4 py-3">
                 <div className="flex justify-end gap-1">
+                  <button
+                    type="button"
+                    onClick={() => onViewDetail(order)}
+                    className="flex size-8 items-center justify-center rounded-md text-foreground-muted transition-colors hover:bg-elevated hover:text-foreground"
+                    aria-label={`${order.orderNumber} numaralı siparişin ayrıntılarını gör`}
+                  >
+                    <Info className="size-4" aria-hidden />
+                  </button>
                   <button
                     type="button"
                     onClick={() => onEdit(order)}
