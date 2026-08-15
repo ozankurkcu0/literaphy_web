@@ -157,3 +157,12 @@ Not: Google hesabında 2 Adımlı Doğrulama olmayan bir işletme/aile hesabı
 kullanıyorsanız (Workspace) yönetici "Daha az güvenli uygulama erişimi"ni
 ayrıca açmanız gerekebilir — Google bunu önermiyor, mümkünse 2FA + Uygulama
 Şifresi yöntemini kullanın.
+
+## 7) Aktivite log'u
+
+"Aktivite" sekmesi, panelde kim ne zaman ne değiştirdi/sildiğini gösterir
+(sipariş/gider/hesap oluşturma-güncelleme-silme, gelen kutusu işaretleme).
+Bunun için sheet'te ayrıca **"Aktivite Log"** sekmesi kullanılıyor — yoksa
+ilk işlemde otomatik oluşturulur, elle hazırlamanıza gerek yok. Log yazımı
+başarısız olsa bile (ör. geçici bir bağlantı sorunu) asıl işlemi (sipariş
+kaydetme vb.) etkilemez, sadece sunucu logunda görünür.

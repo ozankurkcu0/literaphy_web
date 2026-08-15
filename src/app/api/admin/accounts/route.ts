@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { requireAdminSession } from "@/lib/admin-session-guard";
 import { getAdminAccountsSource, listAdminAccountsSummary, upsertAdminAccount } from "@/lib/admin-accounts";
+import { logActivity } from "@/lib/google-sheets";
 
 const upsertSchema = z.object({
   phone: z.string().min(1, "Telefon numarası gerekli."),
@@ -31,6 +32,11 @@ export async function POST(request: Request) {
 
   try {
     const result = await upsertAdminAccount(parsed.data);
+    logActivity(
+      session.name || session.phone,
+      "Admin eklendi/güncellendi",
+      `${parsed.data.name || parsed.data.phone}`,
+    );
     return NextResponse.json(result);
   } catch (error) {
     console.error("[api/admin/accounts] upsertAdminAccount hata:", error);

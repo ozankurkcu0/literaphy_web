@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { requireAdminSession } from "@/lib/admin-session-guard";
-import { CURRENCIES, STATUSES, createOrder, isSheetsConfigured, listOrders } from "@/lib/google-sheets";
+import { CURRENCIES, STATUSES, createOrder, isSheetsConfigured, listOrders, logActivity } from "@/lib/google-sheets";
 
 const orderInputSchema = z.object({
   firstName: z.string().min(1, "İsim gerekli."),
@@ -55,6 +55,11 @@ export async function POST(request: Request) {
 
   try {
     const order = await createOrder(parsed.data);
+    logActivity(
+      session.name || session.phone,
+      "Sipariş oluşturuldu",
+      `${order.firstName} ${order.lastName} (#${order.orderNumber})`,
+    );
     return NextResponse.json({ order }, { status: 201 });
   } catch (error) {
     console.error("[api/admin/orders] createOrder hata:", error);

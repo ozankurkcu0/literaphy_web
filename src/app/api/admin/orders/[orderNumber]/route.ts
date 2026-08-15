@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { requireAdminSession } from "@/lib/admin-session-guard";
-import { CURRENCIES, STATUSES, deleteOrder, isSheetsConfigured, updateOrder } from "@/lib/google-sheets";
+import { CURRENCIES, STATUSES, deleteOrder, isSheetsConfigured, logActivity, updateOrder } from "@/lib/google-sheets";
 
 const orderPatchSchema = z.object({
   firstName: z.string().min(1).optional(),
@@ -40,6 +40,11 @@ export async function PATCH(request: Request, { params }: RouteParams) {
 
   try {
     const order = await updateOrder(orderNumber, parsed.data);
+    logActivity(
+      session.name || session.phone,
+      "Sipariş güncellendi",
+      `${order.firstName} ${order.lastName} (#${order.orderNumber})`,
+    );
     return NextResponse.json({ order });
   } catch (error) {
     console.error("[api/admin/orders/:orderNumber] updateOrder hata:", error);
@@ -57,6 +62,7 @@ export async function DELETE(_request: Request, { params }: RouteParams) {
 
   try {
     await deleteOrder(orderNumber);
+    logActivity(session.name || session.phone, "Sipariş silindi", `#${orderNumber}`);
     return NextResponse.json({ ok: true });
   } catch (error) {
     console.error("[api/admin/orders/:orderNumber] deleteOrder hata:", error);

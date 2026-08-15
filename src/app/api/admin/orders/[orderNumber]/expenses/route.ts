@@ -1,7 +1,14 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { requireAdminSession } from "@/lib/admin-session-guard";
-import { CURRENCIES, EXPENSE_RECURRENCES, createExpense, isSheetsConfigured, listExpensesForOrder } from "@/lib/google-sheets";
+import {
+  CURRENCIES,
+  EXPENSE_RECURRENCES,
+  createExpense,
+  isSheetsConfigured,
+  listExpensesForOrder,
+  logActivity,
+} from "@/lib/google-sheets";
 
 const expenseInputSchema = z.object({
   name: z.string().min(1, "Gider adı gerekli."),
@@ -49,6 +56,7 @@ export async function POST(request: Request, { params }: RouteParams) {
 
   try {
     const expense = await createExpense(orderNumber, parsed.data);
+    logActivity(session.name || session.phone, "Gider eklendi", `${expense.name} · sipariş #${orderNumber}`);
     return NextResponse.json({ expense }, { status: 201 });
   } catch (error) {
     console.error("[api/admin/orders/:orderNumber/expenses] createExpense hata:", error);

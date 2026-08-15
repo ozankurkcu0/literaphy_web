@@ -607,3 +607,101 @@ export async function deleteOrder(orderNumber: string): Promise<void> {
     },
   });
 }
+
+/**
+ * Aktivite log'u — hangi admin ne zaman ne değiştirdi/sildi. Ayrı bir
+ * "Aktivite Log" sekmesinde tutulur (yoksa otomatik oluşturulur). Sadece
+ * ekleme yapılır, hiç silme/güncelleme yok — kalıcı bir defter gibi.
+ * logActivity() kendi hatasını asla dışarı fırlatmaz: log yazımı
+ * başarısız olsa bile asıl işlemi (sipariş/gider kaydı vb.) bozmasın diye.
+ */
+const ACTIVITY_SHEET_NAME = "Aktivite Log";
+const ACTIVITY_HEADER_ROW = ["Zaman", "Admin", "Eylem", "Detay"] as const;
+
+export interface ActivityLogEntry {
+  rowNumber: number;
+  timestamp: string; // ISO
+  actor: string;
+  action: string;
+  detail: string;
+}
+
+let activitySheetEnsured = false;
+
+async function ensureActivitySheet(): Promise<void> {
+  if (activitySheetEnsured) return;
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const existingSheetId = await getNumericSheetId(ACTIVITY_SHEET_NAME);
+  if (existingSheetId === null) {
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId: sheetId,
+      requestBody: { requests: [{ addSheet: { properties: { title: ACTIVITY_SHEET_NAME } } }] },
+    });
+  }
+
+  const { data } = await sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range: `${ACTIVITY_SHEET_NAME}!A1:D1`,
+  });
+  const currentHeaders = data.values?.[0] ?? [];
+  const needsUpdate = ACTIVITY_HEADER_ROW.some((header, index) => currentHeaders[index] !== header);
+  if (needsUpdate) {
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: sheetId,
+      range: `${ACTIVITY_SHEET_NAME}!A1:D1`,
+      valueInputOption: "USER_ENTERED",
+      requestBody: { values: [[...ACTIVITY_HEADER_ROW]] },
+    });
+  }
+
+  activitySheetEnsured = true;
+}
+
+export async function logActivity(actor: string, action: string, detail: string): Promise<void> {
+  try {
+    await ensureActivitySheet();
+    const sheets = await getSheetsClient();
+    const { sheetId } = getConfig();
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: sheetId,
+      range: `${ACTIVITY_SHEET_NAME}!A:D`,
+      valueInputOption: "USER_ENTERED",
+      insertDataOption: "INSERT_ROWS",
+      requestBody: {
+        values: [
+          [new Date().toISOString(), protectFromFormula(actor), protectFromFormula(action), protectFromFormula(detail)],
+        ],
+      },
+    });
+  } catch (error) {
+    console.error("[google-sheets] logActivity hata:", error);
+  }
+}
+
+export async function listActivity(limit = 100): Promise<ActivityLogEntry[]> {
+  await ensureActivitySheet();
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const { data } = await sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range: `${ACTIVITY_SHEET_NAME}!A2:D`,
+  });
+
+  const rows = data.values ?? [];
+  const entries: ActivityLogEntry[] = [];
+  rows.forEach((row, index) => {
+    if (!row[0]) return;
+    entries.push({
+      rowNumber: index + 2,
+      timestamp: row[0] ?? "",
+      actor: row[1] ?? "",
+      action: row[2] ?? "",
+      detail: row[3] ?? "",
+    });
+  });
+
+  return entries.reverse().slice(0, limit);
+}

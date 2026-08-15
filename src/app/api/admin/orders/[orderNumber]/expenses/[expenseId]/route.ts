@@ -1,7 +1,14 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { requireAdminSession } from "@/lib/admin-session-guard";
-import { CURRENCIES, EXPENSE_RECURRENCES, deleteExpense, isSheetsConfigured, updateExpense } from "@/lib/google-sheets";
+import {
+  CURRENCIES,
+  EXPENSE_RECURRENCES,
+  deleteExpense,
+  isSheetsConfigured,
+  logActivity,
+  updateExpense,
+} from "@/lib/google-sheets";
 
 const expensePatchSchema = z.object({
   name: z.string().min(1).optional(),
@@ -24,7 +31,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
   if (!session) return NextResponse.json({ error: "Oturum gerekli." }, { status: 401 });
   if (!isSheetsConfigured()) return NextResponse.json({ error: NOT_CONFIGURED_MESSAGE }, { status: 400 });
 
-  const { expenseId } = await params;
+  const { expenseId, orderNumber } = await params;
   const json = await request.json().catch(() => null);
   const parsed = expensePatchSchema.safeParse(json);
   if (!parsed.success) {
@@ -33,6 +40,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
 
   try {
     const expense = await updateExpense(expenseId, parsed.data);
+    logActivity(session.name || session.phone, "Gider güncellendi", `${expense.name} · sipariş #${orderNumber}`);
     return NextResponse.json({ expense });
   } catch (error) {
     console.error("[api/admin/orders/:orderNumber/expenses/:expenseId] updateExpense hata:", error);
@@ -46,10 +54,11 @@ export async function DELETE(_request: Request, { params }: RouteParams) {
   if (!session) return NextResponse.json({ error: "Oturum gerekli." }, { status: 401 });
   if (!isSheetsConfigured()) return NextResponse.json({ error: NOT_CONFIGURED_MESSAGE }, { status: 400 });
 
-  const { expenseId } = await params;
+  const { expenseId, orderNumber } = await params;
 
   try {
     await deleteExpense(expenseId);
+    logActivity(session.name || session.phone, "Gider silindi", `sipariş #${orderNumber}`);
     return NextResponse.json({ ok: true });
   } catch (error) {
     console.error("[api/admin/orders/:orderNumber/expenses/:expenseId] deleteExpense hata:", error);

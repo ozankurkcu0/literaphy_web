@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAdminSession } from "@/lib/admin-session-guard";
 import { listAdminAccountsSummary, normalizePhone, removeAdminAccount } from "@/lib/admin-accounts";
+import { logActivity } from "@/lib/google-sheets";
 
 interface RouteParams {
   params: Promise<{ phone: string }>;
@@ -24,6 +25,7 @@ export async function DELETE(_request: Request, { params }: RouteParams) {
 
   try {
     const result = removeAdminAccount(phone);
+    logActivity(session.name || session.phone, "Admin silindi", phone);
     return NextResponse.json(result);
   } catch (error) {
     console.error("[api/admin/accounts/:phone] removeAdminAccount hata:", error);

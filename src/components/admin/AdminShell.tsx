@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { BarChart3, ClipboardList, Inbox, LogOut, Users, UserCog } from "lucide-react";
+import { BarChart3, ClipboardList, History, Inbox, LogOut, Users, UserCog } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { label: "Müşteriler", href: "/admin/musteriler", icon: Users },
   { label: "Analiz", href: "/admin/analiz", icon: BarChart3 },
   { label: "Gelen Kutusu", href: "/admin/gelen-kutusu", icon: Inbox },
+  { label: "Aktivite", href: "/admin/aktivite", icon: History },
   { label: "Hesaplar", href: "/admin/hesaplar", icon: UserCog },
 ];
 
