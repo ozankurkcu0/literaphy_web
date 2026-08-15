@@ -7,8 +7,20 @@ import { PricingCard } from "@/components/cards/PricingCard";
 import { RevealGroup, RevealItem } from "@/components/ui/Reveal";
 import { cn } from "@/lib/utils";
 
-export function PricingSection({ plans }: { plans: PricingPlan[] }) {
-  const [billing, setBilling] = useState<"monthly" | "yearly">("monthly");
+type Billing = "monthly" | "yearly";
+
+interface PricingSectionProps {
+  plans: PricingPlan[];
+  /** Verilirse aylık/yıllık seçimi dışarıdan kontrol edilir (üstteki
+   * hesaplayıcıyla senkron kalması için) — verilmezse kendi içinde yönetir. */
+  billing?: Billing;
+  onBillingChange?: (billing: Billing) => void;
+}
+
+export function PricingSection({ plans, billing: billingProp, onBillingChange }: PricingSectionProps) {
+  const [internalBilling, setInternalBilling] = useState<Billing>("monthly");
+  const billing = billingProp ?? internalBilling;
+  const setBilling = onBillingChange ?? setInternalBilling;
 
   return (
     <div>

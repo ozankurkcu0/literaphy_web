@@ -40,15 +40,26 @@ function recommendPlanName(branches: number, languages: LanguageNeed, order: Ord
   return "Premium";
 }
 
+type Billing = "monthly" | "yearly";
+
+interface PricingCalculatorProps {
+  /** Verilirse aylık/yıllık seçimi dışarıdan kontrol edilir (altındaki paket
+   * kartlarıyla senkron kalması için) — verilmezse kendi içinde yönetir. */
+  billing?: Billing;
+  onBillingChange?: (billing: Billing) => void;
+}
+
 /** QR Menü fiyatlandırma sayfasında paket kartlarının üstünde oturan,
  * birkaç soruya göre uygun paketi ve tahmini fiyatı canlı gösteren
  * interaktif hesaplayıcı. Ziyaretçiyi 3 basit soruyla paket kartlarına
  * kıyasla çok daha hızlı bir "size uygun olan bu" cevabına götürür. */
-export function PricingCalculator() {
+export function PricingCalculator({ billing: billingProp, onBillingChange }: PricingCalculatorProps = {}) {
   const [branches, setBranches] = useState(1);
   const [languages, setLanguages] = useState<LanguageNeed>("1");
   const [order, setOrder] = useState<OrderFlow>("none");
-  const [billing, setBilling] = useState<"monthly" | "yearly">("monthly");
+  const [internalBilling, setInternalBilling] = useState<Billing>("monthly");
+  const billing = billingProp ?? internalBilling;
+  const setBilling = onBillingChange ?? setInternalBilling;
 
   const planName = recommendPlanName(branches, languages, order);
   // qrMenuPricing her zaman dolu bir sabit dizi olduğu için [0] fallback'i güvenli.
