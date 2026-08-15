@@ -5,8 +5,8 @@ import { ChevronDown, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { inputBaseClass } from "@/lib/utils";
-import { CURRENCY_OPTIONS, SERVICE_TYPE_OPTIONS } from "@/lib/order-form-options";
-import type { Currency, Order, OrderInput } from "@/lib/google-sheets";
+import { CURRENCY_OPTIONS, SERVICE_TYPE_OPTIONS, STATUS_OPTIONS } from "@/lib/order-form-options";
+import type { Currency, Order, OrderInput, Status } from "@/lib/google-sheets";
 
 const EMPTY_FORM: OrderInput = {
   firstName: "",
@@ -20,6 +20,7 @@ const EMPTY_FORM: OrderInput = {
   currency: "TRY",
   totalInstallments: "",
   paidInstallments: "",
+  status: "Aktif",
 };
 
 interface OrderFormDialogProps {
@@ -142,32 +143,59 @@ export function OrderFormDialog({ order, onClose, onSubmit }: OrderFormDialogPro
             />
           </div>
 
-          <div className="flex flex-col gap-2">
-            <label htmlFor="serviceType" className="text-sm font-medium text-foreground-secondary">
-              Hizmet türü
-            </label>
-            <div className="relative">
-              <select
-                id="serviceType"
-                name="serviceType"
-                required
-                value={values.serviceType}
-                onChange={(event) => update("serviceType", event.target.value)}
-                className={`${inputBaseClass} h-12 appearance-none pr-10`}
-              >
-                <option value="" disabled>
-                  Seçiniz
-                </option>
-                {SERVICE_TYPE_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-2">
+              <label htmlFor="serviceType" className="text-sm font-medium text-foreground-secondary">
+                Hizmet türü
+              </label>
+              <div className="relative">
+                <select
+                  id="serviceType"
+                  name="serviceType"
+                  required
+                  value={values.serviceType}
+                  onChange={(event) => update("serviceType", event.target.value)}
+                  className={`${inputBaseClass} h-12 appearance-none pr-10`}
+                >
+                  <option value="" disabled>
+                    Seçiniz
                   </option>
-                ))}
-              </select>
-              <ChevronDown
-                className="pointer-events-none absolute top-1/2 right-4 size-4 -translate-y-1/2 text-foreground-muted"
-                aria-hidden
-              />
+                  {SERVICE_TYPE_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown
+                  className="pointer-events-none absolute top-1/2 right-4 size-4 -translate-y-1/2 text-foreground-muted"
+                  aria-hidden
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label htmlFor="status" className="text-sm font-medium text-foreground-secondary">
+                Durum
+              </label>
+              <div className="relative">
+                <select
+                  id="status"
+                  name="status"
+                  value={values.status}
+                  onChange={(event) => update("status", event.target.value as Status)}
+                  className={`${inputBaseClass} h-12 appearance-none pr-10`}
+                >
+                  {STATUS_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown
+                  className="pointer-events-none absolute top-1/2 right-4 size-4 -translate-y-1/2 text-foreground-muted"
+                  aria-hidden
+                />
+              </div>
             </div>
           </div>
 

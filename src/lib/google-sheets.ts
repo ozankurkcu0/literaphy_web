@@ -14,7 +14,7 @@ import { google } from "googleapis";
  *  D: Hizmet Türü        E: Hizmete Başlama Tarihi
  *  F: Hesap Kesim Tarihi G: Telefon           H: E-posta
  *  I: Ücret              J: Para Birimi       K: Toplam Taksit
- *  L: Ödenen Taksit
+ *  L: Ödenen Taksit       M: Durum
  */
 
 const HEADER_ROW = [
@@ -30,12 +30,16 @@ const HEADER_ROW = [
   "Para Birimi",
   "Toplam Taksit",
   "Ödenen Taksit",
+  "Durum",
 ] as const;
 
-const DATA_RANGE_COLUMNS = "A:L";
+const DATA_RANGE_COLUMNS = "A:M";
 
 export const CURRENCIES = ["TRY", "USD", "EUR"] as const;
 export type Currency = (typeof CURRENCIES)[number];
+
+export const STATUSES = ["Aktif", "Tamamlandı", "İptal"] as const;
+export type Status = (typeof STATUSES)[number];
 
 export interface OrderInput {
   firstName: string;
@@ -51,6 +55,7 @@ export interface OrderInput {
   // sipariş demektir. Kalan taksit = totalInstallments - paidInstallments.
   totalInstallments: string;
   paidInstallments: string;
+  status: Status;
 }
 
 export interface Order extends OrderInput {
@@ -127,7 +132,7 @@ async function ensureHeaders(): Promise<void> {
 
   const { data } = await sheets.spreadsheets.values.get({
     spreadsheetId: sheetId,
-    range: `${sheetName}!A1:L1`,
+    range: `${sheetName}!A1:M1`,
   });
 
   const currentHeaders = data.values?.[0] ?? [];
@@ -136,7 +141,7 @@ async function ensureHeaders(): Promise<void> {
 
   await sheets.spreadsheets.values.update({
     spreadsheetId: sheetId,
-    range: `${sheetName}!A1:L1`,
+    range: `${sheetName}!A1:M1`,
     valueInputOption: "USER_ENTERED",
     requestBody: { values: [[...HEADER_ROW]] },
   });
@@ -158,6 +163,10 @@ function turkishDateToIso(value: string): string {
 
 function toCurrency(value: string | undefined): Currency {
   return (CURRENCIES as readonly string[]).includes(value ?? "") ? (value as Currency) : "TRY";
+}
+
+function toStatus(value: string | undefined): Status {
+  return (STATUSES as readonly string[]).includes(value ?? "") ? (value as Status) : "Aktif";
 }
 
 /** Google Sheets, USER_ENTERED modunda "+"/"-"/"="/"@" ile başlayan
@@ -188,6 +197,7 @@ function rowToOrder(row: string[], rowNumber: number): Order | null {
     currency: toCurrency(row[9]),
     totalInstallments: row[10] ?? "",
     paidInstallments: row[11] ?? "",
+    status: toStatus(row[12]),
   };
 }
 
@@ -240,11 +250,12 @@ export async function createOrder(input: OrderInput): Promise<Order> {
     input.currency,
     input.totalInstallments,
     input.paidInstallments,
+    input.status,
   ];
 
   await sheets.spreadsheets.values.append({
     spreadsheetId: sheetId,
-    range: `${sheetName}!A:L`,
+    range: `${sheetName}!A:M`,
     valueInputOption: "USER_ENTERED",
     insertDataOption: "INSERT_ROWS",
     requestBody: { values: [values] },
@@ -270,7 +281,7 @@ export async function updateOrder(orderNumber: string, patch: Partial<OrderInput
 
   const { data } = await sheets.spreadsheets.values.get({
     spreadsheetId: sheetId,
-    range: `${sheetName}!A${rowNumber}:L${rowNumber}`,
+    range: `${sheetName}!A${rowNumber}:M${rowNumber}`,
   });
   const current = rowToOrder((data.values?.[0] as string[]) ?? [], rowNumber);
   if (!current) {
@@ -291,11 +302,12 @@ export async function updateOrder(orderNumber: string, patch: Partial<OrderInput
     merged.currency,
     merged.totalInstallments,
     merged.paidInstallments,
+    merged.status,
   ];
 
   await sheets.spreadsheets.values.update({
     spreadsheetId: sheetId,
-    range: `${sheetName}!A${rowNumber}:L${rowNumber}`,
+    range: `${sheetName}!A${rowNumber}:M${rowNumber}`,
     valueInputOption: "USER_ENTERED",
     requestBody: { values: [values] },
   });

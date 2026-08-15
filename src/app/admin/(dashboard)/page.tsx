@@ -4,8 +4,9 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { ChevronDown, Plus, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { OrdersTable } from "@/components/admin/OrdersTable";
+import { OrdersOverview } from "@/components/admin/OrdersOverview";
 import { OrderFormDialog } from "@/components/admin/OrderFormDialog";
-import { SERVICE_TYPE_OPTIONS } from "@/lib/order-form-options";
+import { SERVICE_TYPE_OPTIONS, STATUS_OPTIONS } from "@/lib/order-form-options";
 import { inputBaseClass } from "@/lib/utils";
 import type { Order, OrderInput } from "@/lib/google-sheets";
 
@@ -18,6 +19,7 @@ export default function AdminOrdersPage() {
   const [dialog, setDialog] = useState<DialogState>(null);
   const [search, setSearch] = useState("");
   const [serviceFilter, setServiceFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
 
   const fetchOrders = useCallback(async () => {
     setLoadError(null);
@@ -46,15 +48,16 @@ export default function AdminOrdersPage() {
 
     return orders.filter((order) => {
       if (serviceFilter && order.serviceType !== serviceFilter) return false;
+      if (statusFilter && order.status !== statusFilter) return false;
       if (!query) return true;
       const haystack = [order.orderNumber, order.firstName, order.lastName, order.phone, order.email]
         .join(" ")
         .toLowerCase();
       return haystack.includes(query);
     });
-  }, [orders, search, serviceFilter]);
+  }, [orders, search, serviceFilter, statusFilter]);
 
-  const hasActiveFilters = Boolean(search.trim() || serviceFilter);
+  const hasActiveFilters = Boolean(search.trim() || serviceFilter || statusFilter);
 
   async function handleCreate(values: OrderInput): Promise<string | null> {
     const response = await fetch("/api/admin/orders", {
@@ -130,6 +133,8 @@ export default function AdminOrdersPage() {
         </div>
       ) : (
         <>
+          {orders && orders.length > 0 && <OrdersOverview orders={orders} />}
+
           {orders && orders.length > 0 && (
             <div className="flex flex-wrap items-center gap-3">
               <div className="relative min-w-[220px] flex-1">
@@ -164,6 +169,25 @@ export default function AdminOrdersPage() {
                 >
                   <option value="">Tüm hizmet türleri</option>
                   {SERVICE_TYPE_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown
+                  className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-foreground-muted"
+                  aria-hidden
+                />
+              </div>
+
+              <div className="relative">
+                <select
+                  value={statusFilter}
+                  onChange={(event) => setStatusFilter(event.target.value)}
+                  className={`${inputBaseClass} h-11 w-40 appearance-none pr-9`}
+                >
+                  <option value="">Tüm durumlar</option>
+                  {STATUS_OPTIONS.map((option) => (
                     <option key={option.value} value={option.value}>
                       {option.label}
                     </option>

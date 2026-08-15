@@ -1,4 +1,4 @@
-import type { Currency } from "@/lib/google-sheets";
+import type { Currency, Status } from "@/lib/google-sheets";
 
 /** OrderFormDialog (giriş) ve admin sipariş sayfasındaki filtre dropdown'ı
  * arasında paylaşılan sabit seçenek listeleri. */
@@ -14,4 +14,10 @@ export const CURRENCY_OPTIONS: { label: string; value: Currency }[] = [
   { label: "₺ TL", value: "TRY" },
   { label: "$ USD", value: "USD" },
   { label: "€ EUR", value: "EUR" },
+];
+
+export const STATUS_OPTIONS: { label: string; value: Status }[] = [
+  { label: "Aktif", value: "Aktif" },
+  { label: "Tamamlandı", value: "Tamamlandı" },
+  { label: "İptal", value: "İptal" },
 ];

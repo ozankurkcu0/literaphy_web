@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { requireAdminSession } from "@/lib/admin-session-guard";
-import { CURRENCIES, createOrder, isSheetsConfigured, listOrders } from "@/lib/google-sheets";
+import { CURRENCIES, STATUSES, createOrder, isSheetsConfigured, listOrders } from "@/lib/google-sheets";
 
 const orderInputSchema = z.object({
   firstName: z.string().min(1, "İsim gerekli."),
@@ -15,6 +15,7 @@ const orderInputSchema = z.object({
   currency: z.enum(CURRENCIES).optional().default("TRY"),
   totalInstallments: z.string().optional().default(""),
   paidInstallments: z.string().optional().default(""),
+  status: z.enum(STATUSES).optional().default("Aktif"),
 });
 
 const NOT_CONFIGURED_MESSAGE =

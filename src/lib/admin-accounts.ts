@@ -21,7 +21,7 @@ export interface AdminAccount {
   name?: string;
 }
 
-function normalizePhone(raw: string): string {
+export function normalizePhone(raw: string): string {
   return raw.replace(/\D/g, "");
 }
 
