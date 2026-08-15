@@ -27,3 +27,8 @@ next-env.d.ts
 
 # vercel
 .vercel
+
+# admin panel — telefon/şifre hash'lerini tutan yerel dosya, asla commit'lenmemeli
+# (production'da bunun yerine ADMIN_ACCOUNTS_JSON env değişkeni kullanılır,
+# bkz. docs/admin-panel-kurulum.md)
+/data/admins.local.json

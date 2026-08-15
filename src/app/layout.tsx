@@ -3,10 +3,7 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 import { MotionConfig } from "motion/react";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/constants";
 import { organizationJsonLd, JsonLd } from "@/lib/seo";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
-import { SkipLink } from "@/components/layout/SkipLink";
-import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
+import { SiteChrome } from "@/components/layout/SiteChrome";
 import { Analytics } from "@/components/layout/Analytics";
 import "./globals.css";
 
@@ -66,14 +63,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="tr" className={`${inter.variable} ${jetbrainsMono.variable}`}>
       <body className="flex min-h-screen flex-col antialiased">
         <MotionConfig reducedMotion="user">
-          <SkipLink />
           <JsonLd data={organizationJsonLd()} />
-          <Header />
-          <main id="main-content" tabIndex={-1} className="flex-1 outline-none">
-            {children}
-          </main>
-          <Footer />
-          <WhatsAppButton />
+          <SiteChrome>{children}</SiteChrome>
         </MotionConfig>
         <Analytics />
       </body>
