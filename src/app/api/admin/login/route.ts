@@ -3,6 +3,7 @@ import { z } from "zod";
 import { normalizePhone, verifyAdminCredentials } from "@/lib/admin-accounts";
 import { createSessionToken, SESSION_COOKIE_NAME, SESSION_MAX_AGE_SECONDS } from "@/lib/admin-auth";
 import { checkLoginRateLimit, recordFailedLoginAttempt, resetLoginRateLimit } from "@/lib/login-rate-limit";
+import { logActivity } from "@/lib/google-sheets";
 
 const bodySchema = z.object({
   phone: z.string().min(1, "Telefon numarası gerekli."),
@@ -33,6 +34,7 @@ export async function POST(request: Request) {
   }
 
   resetLoginRateLimit(rateLimitKey);
+  logActivity(account.name || account.phone, "Giriş yapıldı", "");
 
   const token = await createSessionToken({ phone: account.phone, name: account.name });
 

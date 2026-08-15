@@ -56,6 +56,9 @@ function compareOrders(a: Order, b: Order, key: SortKey): number {
 
 interface OrdersTableProps {
   orders: Order[];
+  selectedOrderNumbers: Set<string>;
+  onToggleSelect: (orderNumber: string) => void;
+  onToggleSelectAll: () => void;
   onViewDetail: (order: Order) => void;
   onEdit: (order: Order) => void;
   onDelete: (order: Order) => void;
@@ -65,6 +68,9 @@ interface OrdersTableProps {
 
 export function OrdersTable({
   orders,
+  selectedOrderNumbers,
+  onToggleSelect,
+  onToggleSelectAll,
   onViewDetail,
   onEdit,
   onDelete,
@@ -95,11 +101,26 @@ export function OrdersTable({
     );
   }
 
+  const allSelected = orders.length > 0 && orders.every((order) => selectedOrderNumbers.has(order.orderNumber));
+  const someSelected = !allSelected && orders.some((order) => selectedOrderNumbers.has(order.orderNumber));
+
   return (
     <div className="overflow-x-auto rounded-lg border border-hairline">
       <table className="w-full min-w-[1160px] border-collapse text-left text-[13.5px]">
         <thead>
           <tr className="border-b border-hairline bg-surface text-foreground-muted">
+            <th className="w-10 px-4 py-3">
+              <input
+                type="checkbox"
+                checked={allSelected}
+                ref={(el) => {
+                  if (el) el.indeterminate = someSelected;
+                }}
+                onChange={onToggleSelectAll}
+                aria-label="Tümünü seç"
+                className="size-4 cursor-pointer accent-accent"
+              />
+            </th>
             <SortableHeader columnKey="orderNumber" label="Sipariş No" sort={sort} onSort={handleSort} />
             <th className="px-4 py-3 font-medium">Telefon</th>
             <th className="px-4 py-3 font-medium">E-posta</th>
@@ -115,7 +136,22 @@ export function OrdersTable({
         </thead>
         <tbody>
           {sortedOrders.map((order) => (
-            <tr key={order.orderNumber} className="border-b border-hairline last:border-0 hover:bg-surface">
+            <tr
+              key={order.orderNumber}
+              className={cn(
+                "border-b border-hairline last:border-0 hover:bg-surface",
+                selectedOrderNumbers.has(order.orderNumber) && "bg-accent-soft/40",
+              )}
+            >
+              <td className="px-4 py-3">
+                <input
+                  type="checkbox"
+                  checked={selectedOrderNumbers.has(order.orderNumber)}
+                  onChange={() => onToggleSelect(order.orderNumber)}
+                  aria-label={`${order.orderNumber} numaralı siparişi seç`}
+                  className="size-4 cursor-pointer accent-accent"
+                />
+              </td>
               <td className="px-4 py-3 font-mono text-foreground-secondary">#{order.orderNumber}</td>
               <td className="px-4 py-3 text-foreground-secondary">{order.phone || "—"}</td>
               <td className="px-4 py-3 text-foreground-secondary">{order.email || "—"}</td>

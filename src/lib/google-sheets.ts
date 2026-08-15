@@ -529,7 +529,7 @@ export async function updateExpense(expenseId: string, patch: Partial<ExpenseInp
   return merged;
 }
 
-export async function deleteExpense(expenseId: string): Promise<void> {
+export async function deleteExpense(expenseId: string, actor: string): Promise<void> {
   const sheets = await getSheetsClient();
   const { sheetId } = getConfig();
 
@@ -538,6 +538,8 @@ export async function deleteExpense(expenseId: string): Promise<void> {
   if (!current) {
     throw new Error(`${expenseId} numaralı gider bulunamadı.`);
   }
+
+  await moveToTrash("Gider", `${current.name} · sipariş #${current.orderNumber}`, current, actor);
 
   const numericSheetId = await getNumericSheetId(EXPENSE_SHEET_NAME);
   if (numericSheetId === null) {
@@ -565,24 +567,27 @@ export async function deleteExpense(expenseId: string): Promise<void> {
 
 /** Bir siparişe bağlı tüm giderleri siler — sipariş silindiğinde "Giderler"
  * sekmesinde sahipsiz kayıt kalmasın diye (bkz. deleteOrder). Giderler ayrı
- * bir sheet'te olduğu için sipariş satırının silinmesinden bağımsız. */
-export async function deleteExpensesForOrder(orderNumber: string): Promise<void> {
+ * bir sheet'te olduğu için sipariş satırının silinmesinden bağımsız. Her
+ * gider kendi çöp kutusu kaydını alır (deleteExpense üzerinden). */
+export async function deleteExpensesForOrder(orderNumber: string, actor: string): Promise<void> {
   const expenses = await listExpensesForOrder(orderNumber);
   for (const expense of expenses) {
-    await deleteExpense(expense.expenseId);
+    await deleteExpense(expense.expenseId, actor);
   }
 }
 
-export async function deleteOrder(orderNumber: string): Promise<void> {
+export async function deleteOrder(orderNumber: string, actor: string): Promise<void> {
   const sheets = await getSheetsClient();
   const { sheetId, sheetName } = getConfig();
 
-  const rowNumber = await findOrderRow(orderNumber);
-  if (!rowNumber) {
+  const orders = await listOrders();
+  const current = orders.find((order) => order.orderNumber === orderNumber);
+  if (!current) {
     throw new Error(`${orderNumber} numaralı sipariş bulunamadı.`);
   }
 
-  await deleteExpensesForOrder(orderNumber);
+  await moveToTrash("Sipariş", `${current.firstName} ${current.lastName} (#${current.orderNumber})`, current, actor);
+  await deleteExpensesForOrder(orderNumber, actor);
 
   const numericSheetId = await getNumericSheetId(sheetName);
   if (numericSheetId === null) {
@@ -598,8 +603,8 @@ export async function deleteOrder(orderNumber: string): Promise<void> {
             range: {
               sheetId: numericSheetId,
               dimension: "ROWS",
-              startIndex: rowNumber - 1,
-              endIndex: rowNumber,
+              startIndex: current.rowNumber - 1,
+              endIndex: current.rowNumber,
             },
           },
         },
@@ -704,4 +709,374 @@ export async function listActivity(limit = 100): Promise<ActivityLogEntry[]> {
   });
 
   return entries.reverse().slice(0, limit);
+}
+
+/**
+ * Aylık gelir hedefleri — Analiz sayfasındaki ilerleme çubuğu için. Ayrı
+ * bir "Hedefler" sekmesinde tutulur (yoksa otomatik oluşturulur). Her
+ * ay+para birimi kombinasyonu için tek satır — aynı ay/para birimi tekrar
+ * kaydedilirse üzerine yazılır (upsert).
+ * Sütunlar: A: Ay (yyyy-mm)  B: Para Birimi  C: Hedef Tutar
+ */
+const GOAL_SHEET_NAME = "Hedefler";
+const GOAL_HEADER_ROW = ["Ay", "Para Birimi", "Hedef Tutar"] as const;
+
+export interface MonthlyGoal {
+  rowNumber: number;
+  month: string; // "yyyy-mm"
+  currency: Currency;
+  amount: string;
+}
+
+let goalSheetEnsured = false;
+
+async function ensureGoalSheet(): Promise<void> {
+  if (goalSheetEnsured) return;
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const existingSheetId = await getNumericSheetId(GOAL_SHEET_NAME);
+  if (existingSheetId === null) {
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId: sheetId,
+      requestBody: { requests: [{ addSheet: { properties: { title: GOAL_SHEET_NAME } } }] },
+    });
+  }
+
+  const { data } = await sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range: `${GOAL_SHEET_NAME}!A1:C1`,
+  });
+  const currentHeaders = data.values?.[0] ?? [];
+  const needsUpdate = GOAL_HEADER_ROW.some((header, index) => currentHeaders[index] !== header);
+  if (needsUpdate) {
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: sheetId,
+      range: `${GOAL_SHEET_NAME}!A1:C1`,
+      valueInputOption: "USER_ENTERED",
+      requestBody: { values: [[...GOAL_HEADER_ROW]] },
+    });
+  }
+
+  goalSheetEnsured = true;
+}
+
+export async function listMonthlyGoals(): Promise<MonthlyGoal[]> {
+  await ensureGoalSheet();
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const { data } = await sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range: `${GOAL_SHEET_NAME}!A2:C`,
+  });
+
+  const rows = data.values ?? [];
+  const goals: MonthlyGoal[] = [];
+  rows.forEach((row, index) => {
+    if (!row[0]) return;
+    goals.push({
+      rowNumber: index + 2,
+      month: row[0] ?? "",
+      currency: toCurrency(row[1]),
+      amount: row[2] ?? "",
+    });
+  });
+  return goals;
+}
+
+export async function setMonthlyGoal(month: string, currency: Currency, amount: string): Promise<MonthlyGoal> {
+  await ensureGoalSheet();
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const existing = await listMonthlyGoals();
+  const current = existing.find((goal) => goal.month === month && goal.currency === currency);
+
+  if (current) {
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: sheetId,
+      range: `${GOAL_SHEET_NAME}!A${current.rowNumber}:C${current.rowNumber}`,
+      valueInputOption: "USER_ENTERED",
+      requestBody: { values: [[month, currency, amount]] },
+    });
+    return { ...current, amount };
+  }
+
+  await sheets.spreadsheets.values.append({
+    spreadsheetId: sheetId,
+    range: `${GOAL_SHEET_NAME}!A:C`,
+    valueInputOption: "USER_ENTERED",
+    insertDataOption: "INSERT_ROWS",
+    requestBody: { values: [[month, currency, amount]] },
+  });
+  return { rowNumber: -1, month, currency, amount };
+}
+
+/**
+ * Çöp kutusu — silinen sipariş/gider kayıtları kalıcı silinmeden önce
+ * burada saklanır, geri getirilebilir ya da kalıcı silinebilir. Ayrı bir
+ * "Çöp Kutusu" sekmesinde tutulur (yoksa otomatik oluşturulur).
+ * Sütunlar: A: Çöp ID  B: Zaman  C: Tür  D: Özet  E: Silen  F: Veri (JSON)
+ */
+const TRASH_SHEET_NAME = "Çöp Kutusu";
+const TRASH_HEADER_ROW = ["Çöp ID", "Zaman", "Tür", "Özet", "Silen", "Veri"] as const;
+
+export type TrashType = "Sipariş" | "Gider";
+
+export interface TrashEntry {
+  rowNumber: number;
+  trashId: string;
+  deletedAt: string; // ISO
+  type: TrashType;
+  summary: string;
+  actor: string;
+  data: Order | Expense;
+}
+
+let trashSheetEnsured = false;
+
+async function ensureTrashSheet(): Promise<void> {
+  if (trashSheetEnsured) return;
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const existingSheetId = await getNumericSheetId(TRASH_SHEET_NAME);
+  if (existingSheetId === null) {
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId: sheetId,
+      requestBody: { requests: [{ addSheet: { properties: { title: TRASH_SHEET_NAME } } }] },
+    });
+  }
+
+  const { data } = await sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range: `${TRASH_SHEET_NAME}!A1:F1`,
+  });
+  const currentHeaders = data.values?.[0] ?? [];
+  const needsUpdate = TRASH_HEADER_ROW.some((header, index) => currentHeaders[index] !== header);
+  if (needsUpdate) {
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: sheetId,
+      range: `${TRASH_SHEET_NAME}!A1:F1`,
+      valueInputOption: "USER_ENTERED",
+      requestBody: { values: [[...TRASH_HEADER_ROW]] },
+    });
+  }
+
+  trashSheetEnsured = true;
+}
+
+function generateTrashId(existing: Set<string>): string {
+  for (let attempt = 0; attempt < 50; attempt++) {
+    const candidate = String(Math.floor(100000 + Math.random() * 900000));
+    if (!existing.has(candidate)) return candidate;
+  }
+  throw new Error("Benzersiz çöp kutusu numarası üretilemedi, lütfen tekrar deneyin.");
+}
+
+function rowToTrashEntry(row: string[], rowNumber: number): TrashEntry | null {
+  const trashId = row[0]?.trim();
+  if (!trashId) return null;
+  const type: TrashType = row[2] === "Gider" ? "Gider" : "Sipariş";
+  let data: Order | Expense;
+  try {
+    data = JSON.parse(row[5] ?? "{}");
+  } catch {
+    return null;
+  }
+  return {
+    rowNumber,
+    trashId,
+    deletedAt: row[1] ?? "",
+    type,
+    summary: row[3] ?? "",
+    actor: row[4] ?? "",
+    data,
+  };
+}
+
+export async function listTrash(): Promise<TrashEntry[]> {
+  await ensureTrashSheet();
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const { data } = await sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range: `${TRASH_SHEET_NAME}!A2:F`,
+  });
+
+  const rows = data.values ?? [];
+  const entries: TrashEntry[] = [];
+  rows.forEach((row, index) => {
+    const entry = rowToTrashEntry(row as string[], index + 2);
+    if (entry) entries.push(entry);
+  });
+  return entries.reverse(); // en son silinen en üstte
+}
+
+/** Silinen bir sipariş/gider kaydını kalıcı silmeden önce çöp kutusuna
+ * taşır. deleteOrder/deleteExpense içinden AWAIT edilir ve hata fırlatırsa
+ * silme işlemi de iptal olur — logActivity'nin aksine burada asıl amaç
+ * veri kaybını önlemek olduğu için hata yutulmaz. */
+async function moveToTrash(type: TrashType, summary: string, data: Order | Expense, actor: string): Promise<void> {
+  await ensureTrashSheet();
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const existing = await listTrash();
+  const trashId = generateTrashId(new Set(existing.map((entry) => entry.trashId)));
+
+  await sheets.spreadsheets.values.append({
+    spreadsheetId: sheetId,
+    range: `${TRASH_SHEET_NAME}!A:F`,
+    valueInputOption: "USER_ENTERED",
+    insertDataOption: "INSERT_ROWS",
+    requestBody: {
+      values: [
+        [
+          trashId,
+          new Date().toISOString(),
+          type,
+          protectFromFormula(summary),
+          protectFromFormula(actor),
+          JSON.stringify(data),
+        ],
+      ],
+    },
+  });
+}
+
+async function findTrashRow(trashId: string): Promise<TrashEntry | null> {
+  const entries = await listTrash();
+  return entries.find((entry) => entry.trashId === trashId) ?? null;
+}
+
+async function deleteTrashRow(rowNumber: number): Promise<void> {
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+  const numericSheetId = await getNumericSheetId(TRASH_SHEET_NAME);
+  if (numericSheetId === null) {
+    throw new Error(`"${TRASH_SHEET_NAME}" adlı sayfa bulunamadı.`);
+  }
+  await sheets.spreadsheets.batchUpdate({
+    spreadsheetId: sheetId,
+    requestBody: {
+      requests: [
+        {
+          deleteDimension: {
+            range: {
+              sheetId: numericSheetId,
+              dimension: "ROWS",
+              startIndex: rowNumber - 1,
+              endIndex: rowNumber,
+            },
+          },
+        },
+      ],
+    },
+  });
+}
+
+/** Bir siparişi, ORİJİNAL sipariş numarasını koruyarak "Sipariş Kayıtları"
+ * sheet'ine geri ekler — createOrder()'ın rastgele numara üretme mantığını
+ * atlar, aksi halde geri getirilen sipariş yeni bir numara alır ve ona
+ * bağlı giderlerin orderNumber referansı kırılır. */
+async function restoreOrderRow(order: Order): Promise<void> {
+  await ensureHeaders();
+  const sheets = await getSheetsClient();
+  const { sheetId, sheetName } = getConfig();
+
+  const values = [
+    order.orderNumber,
+    protectFromFormula(order.firstName),
+    protectFromFormula(order.lastName),
+    protectFromFormula(order.serviceType),
+    isoToTurkishDate(order.startDate),
+    isoToTurkishDate(order.billingDate),
+    protectFromFormula(order.phone),
+    protectFromFormula(order.email),
+    order.fee,
+    order.currency,
+    order.totalInstallments,
+    order.paidInstallments,
+    order.status,
+    protectFromFormula(order.note),
+  ];
+
+  await sheets.spreadsheets.values.append({
+    spreadsheetId: sheetId,
+    range: `${sheetName}!A:N`,
+    valueInputOption: "USER_ENTERED",
+    insertDataOption: "INSERT_ROWS",
+    requestBody: { values: [values] },
+  });
+}
+
+/** restoreOrderRow'un gider karşılığı — ORİJİNAL gider ID'sini korur. */
+async function restoreExpenseRow(expense: Expense): Promise<void> {
+  await ensureExpenseSheet();
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const values = [
+    expense.expenseId,
+    expense.orderNumber,
+    protectFromFormula(expense.name),
+    expense.amount,
+    expense.currency,
+    serializeExpenseDueDate(expense.recurrence, expense.dueDate),
+    protectFromFormula(expense.note),
+    expense.recurrence,
+  ];
+
+  await sheets.spreadsheets.values.append({
+    spreadsheetId: sheetId,
+    range: `${EXPENSE_SHEET_NAME}!${EXPENSE_DATA_COLUMNS}`,
+    valueInputOption: "USER_ENTERED",
+    insertDataOption: "INSERT_ROWS",
+    requestBody: { values: [values] },
+  });
+}
+
+/** Çöp kutusundaki bir kaydı geri getirir: ilgili sheet'e orijinal
+ * kimliğiyle ekler, sonra çöp kutusu satırını siler. Sipariş/gider
+ * numarası bir başka kayıtta yeniden kullanılmışsa sessizce üzerine
+ * yazmak yerine hata fırlatır. */
+export async function restoreFromTrash(trashId: string): Promise<void> {
+  const entry = await findTrashRow(trashId);
+  if (!entry) {
+    throw new Error(`${trashId} numaralı çöp kutusu kaydı bulunamadı.`);
+  }
+
+  if (entry.type === "Sipariş") {
+    const order = entry.data as Order;
+    const orders = await listOrders();
+    if (orders.some((existing) => existing.orderNumber === order.orderNumber)) {
+      throw new Error(
+        `${order.orderNumber} numaralı sipariş numarası bir başka kayıtta kullanılıyor, geri getirilemedi.`,
+      );
+    }
+    await restoreOrderRow(order);
+  } else {
+    const expense = entry.data as Expense;
+    const expenses = await listExpenses();
+    if (expenses.some((existing) => existing.expenseId === expense.expenseId)) {
+      throw new Error(
+        `${expense.expenseId} numaralı gider numarası bir başka kayıtta kullanılıyor, geri getirilemedi.`,
+      );
+    }
+    await restoreExpenseRow(expense);
+  }
+
+  await deleteTrashRow(entry.rowNumber);
+}
+
+/** Çöp kutusundan kalıcı olarak siler — geri alınamaz. */
+export async function permanentlyDeleteTrashEntry(trashId: string): Promise<void> {
+  const entry = await findTrashRow(trashId);
+  if (!entry) {
+    throw new Error(`${trashId} numaralı çöp kutusu kaydı bulunamadı.`);
+  }
+  await deleteTrashRow(entry.rowNumber);
 }

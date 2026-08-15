@@ -18,10 +18,24 @@ function formatPhoneDisplay(phone: string): string {
   return `${phone.slice(0, 4)} ${phone.slice(4, 7)} ${phone.slice(7, 9)} ${phone.slice(9, 11)}`;
 }
 
+const lastLoginFormatter = new Intl.DateTimeFormat("tr-TR", {
+  day: "numeric",
+  month: "short",
+  hour: "2-digit",
+  minute: "2-digit",
+});
+
+function formatLastLogin(iso: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return iso;
+  return lastLoginFormatter.format(date);
+}
+
 export default function AdminAccountsPage() {
   const [accounts, setAccounts] = useState<AccountSummary[] | null>(null);
   const [source, setSource] = useState<Source>("file");
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [lastLogins, setLastLogins] = useState<Record<string, string>>({});
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -49,9 +63,31 @@ export default function AdminAccountsPage() {
     }
   }, []);
 
+  // Her hesabın en son giriş zamanını, aktivite log'undaki "Giriş yapıldı"
+  // kayıtlarından çıkarır — ayrı bir alan/sheet'e ihtiyaç kalmadan (bkz.
+  // src/app/api/admin/login/route.ts). Sessizce başarısız olur, hesap
+  // listesi zaten kendi hatasını gösteriyor.
+  const fetchLastLogins = useCallback(async () => {
+    try {
+      const response = await fetch("/api/admin/activity");
+      const data = await response.json();
+      if (!response.ok) return;
+      const entries: { actor: string; action: string; timestamp: string }[] = data.entries ?? [];
+      const map: Record<string, string> = {};
+      for (const entry of entries) {
+        if (entry.action !== "Giriş yapıldı") continue;
+        if (!map[entry.actor]) map[entry.actor] = entry.timestamp; // en yeni önce geliyor
+      }
+      setLastLogins(map);
+    } catch {
+      // sessiz — sadece "son giriş" bilgisi eksik kalır
+    }
+  }, []);
+
   useEffect(() => {
     fetchAccounts();
-  }, [fetchAccounts]);
+    fetchLastLogins();
+  }, [fetchAccounts, fetchLastLogins]);
 
   function resetForm() {
     setName("");
@@ -185,6 +221,13 @@ export default function AdminAccountsPage() {
               <div>
                 <p className="text-[14px] font-medium text-foreground">{account.name || "(isimsiz)"}</p>
                 <p className="text-[12.5px] text-foreground-muted">{formatPhoneDisplay(account.phone)}</p>
+                <p className="mt-0.5 text-[12px] text-foreground-muted">
+                  {(() => {
+                    const key = account.name || account.phone;
+                    const lastLogin = lastLogins[key];
+                    return lastLogin ? `Son giriş: ${formatLastLogin(lastLogin)}` : "Henüz giriş yapılmadı";
+                  })()}
+                </p>
               </div>
               <button
                 type="button"

@@ -166,3 +166,14 @@ Bunun için sheet'te ayrıca **"Aktivite Log"** sekmesi kullanılıyor — yoksa
 ilk işlemde otomatik oluşturulur, elle hazırlamanıza gerek yok. Log yazımı
 başarısız olsa bile (ör. geçici bir bağlantı sorunu) asıl işlemi (sipariş
 kaydetme vb.) etkilemez, sadece sunucu logunda görünür.
+
+## 8) Aylık gelir hedefi, Takvim, Dışa aktarma
+
+- **Analiz** sayfasındaki "Bu ayın hedefi" kartı ayrı bir **"Hedefler"**
+  sekmesinde tutuluyor (otomatik oluşur). Her ay+para birimi için tek
+  satır — aynı ayı tekrar kaydederseniz üzerine yazılır.
+- **Takvim** sayfası ekstra bir sheet kullanmaz, zaten yüklü sipariş/gider
+  verisinden hesaplar.
+- **Dışa Aktar** (Siparişler sayfasında) CSV'yi tamamen tarayıcıda üretir,
+  sunucuya bir şey göndermez — noktalı virgül ayraçlı ve UTF-8 BOM'lu,
+  Türkçe Excel'de doğrudan düzgün açılır.

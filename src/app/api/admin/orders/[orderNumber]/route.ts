@@ -61,7 +61,7 @@ export async function DELETE(_request: Request, { params }: RouteParams) {
   const { orderNumber } = await params;
 
   try {
-    await deleteOrder(orderNumber);
+    await deleteOrder(orderNumber, session.name || session.phone);
     logActivity(session.name || session.phone, "Sipariş silindi", `#${orderNumber}`);
     return NextResponse.json({ ok: true });
   } catch (error) {

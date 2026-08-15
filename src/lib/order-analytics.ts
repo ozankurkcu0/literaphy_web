@@ -193,3 +193,59 @@ export function availableCurrencies(orders: Order[], expenses: Expense[]): Curre
   for (const expense of expenses) set.add(expense.currency);
   return [...set];
 }
+
+export interface CalendarDayEvents {
+  day: number;
+  income: Order[];
+  expense: Expense[];
+}
+
+/** Takvim sayfası için — verilen ay/yıla düşen hesap kesim tarihlerini
+ * (aktif siparişler) ve gider tarihlerini (tekrar tipine göre hesaplanmış)
+ * gün gün gruplar. */
+export function buildCalendarEvents(
+  year: number,
+  month: number,
+  orders: Order[],
+  expenses: Expense[],
+): Map<number, CalendarDayEvents> {
+  const map = new Map<number, CalendarDayEvents>();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  function dayEntry(day: number): CalendarDayEvents {
+    let entry = map.get(day);
+    if (!entry) {
+      entry = { day, income: [], expense: [] };
+      map.set(day, entry);
+    }
+    return entry;
+  }
+
+  for (const order of orders) {
+    if (order.status !== "Aktif") continue;
+    const date = parseDate(order.billingDate);
+    if (!date) continue;
+    if (date.getFullYear() === year && date.getMonth() === month) {
+      dayEntry(date.getDate()).income.push(order);
+    }
+  }
+
+  for (const expense of expenses) {
+    if (expense.recurrence === "Aylık") {
+      const day = Number(expense.dueDate);
+      if (day >= 1 && day <= daysInMonth) dayEntry(day).expense.push(expense);
+    } else if (expense.recurrence === "Yıllık") {
+      const [, mm, dd] = expense.dueDate.split("-");
+      if (mm && Number(mm) - 1 === month && dd) {
+        dayEntry(Math.min(Number(dd), daysInMonth)).expense.push(expense);
+      }
+    } else {
+      const date = parseDate(expense.dueDate);
+      if (date && date.getFullYear() === year && date.getMonth() === month) {
+        dayEntry(date.getDate()).expense.push(expense);
+      }
+    }
+  }
+
+  return map;
+}

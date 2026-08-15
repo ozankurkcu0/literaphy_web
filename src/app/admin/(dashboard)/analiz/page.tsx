@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { ChevronDown, ClipboardList, TrendingDown, TrendingUp, Wallet } from "lucide-react";
 import { IncomeExpenseChart } from "@/components/admin/charts/IncomeExpenseChart";
 import { ServiceRevenueChart } from "@/components/admin/charts/ServiceRevenueChart";
+import { MonthlyGoalCard } from "@/components/admin/MonthlyGoalCard";
 import { formatCurrencyAmount } from "@/lib/order-format";
 import {
   PERIOD_PRESET_OPTIONS,
@@ -131,6 +132,8 @@ export default function AdminAnalyticsPage() {
               />
             </div>
           </div>
+
+          <MonthlyGoalCard orders={orders ?? []} currency={currency} />
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <StatCard icon={Wallet} label="Toplam gelir" value={formatCurrencyAmount(totalIncome, currency)} />
