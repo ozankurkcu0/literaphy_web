@@ -9,6 +9,7 @@ import { FeatureSummaryGrid } from "@/components/sections/FeatureSummaryGrid";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { PricingSection } from "@/components/features/PricingSection";
+import { GoogleReviewCrossSell } from "@/components/sections/GoogleReviewCrossSell";
 import { TestimonialSlider } from "@/components/sections/TestimonialSlider";
 import { MiniFAQ } from "@/components/sections/MiniFAQ";
 import { CTABand } from "@/components/sections/CTABand";
@@ -84,6 +85,8 @@ export default function QrMenuLandingPage() {
         />
         <PricingSection plans={qrMenuPricing} />
       </Section>
+
+      <GoogleReviewCrossSell />
 
       {testimonials.length > 0 && (
         <TestimonialSlider

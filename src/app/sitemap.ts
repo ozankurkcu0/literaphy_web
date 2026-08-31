@@ -15,6 +15,7 @@ const staticRoutes = [
   "/n8n-otomasyonlari/ozellikler",
   "/n8n-otomasyonlari/fiyatlandirma",
   "/n8n-otomasyonlari/demo",
+  "/google-review-karti",
   "/projeler",
   "/blog",
   "/hakkimizda",
