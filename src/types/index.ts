@@ -6,7 +6,8 @@ export type ProjectCategory =
   | "ai-otomasyon"
   | "whatsapp-otomasyonu"
   | "api-entegrasyonu"
-  | "qr-menu";
+  | "qr-menu"
+  | "google-review";
 
 export interface Service {
   slug: string;
@@ -100,6 +101,18 @@ export interface PricingPlan {
    * yıllık toplam satırı da buna göre işaretlenir. Fiyatlar yine sayı
    * kalmalı (yıllık toplam hesaplaması fiyat * 12 yapıyor). */
   startingAt?: boolean;
+  description: string;
+  features: string[];
+  highlighted: boolean;
+  ctaLabel: string;
+}
+
+/** Aylık/yıllık abonelik yerine adet bazlı tek seferlik fiyatlandırma —
+ * Google Review Kartı gibi fiziksel ürünler için (bkz. src/content/google-review.ts). */
+export interface QuantityPricingTier {
+  quantity: string;
+  unitPrice: number;
+  totalPrice: number;
   description: string;
   features: string[];
   highlighted: boolean;

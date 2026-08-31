@@ -18,6 +18,7 @@ const categoryLabels: Record<ProjectCategory, string> = {
   "whatsapp-otomasyonu": "WhatsApp Otomasyonu",
   "api-entegrasyonu": "API Entegrasyonu",
   "qr-menu": "QR Menü Sistemleri",
+  "google-review": "Google Review Kartı",
 };
 
 export function ServiceCard({ slug, detailed = false }: ServiceCardProps) {

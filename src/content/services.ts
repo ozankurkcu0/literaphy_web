@@ -1,4 +1,4 @@
-import { BrainCircuit, Globe, QrCode } from "lucide-react";
+import { BrainCircuit, Globe, QrCode, SmartphoneNfc } from "lucide-react";
 import type { Service } from "@/types";
 
 export const services: Service[] = [
@@ -121,6 +121,46 @@ export const services: Service[] = [
     // SSS) — burada ikinci, daha sade bir /hizmetler/qr-menu-sistemleri
     // sayfası oluşturmak yerine oraya yönlendiriyoruz.
     href: "/qr-menu-sistemleri",
+  },
+  {
+    slug: "google-review-karti",
+    category: "google-review",
+    icon: SmartphoneNfc,
+    name: "Google Review Kartı",
+    shortDescription:
+      "NFC ve QR ile çalışan, telefona okutulduğunda işletmenizin Google Haritalar değerlendirme sayfasını doğrudan açan kart.",
+    heroLead:
+      "Müşterileriniz kartı telefonuna yaklaştırdığında ya da üzerindeki karekodu okuttuğunda, uygulama indirmeden doğrudan işletmenizin Google Haritalar değerlendirme ekranı açılır. Yorum bırakma adımını tek dokunuşa indirerek daha fazla ve daha hızlı Google yorumu toplarsınız.",
+    scope: [
+      "NFC çipli ve karekodlu, işletmenize özel programlanmış kart",
+      "Okutulduğunda doğrudan Google Haritalar değerlendirme sayfasına yönlendirme",
+      "Uygulama indirme gerektirmeyen, tarayıcı üzerinden anında açılan deneyim",
+      "Masa, kasa veya girişe yerleştirilebilecek dayanıklı PVC kart tasarımı",
+      "Çok şubeli işletmeler için şube başına ayrı programlanmış kartlar",
+    ],
+    techStack: ["NFC (NDEF)", "QR Kod Üretimi", "Google Business Profile Entegrasyonu"],
+    faq: [
+      {
+        question: "NFC kart nasıl çalışır, telefonuma özel bir uygulama mı gerekiyor?",
+        answer:
+          "Hayır. Güncel akıllı telefonların büyük çoğunluğu NFC'yi tarayıcı üzerinden destekler; kart telefona yaklaştırıldığında ekstra bir uygulama gerekmeden Google Haritalar değerlendirme sayfası açılır. NFC desteklemeyen telefonlarda ise kartın üzerindeki QR kod aynı sonucu verir.",
+      },
+      {
+        question: "Kartlar hangi Google Haritalar sayfasına yönlendiriliyor?",
+        answer:
+          "Kart, yalnızca sizin işletmenizin Google Business Profili'ndeki 'yorum yaz' ekranına özel olarak programlanır; sipariş sırasında işletme bilgilerinizi bizimle paylaşmanız yeterlidir.",
+      },
+      {
+        question: "Birden fazla şubem var, her şube için ayrı kart mı gerekiyor?",
+        answer:
+          "Evet, her şubenin kendi Google Business Profili olduğundan her şube için o şubeye özel programlanmış ayrı kart(lar) gönderiyoruz. Çok şubeli işletmeler için 10'lu paket veya özel teklif en uygun seçenektir.",
+      },
+    ],
+    relatedCoverTone: "emerald",
+    // Zaten kendi zengin landing page'i var (hero, özellikler, fiyatlandırma,
+    // SSS) — burada ikinci, daha sade bir /hizmetler/google-review-karti
+    // sayfası oluşturmak yerine oraya yönlendiriyoruz.
+    href: "/google-review-karti",
   },
 ];
 

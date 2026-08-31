@@ -4,6 +4,7 @@ import { qrMenuFaq, qrMenuPricing } from "@/content/qr-menu";
 import { PageHero } from "@/components/sections/PageHero";
 import { SyncedPricing } from "@/components/features/SyncedPricing";
 import { PricingComparisonTable } from "@/components/sections/PricingComparisonTable";
+import { GoogleReviewCrossSell } from "@/components/sections/GoogleReviewCrossSell";
 import { MiniFAQ } from "@/components/sections/MiniFAQ";
 import { CTABand } from "@/components/sections/CTABand";
 
@@ -33,6 +34,7 @@ export default function QrMenuPricingPage() {
       />
       <SyncedPricing plans={qrMenuPricing} />
       <PricingComparisonTable />
+      <GoogleReviewCrossSell />
       <MiniFAQ items={qrMenuFaq} title="Fiyatlandırma hakkında merak edilenler" tone="base" />
       <CTABand
         title="Hâlâ karar veremediniz mi?"
