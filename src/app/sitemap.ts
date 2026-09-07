@@ -16,6 +16,7 @@ const staticRoutes = [
   "/n8n-otomasyonlari/fiyatlandirma",
   "/n8n-otomasyonlari/demo",
   "/google-review-karti",
+  "/instagram-nfc-karti",
   "/projeler",
   "/blog",
   "/hakkimizda",

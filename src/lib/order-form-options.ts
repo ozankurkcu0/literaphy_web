@@ -7,6 +7,7 @@ export const SERVICE_TYPE_OPTIONS = [
   { label: "N8N / AI Otomasyonu", value: "N8N / AI Otomasyonu" },
   { label: "QR Menü Sistemi", value: "QR Menü Sistemi" },
   { label: "Google Review Kartı", value: "Google Review Kartı" },
+  { label: "Instagram NFC Kartı", value: "Instagram NFC Kartı" },
   { label: "WhatsApp Otomasyonu", value: "WhatsApp Otomasyonu" },
   { label: "Diğer", value: "Diğer" },
 ];

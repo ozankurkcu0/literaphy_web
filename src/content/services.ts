@@ -1,4 +1,4 @@
-import { BrainCircuit, Globe, QrCode, SmartphoneNfc } from "lucide-react";
+import { BrainCircuit, Globe, Instagram, QrCode, SmartphoneNfc } from "lucide-react";
 import type { Service } from "@/types";
 
 export const services: Service[] = [
@@ -161,6 +161,46 @@ export const services: Service[] = [
     // SSS) — burada ikinci, daha sade bir /hizmetler/google-review-karti
     // sayfası oluşturmak yerine oraya yönlendiriyoruz.
     href: "/google-review-karti",
+  },
+  {
+    slug: "instagram-nfc-karti",
+    category: "instagram-nfc",
+    icon: Instagram,
+    name: "Instagram NFC Kartı",
+    shortDescription:
+      "NFC ile çalışan, telefona okutulduğunda Instagram profilinizi doğrudan açan kart.",
+    heroLead:
+      "Karşınızdaki kişi kartı telefonuna yaklaştırdığında, uygulama indirmeden doğrudan Instagram profiliniz açılır. Takip etme adımını tek dokunuşa indirerek daha fazla ve daha hızlı takipçi kazanırsınız.",
+    scope: [
+      "NFC çipli, hesabınıza özel programlanmış kart",
+      "Okutulduğunda doğrudan Instagram profilinize yönlendirme",
+      "Uygulama indirme gerektirmeyen, anında açılan deneyim",
+      "Cüzdanda, masada veya kartvizit standında taşınabilecek dayanıklı PVC kart tasarımı",
+      "Çok şubeli işletmeler için şube başına ayrı programlanmış kartlar",
+    ],
+    techStack: ["NFC (NDEF)", "Instagram Deep Link"],
+    faq: [
+      {
+        question: "NFC kart nasıl çalışır, telefonuma özel bir uygulama mı gerekiyor?",
+        answer:
+          "Hayır. Güncel akıllı telefonların büyük çoğunluğu NFC'yi tarayıcı üzerinden destekler; kart telefona yaklaştırıldığında ekstra bir uygulama gerekmeden Instagram profiliniz açılır.",
+      },
+      {
+        question: "Kartlar hangi Instagram hesabına yönlendiriliyor?",
+        answer:
+          "Kart, yalnızca sizin belirttiğiniz Instagram hesabına özel olarak programlanır; sipariş sırasında kullanıcı adınızı bizimle paylaşmanız yeterlidir.",
+      },
+      {
+        question: "Birden fazla hesabım veya şubem var, her biri için ayrı kart mı gerekiyor?",
+        answer:
+          "Evet, her hesap için o hesaba özel programlanmış ayrı kart(lar) gönderiyoruz. Çok şubeli işletmeler ve ajanslar için 10'lu paket veya özel teklif en uygun seçenektir.",
+      },
+    ],
+    relatedCoverTone: "violet",
+    // Zaten kendi zengin landing page'i var (hero, özellikler, fiyatlandırma,
+    // SSS) — burada ikinci, daha sade bir /hizmetler/instagram-nfc-karti
+    // sayfası oluşturmak yerine oraya yönlendiriyoruz.
+    href: "/instagram-nfc-karti",
   },
 ];
 
