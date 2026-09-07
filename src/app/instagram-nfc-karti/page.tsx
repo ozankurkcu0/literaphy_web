@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Instagram } from "lucide-react";
+import Image from "next/image";
+import { CreditCard, Instagram, Layers } from "lucide-react";
 import { buildMetadata, breadcrumbJsonLd, productJsonLd, faqJsonLd, JsonLd } from "@/lib/seo";
 import {
   instagramNfcFaq,
@@ -27,10 +28,11 @@ export const metadata: Metadata = buildMetadata({
   path: "/instagram-nfc-karti",
 });
 
-// Henüz gerçek ürün fotoğrafı yok — CoverArt fallback'i kullanılıyor. Gerçek
-// kart fotoğrafları elinize geçtiğinde google-review-karti sayfasındaki
-// desene bakarak (public/products/ altına dosya + Image bileşeni) buraya da
-// aynı şekilde ekleyebilirsiniz.
+// Gerçek ürün fotoğrafları.
+const heroImage: string | undefined = "/products/instagram-nfc-karti-hero.jpg"; // kafede kullanım
+const cardFrontImage: string | undefined = "/products/instagram-nfc-karti-on-yuz.jpg"; // kart yakın çekim
+const cardBackImage: string | undefined = undefined; // henüz paket/çoklu kart fotoğrafı yok
+const inUseImage: string | undefined = "/products/instagram-nfc-karti-kullanimda.jpg"; // kafede elde kullanım
 
 export default function InstagramNfcCardPage() {
   return (
@@ -68,7 +70,22 @@ export default function InstagramNfcCardPage() {
             </ButtonLink>
           </>
         }
-        visual={<CoverArt tone="violet" icon={Instagram} ratio="wide" label="Instagram NFC Kartı" />}
+        visual={
+          heroImage ? (
+            <div className="relative aspect-video overflow-hidden rounded-lg shadow-[inset_0_0_0_1px_rgba(255,255,255,0.07)]">
+              <Image
+                src={heroImage}
+                alt="Instagram NFC Kartı bir kafede kasada kullanılıyor"
+                fill
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                className="object-cover object-center"
+                priority
+              />
+            </div>
+          ) : (
+            <CoverArt tone="violet" icon={Instagram} ratio="wide" label="Instagram NFC Kartı" />
+          )
+        }
       />
 
       <HowItWorksSteps
@@ -97,19 +114,52 @@ export default function InstagramNfcCardPage() {
         <SectionHeading
           eyebrow="Kart Tasarımı"
           title="Markanıza uygun, şık bir kart"
-          lead="Kart üzerine logonuzu ve marka renklerinizi işleyebiliriz. Gerçek kartımızın fotoğrafları elimize geçtiğinde bu alana ekleyeceğiz."
+          lead="Kart üzerine logonuzu ve marka renklerinizi işleyebiliriz. Aşağıda gerçek kartımızın yakın çekimini ve bir kafede kullanım örneğini görebilirsiniz."
           tone="product"
           className="mb-14"
         />
         <RevealGroup className="grid grid-cols-1 gap-6 sm:grid-cols-3">
           <RevealItem>
-            <CoverArt tone="violet" icon={Instagram} ratio="video" label="Kart — Ön Yüz" />
+            {cardFrontImage ? (
+              <div className="relative aspect-[16/10] overflow-hidden rounded-lg bg-surface shadow-[inset_0_0_0_1px_rgba(255,255,255,0.07)]">
+                <Image
+                  src={cardFrontImage}
+                  alt="Instagram NFC Kartı yakın çekim"
+                  fill
+                  className="object-cover object-center"
+                />
+              </div>
+            ) : (
+              <CoverArt tone="violet" icon={CreditCard} ratio="video" label="Kart — Ön Yüz" />
+            )}
           </RevealItem>
           <RevealItem>
-            <CoverArt tone="rose" icon={Instagram} ratio="video" label="Kartlar — Paket Görünümü" />
+            {cardBackImage ? (
+              <div className="relative aspect-[16/10] overflow-hidden rounded-lg bg-surface shadow-[inset_0_0_0_1px_rgba(255,255,255,0.07)]">
+                <Image
+                  src={cardBackImage}
+                  alt="Instagram NFC Kartları çoklu paket görünümü"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+            ) : (
+              <CoverArt tone="rose" icon={Layers} ratio="video" label="Kartlar — Paket Görünümü" />
+            )}
           </RevealItem>
           <RevealItem>
-            <CoverArt tone="amber" icon={Instagram} ratio="video" label="Kullanımda" />
+            {inUseImage ? (
+              <div className="relative aspect-[16/10] overflow-hidden rounded-lg bg-surface shadow-[inset_0_0_0_1px_rgba(255,255,255,0.07)]">
+                <Image
+                  src={inUseImage}
+                  alt="Instagram NFC Kartı kafede elde kullanımda"
+                  fill
+                  className="object-cover object-center"
+                />
+              </div>
+            ) : (
+              <CoverArt tone="amber" icon={Instagram} ratio="video" label="Kullanımda" />
+            )}
           </RevealItem>
         </RevealGroup>
       </Section>
