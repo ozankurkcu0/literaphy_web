@@ -5,7 +5,7 @@ export const googleReviewHowItWorks = [
   {
     number: "01",
     title: "Kartı Okutun",
-    description: "Müşteriniz kartı telefonuna yaklaştırır (NFC) ya da üzerindeki karekodu kamerayla okutur.",
+    description: "Müşteriniz kartı telefonuna yaklaştırır, NFC çipi devreye girer.",
   },
   {
     number: "02",
@@ -22,8 +22,8 @@ export const googleReviewHowItWorks = [
 export const googleReviewFeatures = [
   {
     icon: SmartphoneNfc,
-    title: "NFC + QR Bir Arada",
-    description: "Kartın hem NFC çipi hem karekodu var; müşteriniz hangisini kullanmayı tercih ederse etsin aynı sonuca ulaşır.",
+    title: "Güçlü NFC Çipi",
+    description: "Kartın içindeki NFC çipi, telefon yaklaştırıldığı anda devreye girer; ekstra bir işlem gerekmez.",
   },
   {
     icon: Zap,
@@ -59,7 +59,7 @@ export const googleReviewPricing: QuantityPricingTier[] = [
     totalPrice: 1000,
     description: "Tek şubeli işletmeler veya önce denemek isteyenler için.",
     features: [
-      "İşletmenize özel programlanmış 1 adet NFC + QR kart",
+      "İşletmenize özel programlanmış 1 adet NFC kart",
       "Google Haritalar değerlendirme sayfasına doğrudan yönlendirme",
       "Kargo ile adresinize teslim",
     ],
@@ -72,7 +72,7 @@ export const googleReviewPricing: QuantityPricingTier[] = [
     totalPrice: 4500,
     description: "Masalara, kasaya ve girişe dağıtmak isteyen işletmeler için en popüler paket.",
     features: [
-      "İşletmenize özel programlanmış 5 adet NFC + QR kart",
+      "İşletmenize özel programlanmış 5 adet NFC kart",
       "Masa, kasa ve giriş için yeterli adet",
       "Adet başı %10 indirimli fiyat",
       "Kargo ile adresinize teslim",
@@ -86,7 +86,7 @@ export const googleReviewPricing: QuantityPricingTier[] = [
     totalPrice: 8000,
     description: "Çok şubeli işletmeler ve zincirler için toplu avantajlı fiyat.",
     features: [
-      "İşletmenize özel programlanmış 10 adet NFC + QR kart",
+      "İşletmenize özel programlanmış 10 adet NFC kart",
       "Çok şubeli işletmeler için ideal dağıtım adedi",
       "Adet başı %20 indirimli fiyat",
       "Kargo ile adresinize teslim",
@@ -100,7 +100,7 @@ export const googleReviewFaq = [
   {
     question: "NFC kart nasıl çalışır, telefonuma özel bir uygulama mı gerekiyor?",
     answer:
-      "Hayır. Güncel akıllı telefonların büyük çoğunluğu NFC'yi tarayıcı üzerinden destekler; kart telefona yaklaştırıldığında ekstra bir uygulama gerekmeden Google Haritalar değerlendirme sayfası açılır. NFC desteklemeyen telefonlarda ise kartın üzerindeki QR kod aynı sonucu verir.",
+      "Hayır. Güncel akıllı telefonların büyük çoğunluğu NFC'yi tarayıcı üzerinden destekler; kart telefona yaklaştırıldığında ekstra bir uygulama gerekmeden Google Haritalar değerlendirme sayfası açılır.",
   },
   {
     question: "Kartlar hangi Google Haritalar sayfasına yönlendiriliyor?",

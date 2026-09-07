@@ -128,22 +128,22 @@ export const services: Service[] = [
     icon: SmartphoneNfc,
     name: "Google Review Kartı",
     shortDescription:
-      "NFC ve QR ile çalışan, telefona okutulduğunda işletmenizin Google Haritalar değerlendirme sayfasını doğrudan açan kart.",
+      "NFC ile çalışan, telefona okutulduğunda işletmenizin Google Haritalar değerlendirme sayfasını doğrudan açan kart.",
     heroLead:
-      "Müşterileriniz kartı telefonuna yaklaştırdığında ya da üzerindeki karekodu okuttuğunda, uygulama indirmeden doğrudan işletmenizin Google Haritalar değerlendirme ekranı açılır. Yorum bırakma adımını tek dokunuşa indirerek daha fazla ve daha hızlı Google yorumu toplarsınız.",
+      "Müşterileriniz kartı telefonuna yaklaştırdığında, uygulama indirmeden doğrudan işletmenizin Google Haritalar değerlendirme ekranı açılır. Yorum bırakma adımını tek dokunuşa indirerek daha fazla ve daha hızlı Google yorumu toplarsınız.",
     scope: [
-      "NFC çipli ve karekodlu, işletmenize özel programlanmış kart",
+      "NFC çipli, işletmenize özel programlanmış kart",
       "Okutulduğunda doğrudan Google Haritalar değerlendirme sayfasına yönlendirme",
       "Uygulama indirme gerektirmeyen, tarayıcı üzerinden anında açılan deneyim",
       "Masa, kasa veya girişe yerleştirilebilecek dayanıklı PVC kart tasarımı",
       "Çok şubeli işletmeler için şube başına ayrı programlanmış kartlar",
     ],
-    techStack: ["NFC (NDEF)", "QR Kod Üretimi", "Google Business Profile Entegrasyonu"],
+    techStack: ["NFC (NDEF)", "Google Business Profile Entegrasyonu"],
     faq: [
       {
         question: "NFC kart nasıl çalışır, telefonuma özel bir uygulama mı gerekiyor?",
         answer:
-          "Hayır. Güncel akıllı telefonların büyük çoğunluğu NFC'yi tarayıcı üzerinden destekler; kart telefona yaklaştırıldığında ekstra bir uygulama gerekmeden Google Haritalar değerlendirme sayfası açılır. NFC desteklemeyen telefonlarda ise kartın üzerindeki QR kod aynı sonucu verir.",
+          "Hayır. Güncel akıllı telefonların büyük çoğunluğu NFC'yi tarayıcı üzerinden destekler; kart telefona yaklaştırıldığında ekstra bir uygulama gerekmeden Google Haritalar değerlendirme sayfası açılır.",
       },
       {
         question: "Kartlar hangi Google Haritalar sayfasına yönlendiriliyor?",
