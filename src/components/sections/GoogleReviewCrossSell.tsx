@@ -26,8 +26,8 @@ export function GoogleReviewCrossSell() {
           </Reveal>
           <Reveal delay={0.12}>
             <p className="text-[16px] leading-relaxed text-foreground-muted">
-              Müşterilerinizin Google Haritalar&apos;da tek dokunuşla veya karekodla yorum bırakmasını sağlayan Google
-              Review Kartı, QR Menü Sistemleri müşterilerimize tüm paketlerde %50 indirimli.
+              Müşterilerinizin Google Haritalar&apos;da tek dokunuşla yorum bırakmasını sağlayan Google Review Kartı,
+              QR Menü Sistemleri müşterilerimize tüm paketlerde %50 indirimli.
             </p>
           </Reveal>
           <Reveal delay={0.16} className="flex items-baseline gap-3">
