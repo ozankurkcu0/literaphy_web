@@ -7,7 +7,8 @@ export type ProjectCategory =
   | "whatsapp-otomasyonu"
   | "api-entegrasyonu"
   | "qr-menu"
-  | "google-review";
+  | "google-review"
+  | "instagram-nfc";
 
 export interface Service {
   slug: string;

@@ -19,6 +19,7 @@ const categoryLabels: Record<ProjectCategory, string> = {
   "api-entegrasyonu": "API Entegrasyonu",
   "qr-menu": "QR Menü Sistemleri",
   "google-review": "Google Review Kartı",
+  "instagram-nfc": "Instagram NFC Kartı",
 };
 
 export function ServiceCard({ slug, detailed = false }: ServiceCardProps) {
