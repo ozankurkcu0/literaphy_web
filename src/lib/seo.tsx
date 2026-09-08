@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/constants";
+import { CONTACT, SITE_DESCRIPTION, SITE_NAME, SITE_URL, SOCIAL_LINKS } from "@/lib/constants";
 
 interface PageMetaInput {
   title: string;
@@ -48,12 +48,25 @@ export function organizationJsonLd() {
     url: SITE_URL,
     logo: `${SITE_URL}/logo-icon.png`,
     description: SITE_DESCRIPTION,
-    sameAs: [
-      "https://linkedin.com/company/literaphy",
-      "https://instagram.com/literaphy",
-      "https://x.com/literaphy",
-      "https://github.com/literaphy",
-    ],
+    telephone: CONTACT.phone,
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "Kartepe",
+      addressRegion: "Kocaeli",
+      addressCountry: "TR",
+    },
+    contactPoint: {
+      "@type": "ContactPoint",
+      contactType: "customer service",
+      telephone: CONTACT.phone,
+      email: CONTACT.email,
+      areaServed: "TR",
+      availableLanguage: ["tr"],
+    },
+    // SOCIAL_LINKS doğrulanmış gerçek hesaplar içerdiğinde otomatik dolar —
+    // bkz. constants.ts'deki not (placeholder handle'lar SEO denetiminde
+    // kaldırıldı, yanlış üçüncü şahıs profillerine işaret ediyorlardı).
+    ...(SOCIAL_LINKS.length > 0 ? { sameAs: SOCIAL_LINKS.map((s) => s.href) } : {}),
   };
 }
 
