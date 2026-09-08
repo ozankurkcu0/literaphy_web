@@ -9,12 +9,12 @@ import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
 /** Pazarlama sitesinin Header/Footer/WhatsApp CTA'sını sarar. /admin
  * altındaki sayfalar kendi kabuğunu (bkz. admin/(dashboard)/layout.tsx)
  * kullandığı için burada hiçbir marketing chrome'u render edilmez. Aynı
- * şekilde /yagmurumm gibi tek seferlik/özel tam ekran sayfalar da chrome'suz
- * kalır. */
+ * şekilde /yagmurumm* ile başlayan tek seferlik/özel tam ekran sayfalar
+ * da chrome'suz kalır. */
 export function SiteChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isAdmin = pathname?.startsWith("/admin");
-  const isStandalone = pathname === "/yagmurumm";
+  const isStandalone = pathname?.startsWith("/yagmurumm");
 
   if (isAdmin || isStandalone) {
     return <>{children}</>;
