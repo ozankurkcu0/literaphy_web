@@ -5,25 +5,39 @@ nedeniyle makul varsayımlarla doldurulan noktaları listeler. Kesintiye
 sebep olmamak için akış durdurulmadı; aşağıdakiler devreye alınmadan
 önce netleştirilmeli veya gerçek verilerle değiştirilmeli.
 
-## Yüksek Öncelik
+## Yüksek Öncelik — SEO denetimi (2026-09-08) sonrası açık kalanlar
 
-- **Gerçek alan adı**: `src/lib/constants.ts` içindeki `SITE_URL` şu an
-  `https://literaphy.com.tr` olarak varsayıldı (metadata, sitemap, robots,
-  JSON-LD, OG görselleri bu değeri kullanıyor). Gerçek domain
-  belirlenince tek bu satır güncellenmeli.
-- **İletişim bilgileri**: Telefon/WhatsApp gerçek numarayla güncellendi
-  (`0542 461 96 30`). E-posta ve adres (`Kartepe, Kocaeli`) hâlâ
-  placeholder olabilir — netleşince `CONTACT` bloğu güncellenmeli.
+- **[YAPILDI — kod] Gerçek alan adı**: `SITE_URL` fallback'i
+  `https://www.literaphy.com` olarak güncellendi. **AMA prod'da hâlâ eksik
+  olan asıl adım**: Vercel > Project Settings > Environment Variables'a
+  `NEXT_PUBLIC_SITE_URL=https://www.literaphy.com` eklenip yeniden deploy
+  edilmeli — env değişkeni set edilene kadar canlı sitede canonical/OG/
+  JSON-LD/sitemap.xml/robots.txt hâlâ eski `literaphy-web.vercel.app`
+  değerini basıyor olabilir (bu, denetimde tespit edilen en kritik bulguydu:
+  gerçek domain'in Google tarafından indexlenmesini engelliyordu).
+- **[YAPILDI — kod] Sahte sosyal medya linkleri**: `SOCIAL_LINKS` boşaltıldı.
+  Denetimde `instagram.com/literaphy` ve `x.com/literaphy`'nin tamamen
+  alakasız üçüncü şahıslara ait olduğu, `github.com/literaphy`'nin 404
+  verdiği tespit edildi — footer'da ve Organization JSON-LD `sameAs`'ta
+  canlıdaydı. Gerçek hesaplar netleşince `constants.ts`'e eklenmeli.
 - **Form teslimatı (e-posta)**: Altyapı hazır (`src/lib/email.ts`, Resend
   üzerinden) ve üç forma da (İletişim, QR Menü demo, N8N demo) bağlandı; ama
   `RESEND_API_KEY` henüz set edilmedi — ID'siz iken sadece sunucu loguna
-  yazıyor. resend.com'da hesap açılıp API key `.env`'e (ve deploy ortamına)
-  eklenince ek kod değişikliği gerekmeden devreye girer. Bildirimler
-  `literaphy@gmail.com` adresine gidecek şekilde ayarlandı (`CONTACT_NOTIFY_EMAIL`
-  ile değiştirilebilir).
-- **Sosyal medya linkleri**: `SOCIAL_LINKS` içindeki URL'ler
-  (linkedin.com/company/literaphy vb.) gerçek hesaplar açılınca
-  güncellenmeli; şu an tahmini/placeholder.
+  yazıyor, yani şu an gelen talepler e-posta ile ulaşmıyor olabilir.
+  resend.com'da hesap açılıp API key deploy ortamına eklenince ek kod
+  değişikliği gerekmeden devreye girer. Bildirimler `literaphy@gmail.com`
+  adresine gidecek şekilde ayarlandı (`CONTACT_NOTIFY_EMAIL` ile
+  değiştirilebilir).
+- **Analytics/Search Console**: `NEXT_PUBLIC_GA_MEASUREMENT_ID` hâlâ set
+  değil — indexleme/trafik/CWV verisi olmadan SEO etkisi ölçülemiyor.
+  GA4 property + Google Search Console (domain mülkiyeti + sitemap
+  gönderimi) öncelikli.
+- **Blog içerik derinliği**: Denetimde blog yazılarının gövde metninin
+  oldukça kısa olduğu görüldü (~150-200 kelime/yazı). Google ve AI arama
+  motorları (ChatGPT/Perplexity gibi) için E-E-A-T ve alıntılanabilirlik
+  açısından her yazının gerçek örnek/vaka detaylarıyla 600-900 kelimeye
+  çıkarılması önerilir — bu bilerek otomatik doldurulmadı (uydurma
+  "vaka" içeriği E-E-A-T'yi gerçek verilerden daha çok zedeler).
 
 ## Orta Öncelik
 
