@@ -31,7 +31,7 @@ export const metadata: Metadata = buildMetadata({
 // Gerçek ürün fotoğrafları.
 const heroImage: string | undefined = "/products/instagram-nfc-karti-hero.jpg"; // kafede kullanım
 const cardFrontImage: string | undefined = "/products/instagram-nfc-karti-on-yuz.jpg"; // kart yakın çekim
-const cardBackImage: string | undefined = undefined; // henüz paket/çoklu kart fotoğrafı yok
+const cardBackImage: string | undefined = "/products/instagram-nfc-karti-paket.jpg"; // paket/çoklu kart fotoğrafı
 const inUseImage: string | undefined = "/products/instagram-nfc-karti-kullanimda.jpg"; // kafede elde kullanım
 
 export default function InstagramNfcCardPage() {
