@@ -14,12 +14,22 @@ import { SESSION_COOKIE_NAME, verifySessionToken } from "@/lib/admin-auth";
 const OLD_PRODUCTION_HOST = "literaphy-web.vercel.app";
 const CANONICAL_HOST = "www.literaphy.com";
 
+// Eski adresi Search Console'da ayrı bir mülk olarak doğrulayıp Kaldırma
+// aracıyla hızlıca (24-48 saat) arama sonuçlarından düşürebilmek için,
+// Google'ın HTML dosyası doğrulama isteğini (google<hash>.html) redirect'ten
+// muaf tutuyoruz — o dosya public/ altına konulup normal şekilde servis
+// edilebilsin. Doğrulama tamamlandıktan sonra bu satır kalsa da zararı yok.
+const GOOGLE_SITE_VERIFICATION_PATTERN = /^\/google[a-f0-9]+\.html$/;
+
 /** /admin altındaki tüm sayfaları korur — geçerli oturum çerezi yoksa
  * /admin/login'e yönlendirir. API route'lar (/api/admin/*) kendi içinde
  * ayrıca oturum kontrolü yapar (bkz. src/app/api/admin). */
 export async function middleware(request: NextRequest) {
   const host = request.headers.get("host");
-  if (host === OLD_PRODUCTION_HOST) {
+  if (
+    host === OLD_PRODUCTION_HOST &&
+    !GOOGLE_SITE_VERIFICATION_PATTERN.test(request.nextUrl.pathname)
+  ) {
     const url = new URL(request.url);
     url.protocol = "https:";
     url.host = CANONICAL_HOST;

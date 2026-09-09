@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import { MotionConfig } from "motion/react";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/constants";
-import { organizationJsonLd, JsonLd } from "@/lib/seo";
+import { organizationJsonLd, websiteJsonLd, JsonLd } from "@/lib/seo";
 import { SiteChrome } from "@/components/layout/SiteChrome";
 import { Analytics } from "@/components/layout/Analytics";
 import "./globals.css";
@@ -64,6 +64,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="flex min-h-screen flex-col antialiased">
         <MotionConfig reducedMotion="user">
           <JsonLd data={organizationJsonLd()} />
+          <JsonLd data={websiteJsonLd()} />
           <SiteChrome>{children}</SiteChrome>
         </MotionConfig>
         <Analytics />

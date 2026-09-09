@@ -44,6 +44,7 @@ export function organizationJsonLd() {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
+    "@id": `${SITE_URL}/#organization`,
     name: SITE_NAME,
     url: SITE_URL,
     logo: `${SITE_URL}/logo-icon.png`,
@@ -67,6 +68,23 @@ export function organizationJsonLd() {
     // bkz. constants.ts'deki not (placeholder handle'lar SEO denetiminde
     // kaldırıldı, yanlış üçüncü şahıs profillerine işaret ediyorlardı).
     ...(SOCIAL_LINKS.length > 0 ? { sameAs: SOCIAL_LINKS.map((s) => s.href) } : {}),
+  };
+}
+
+// "literaphy" aratıldığında Google'ın markayı tek bir varlığa (www.literaphy.com)
+// bağlaması için Organization'ın yanına WebSite şeması eklendi — @id ile
+// Organization'a referans veriyor, böylece ikisi aynı knowledge graph
+// düğümünde birleşiyor. Eski/yanlış bir vercel.app kopyasının aynı markayla
+// eşleşme ihtimalini azaltır.
+export function websiteJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": `${SITE_URL}/#website`,
+    name: SITE_NAME,
+    url: SITE_URL,
+    inLanguage: "tr-TR",
+    publisher: { "@id": `${SITE_URL}/#organization` },
   };
 }
 
