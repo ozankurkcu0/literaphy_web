@@ -7,7 +7,7 @@ export const privacyPolicy = {
     {
       heading: "1. Genel Bilgilendirme",
       paragraphs: [
-        `${SITE_LEGAL_NAME} ("Literaphy", "biz") olarak, literaphy.com.tr web sitesi üzerinden topladığımız kişisel verilerin gizliliğini ve güvenliğini önemsiyoruz. Bu politika, hangi verileri, hangi amaçla topladığımızı ve nasıl işlediğimizi açıklar.`,
+        `${SITE_LEGAL_NAME} ("Literaphy", "biz") olarak, literaphy.com web sitesi üzerinden topladığımız kişisel verilerin gizliliğini ve güvenliğini önemsiyoruz. Bu politika, hangi verileri, hangi amaçla topladığımızı ve nasıl işlediğimizi açıklar.`,
       ],
     },
     {
@@ -45,7 +45,7 @@ export const termsOfService = {
     {
       heading: "1. Kabul",
       paragraphs: [
-        `literaphy.com.tr web sitesini kullanarak bu kullanım şartlarını kabul etmiş sayılırsınız. Şartları kabul etmiyorsanız lütfen siteyi kullanmayınız.`,
+        `literaphy.com web sitesini kullanarak bu kullanım şartlarını kabul etmiş sayılırsınız. Şartları kabul etmiyorsanız lütfen siteyi kullanmayınız.`,
       ],
     },
     {
