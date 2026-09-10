@@ -614,6 +614,231 @@ export async function deleteOrder(orderNumber: string, actor: string): Promise<v
 }
 
 /**
+ * Siparişe bağlı olmayan genel şirket giderleri (domain/hosting, reklam,
+ * yazılım abonelikleri vb.) — kendi sekmesinde ("Şirket Giderleri") tutulur.
+ * "Giderler" sekmesinden bilinçli olarak ayrı: o sekme siparişe bağlı
+ * (bire-çok, sipariş silinince giderleri de silinir), bu ise hiçbir siparişe
+ * bağlı değil, tek başına yönetiliyor. Sekme yoksa ilk kullanımda otomatik
+ * oluşturulur (bkz. ensureCompanyExpenseSheet).
+ * Sütunlar: A: Gider ID  B: Kategori  C: Tutar  D: Para Birimi
+ *           E: Ödeme Tarihi  F: Tekrar  G: Not
+ */
+const COMPANY_EXPENSE_SHEET_NAME = "Şirket Giderleri";
+const COMPANY_EXPENSE_HEADER_ROW = [
+  "Gider ID",
+  "Kategori",
+  "Tutar",
+  "Para Birimi",
+  "Ödeme Tarihi",
+  "Tekrar",
+  "Not",
+] as const;
+const COMPANY_EXPENSE_DATA_COLUMNS = "A:G";
+
+export const COMPANY_EXPENSE_CATEGORIES = [
+  "Domain & Hosting",
+  "Reklam Giderleri",
+  "Yazılım & Araç Abonelikleri",
+  "Ofis & Kırtasiye",
+  "Muhasebe & Hukuk",
+  "Donanım & Ekipman",
+  "Diğer",
+] as const;
+export type CompanyExpenseCategory = (typeof COMPANY_EXPENSE_CATEGORIES)[number];
+
+export interface CompanyExpenseInput {
+  category: CompanyExpenseCategory;
+  amount: string;
+  currency: Currency;
+  recurrence: ExpenseRecurrence;
+  // Semantiği "Giderler" sekmesindeki dueDate ile birebir aynı (bkz.
+  // serializeExpenseDueDate/deserializeExpenseDueDate) — Aylık için ayın
+  // günü, diğerlerinde tam tarih.
+  dueDate: string;
+  note: string;
+}
+
+export interface CompanyExpense extends CompanyExpenseInput {
+  rowNumber: number;
+  expenseId: string;
+}
+
+async function ensureCompanyExpenseSheet(): Promise<void> {
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const existingSheetId = await getNumericSheetId(COMPANY_EXPENSE_SHEET_NAME);
+  if (existingSheetId === null) {
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId: sheetId,
+      requestBody: { requests: [{ addSheet: { properties: { title: COMPANY_EXPENSE_SHEET_NAME } } }] },
+    });
+  }
+
+  const { data } = await sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range: `${COMPANY_EXPENSE_SHEET_NAME}!A1:G1`,
+  });
+  const currentHeaders = data.values?.[0] ?? [];
+  const needsUpdate = COMPANY_EXPENSE_HEADER_ROW.some((header, index) => currentHeaders[index] !== header);
+  if (!needsUpdate) return;
+
+  await sheets.spreadsheets.values.update({
+    spreadsheetId: sheetId,
+    range: `${COMPANY_EXPENSE_SHEET_NAME}!A1:G1`,
+    valueInputOption: "USER_ENTERED",
+    requestBody: { values: [[...COMPANY_EXPENSE_HEADER_ROW]] },
+  });
+}
+
+function toCompanyExpenseCategory(value: string | undefined): CompanyExpenseCategory {
+  return (COMPANY_EXPENSE_CATEGORIES as readonly string[]).includes(value ?? "")
+    ? (value as CompanyExpenseCategory)
+    : "Diğer";
+}
+
+function rowToCompanyExpense(row: string[], rowNumber: number): CompanyExpense | null {
+  const expenseId = row[0]?.trim();
+  if (!expenseId) return null;
+
+  const recurrence = toExpenseRecurrence(row[5]);
+
+  return {
+    rowNumber,
+    expenseId,
+    category: toCompanyExpenseCategory(row[1]),
+    amount: row[2] ?? "",
+    currency: toCurrency(row[3]),
+    dueDate: deserializeExpenseDueDate(recurrence, row[4] ?? ""),
+    recurrence,
+    note: row[6] ?? "",
+  };
+}
+
+export async function listCompanyExpenses(): Promise<CompanyExpense[]> {
+  await ensureCompanyExpenseSheet();
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const { data } = await sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range: `${COMPANY_EXPENSE_SHEET_NAME}!A2:${COMPANY_EXPENSE_DATA_COLUMNS.split(":")[1]}`,
+  });
+
+  const rows = data.values ?? [];
+  const expenses: CompanyExpense[] = [];
+  rows.forEach((row, index) => {
+    const expense = rowToCompanyExpense(row as string[], index + 2);
+    if (expense) expenses.push(expense);
+  });
+  return expenses;
+}
+
+export async function createCompanyExpense(input: CompanyExpenseInput): Promise<CompanyExpense> {
+  await ensureCompanyExpenseSheet();
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const existing = await listCompanyExpenses();
+  const expenseId = generateExpenseId(new Set(existing.map((expense) => expense.expenseId)));
+
+  const values = [
+    expenseId,
+    input.category,
+    input.amount,
+    input.currency,
+    serializeExpenseDueDate(input.recurrence, input.dueDate),
+    input.recurrence,
+    protectFromFormula(input.note),
+  ];
+
+  await sheets.spreadsheets.values.append({
+    spreadsheetId: sheetId,
+    range: `${COMPANY_EXPENSE_SHEET_NAME}!${COMPANY_EXPENSE_DATA_COLUMNS}`,
+    valueInputOption: "USER_ENTERED",
+    insertDataOption: "INSERT_ROWS",
+    requestBody: { values: [values] },
+  });
+
+  return { rowNumber: -1, expenseId, ...input };
+}
+
+export async function updateCompanyExpense(
+  expenseId: string,
+  patch: Partial<CompanyExpenseInput>,
+): Promise<CompanyExpense> {
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const all = await listCompanyExpenses();
+  const current = all.find((expense) => expense.expenseId === expenseId);
+  if (!current) {
+    throw new Error(`${expenseId} numaralı gider bulunamadı.`);
+  }
+
+  const merged: CompanyExpense = { ...current, ...patch };
+  const values = [
+    merged.expenseId,
+    merged.category,
+    merged.amount,
+    merged.currency,
+    serializeExpenseDueDate(merged.recurrence, merged.dueDate),
+    merged.recurrence,
+    protectFromFormula(merged.note),
+  ];
+
+  await sheets.spreadsheets.values.update({
+    spreadsheetId: sheetId,
+    range: `${COMPANY_EXPENSE_SHEET_NAME}!A${current.rowNumber}:G${current.rowNumber}`,
+    valueInputOption: "USER_ENTERED",
+    requestBody: { values: [values] },
+  });
+
+  return merged;
+}
+
+export async function deleteCompanyExpense(expenseId: string, actor: string): Promise<void> {
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const all = await listCompanyExpenses();
+  const current = all.find((expense) => expense.expenseId === expenseId);
+  if (!current) {
+    throw new Error(`${expenseId} numaralı gider bulunamadı.`);
+  }
+
+  await moveToTrash(
+    "Şirket Gideri",
+    `${current.category} · ${current.amount || "0"} ${current.currency}`,
+    current,
+    actor,
+  );
+
+  const numericSheetId = await getNumericSheetId(COMPANY_EXPENSE_SHEET_NAME);
+  if (numericSheetId === null) {
+    throw new Error(`"${COMPANY_EXPENSE_SHEET_NAME}" adlı sayfa bulunamadı.`);
+  }
+
+  await sheets.spreadsheets.batchUpdate({
+    spreadsheetId: sheetId,
+    requestBody: {
+      requests: [
+        {
+          deleteDimension: {
+            range: {
+              sheetId: numericSheetId,
+              dimension: "ROWS",
+              startIndex: current.rowNumber - 1,
+              endIndex: current.rowNumber,
+            },
+          },
+        },
+      ],
+    },
+  });
+}
+
+/**
  * Aktivite log'u — hangi admin ne zaman ne değiştirdi/sildi. Ayrı bir
  * "Aktivite Log" sekmesinde tutulur (yoksa otomatik oluşturulur). Sadece
  * ekleme yapılır, hiç silme/güncelleme yok — kalıcı bir defter gibi.
@@ -822,7 +1047,7 @@ export async function setMonthlyGoal(month: string, currency: Currency, amount: 
 const TRASH_SHEET_NAME = "Çöp Kutusu";
 const TRASH_HEADER_ROW = ["Çöp ID", "Zaman", "Tür", "Özet", "Silen", "Veri"] as const;
 
-export type TrashType = "Sipariş" | "Gider";
+export type TrashType = "Sipariş" | "Gider" | "Şirket Gideri";
 
 export interface TrashEntry {
   rowNumber: number;
@@ -831,7 +1056,7 @@ export interface TrashEntry {
   type: TrashType;
   summary: string;
   actor: string;
-  data: Order | Expense;
+  data: Order | Expense | CompanyExpense;
 }
 
 let trashSheetEnsured = false;
@@ -878,8 +1103,9 @@ function generateTrashId(existing: Set<string>): string {
 function rowToTrashEntry(row: string[], rowNumber: number): TrashEntry | null {
   const trashId = row[0]?.trim();
   if (!trashId) return null;
-  const type: TrashType = row[2] === "Gider" ? "Gider" : "Sipariş";
-  let data: Order | Expense;
+  const type: TrashType =
+    row[2] === "Gider" ? "Gider" : row[2] === "Şirket Gideri" ? "Şirket Gideri" : "Sipariş";
+  let data: Order | Expense | CompanyExpense;
   try {
     data = JSON.parse(row[5] ?? "{}");
   } catch {
@@ -919,7 +1145,12 @@ export async function listTrash(): Promise<TrashEntry[]> {
  * taşır. deleteOrder/deleteExpense içinden AWAIT edilir ve hata fırlatırsa
  * silme işlemi de iptal olur — logActivity'nin aksine burada asıl amaç
  * veri kaybını önlemek olduğu için hata yutulmaz. */
-async function moveToTrash(type: TrashType, summary: string, data: Order | Expense, actor: string): Promise<void> {
+async function moveToTrash(
+  type: TrashType,
+  summary: string,
+  data: Order | Expense | CompanyExpense,
+  actor: string,
+): Promise<void> {
   await ensureTrashSheet();
   const sheets = await getSheetsClient();
   const { sheetId } = getConfig();
@@ -1039,6 +1270,32 @@ async function restoreExpenseRow(expense: Expense): Promise<void> {
   });
 }
 
+/** restoreExpenseRow'un genel şirket gideri karşılığı — ORİJİNAL gider
+ * ID'sini korur. */
+async function restoreCompanyExpenseRow(expense: CompanyExpense): Promise<void> {
+  await ensureCompanyExpenseSheet();
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const values = [
+    expense.expenseId,
+    expense.category,
+    expense.amount,
+    expense.currency,
+    serializeExpenseDueDate(expense.recurrence, expense.dueDate),
+    expense.recurrence,
+    protectFromFormula(expense.note),
+  ];
+
+  await sheets.spreadsheets.values.append({
+    spreadsheetId: sheetId,
+    range: `${COMPANY_EXPENSE_SHEET_NAME}!${COMPANY_EXPENSE_DATA_COLUMNS}`,
+    valueInputOption: "USER_ENTERED",
+    insertDataOption: "INSERT_ROWS",
+    requestBody: { values: [values] },
+  });
+}
+
 /** Çöp kutusundaki bir kaydı geri getirir: ilgili sheet'e orijinal
  * kimliğiyle ekler, sonra çöp kutusu satırını siler. Sipariş/gider
  * numarası bir başka kayıtta yeniden kullanılmışsa sessizce üzerine
@@ -1058,6 +1315,15 @@ export async function restoreFromTrash(trashId: string): Promise<void> {
       );
     }
     await restoreOrderRow(order);
+  } else if (entry.type === "Şirket Gideri") {
+    const expense = entry.data as CompanyExpense;
+    const expenses = await listCompanyExpenses();
+    if (expenses.some((existing) => existing.expenseId === expense.expenseId)) {
+      throw new Error(
+        `${expense.expenseId} numaralı gider numarası bir başka kayıtta kullanılıyor, geri getirilemedi.`,
+      );
+    }
+    await restoreCompanyExpenseRow(expense);
   } else {
     const expense = entry.data as Expense;
     const expenses = await listExpenses();

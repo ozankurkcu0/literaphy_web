@@ -17,7 +17,7 @@ import {
   type PeriodPreset,
 } from "@/lib/order-analytics";
 import { cardSurfaceClass, cn, inputBaseClass } from "@/lib/utils";
-import type { Currency, Expense, Order } from "@/lib/google-sheets";
+import type { CompanyExpense, Currency, Expense, Order } from "@/lib/google-sheets";
 
 const STATUS_TILE_CLASS: Record<string, string> = {
   Aktif: "border-success/20 bg-success/5 text-success",
@@ -28,6 +28,7 @@ const STATUS_TILE_CLASS: Record<string, string> = {
 export default function AdminAnalyticsPage() {
   const [orders, setOrders] = useState<Order[] | null>(null);
   const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [companyExpenses, setCompanyExpenses] = useState<CompanyExpense[]>([]);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [preset, setPreset] = useState<PeriodPreset>("last-6-months");
   const [currency, setCurrency] = useState<Currency>("TRY");
@@ -35,18 +36,23 @@ export default function AdminAnalyticsPage() {
   const fetchAll = useCallback(async () => {
     setLoadError(null);
     try {
-      const [ordersRes, expensesRes] = await Promise.all([
+      const [ordersRes, expensesRes, companyExpensesRes] = await Promise.all([
         fetch("/api/admin/orders"),
         fetch("/api/admin/expenses"),
+        fetch("/api/admin/company-expenses"),
       ]);
       const ordersData = await ordersRes.json();
       const expensesData = await expensesRes.json();
+      const companyExpensesData = await companyExpensesRes.json();
       if (!ordersRes.ok) {
         setLoadError(ordersData.error ?? "Veriler alınamadı.");
         return;
       }
       setOrders(ordersData.orders ?? []);
       setExpenses(expensesData.expenses ?? []);
+      // Genel şirket giderleri (domain/hosting, reklam vb.) yapılandırılmamışsa
+      // configured:false döner — sipariş bazlı giderleri göstermeye engel değil.
+      setCompanyExpenses(companyExpensesData.configured === false ? [] : (companyExpensesData.expenses ?? []));
       if (ordersData.error) setLoadError(ordersData.error);
     } catch {
       setLoadError("Sunucuya ulaşılamadı, lütfen tekrar deneyin.");
@@ -58,12 +64,17 @@ export default function AdminAnalyticsPage() {
   }, [fetchAll]);
 
   const range = useMemo(() => resolvePeriodRange(preset), [preset]);
-  const currencies = useMemo(() => availableCurrencies(orders ?? [], expenses), [orders, expenses]);
+  // "Toplam gider" ve Gelir & Gider grafiği hem sipariş bazlı hem genel şirket
+  // giderlerini kapsasın diye ikisi tek listeymiş gibi birleştiriliyor —
+  // buildMonthBuckets/buildMonthlyFinance/availableCurrencies sadece
+  // currency/amount/recurrence/dueDate alanlarına bakıyor, ikisinde de var.
+  const allExpenses = useMemo(() => [...expenses, ...companyExpenses], [expenses, companyExpenses]);
+  const currencies = useMemo(() => availableCurrencies(orders ?? [], allExpenses), [orders, allExpenses]);
 
-  const months = useMemo(() => buildMonthBuckets(range, orders ?? [], expenses), [range, orders, expenses]);
+  const months = useMemo(() => buildMonthBuckets(range, orders ?? [], allExpenses), [range, orders, allExpenses]);
   const monthlyFinance = useMemo(
-    () => buildMonthlyFinance(months, orders ?? [], expenses, currency),
-    [months, orders, expenses, currency],
+    () => buildMonthlyFinance(months, orders ?? [], allExpenses, currency),
+    [months, orders, allExpenses, currency],
   );
   const serviceRevenue = useMemo(
     () => buildServiceRevenue(orders ?? [], range, currency),

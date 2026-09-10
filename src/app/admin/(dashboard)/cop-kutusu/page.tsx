@@ -9,7 +9,7 @@ interface TrashEntry {
   rowNumber: number;
   trashId: string;
   deletedAt: string;
-  type: "Sipariş" | "Gider";
+  type: "Sipariş" | "Gider" | "Şirket Gideri";
   summary: string;
   actor: string;
 }

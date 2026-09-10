@@ -1,8 +1,20 @@
-import type { Currency, Expense, Order, Status } from "@/lib/google-sheets";
+import type { Currency, Expense, ExpenseRecurrence, Order, Status } from "@/lib/google-sheets";
 
 /** Analiz sayfası için dönem/para birimi filtrelerine göre sipariş ve
  * gider verisini aylık kovalara toplayan saf yardımcı fonksiyonlar —
  * hiçbir API çağrısı yapmaz, zaten yüklenmiş listeler üzerinde çalışır. */
+
+/** buildMonthBuckets/buildMonthlyFinance/availableCurrencies'in ihtiyaç
+ * duyduğu asgari şekil — hem sipariş bazlı Expense hem de siparişe bağlı
+ * olmayan CompanyExpense bu şekle uyduğu için Analiz sayfası ikisini
+ * birleştirip tek bir listeymiş gibi geçebilir; "toplam gider" ve Gelir &
+ * Gider grafiği böylece genel şirket giderlerini de kapsar. */
+interface FinanceExpenseLike {
+  currency: Currency;
+  amount: string;
+  recurrence: ExpenseRecurrence;
+  dueDate: string;
+}
 
 export type PeriodPreset = "this-month" | "last-3-months" | "last-6-months" | "this-year" | "all-time";
 
@@ -64,7 +76,7 @@ function monthKey(date: Date): string {
 /** Seçili aralığı ay ay listeler. "Tüm zamanlar" için alt sınır, veri
  * içindeki en eski tarihten (sipariş başlama / tek seferlik gider tarihi)
  * türetilir — hiç veri yoksa son 6 ayı gösterir. */
-export function buildMonthBuckets(range: PeriodRange, orders: Order[], expenses: Expense[]): MonthBucket[] {
+export function buildMonthBuckets(range: PeriodRange, orders: Order[], expenses: FinanceExpenseLike[]): MonthBucket[] {
   let start = range.start;
 
   if (!start) {
@@ -112,7 +124,7 @@ export interface MonthlyFinancePoint {
 export function buildMonthlyFinance(
   months: MonthBucket[],
   orders: Order[],
-  expenses: Expense[],
+  expenses: FinanceExpenseLike[],
   currency: Currency,
 ): MonthlyFinancePoint[] {
   const income = new Map<string, number>();
@@ -187,7 +199,7 @@ export function buildStatusCounts(orders: Order[], range: PeriodRange): Record<S
   return counts;
 }
 
-export function availableCurrencies(orders: Order[], expenses: Expense[]): Currency[] {
+export function availableCurrencies(orders: Order[], expenses: FinanceExpenseLike[]): Currency[] {
   const set = new Set<Currency>(["TRY"]);
   for (const order of orders) set.add(order.currency);
   for (const expense of expenses) set.add(expense.currency);

@@ -1,7 +1,15 @@
-import type { Expense } from "@/lib/google-sheets";
+import type { ExpenseRecurrence } from "@/lib/google-sheets";
 
 /** OrdersTable, OrdersOverview ve OrderDetailDialog arasında paylaşılan
  * küçük biçimlendirme yardımcıları. */
+
+/** getExpenseNextOccurrence/formatExpenseSchedule'ın ihtiyaç duyduğu asgari
+ * şekil — hem sipariş bazlı Expense hem de siparişe bağlı olmayan
+ * CompanyExpense bu şekle uyduğu için ikisinde de kullanılabilirler. */
+interface ScheduledExpense {
+  recurrence: ExpenseRecurrence;
+  dueDate: string;
+}
 
 export function formatDateDisplay(iso: string): string {
   if (!iso) return "—";
@@ -28,7 +36,7 @@ function startOfToday(): Date {
  * tipine göre "aylık"/"yıllık" için her zaman bugünden itibaren ileriye
  * dönük en yakın tarihi bulur (geçmiş bir tarih asla dönmez), "tek
  * seferlik" için ise sadece kayıtlı tarihi döner (geçmişse de). */
-export function getExpenseNextOccurrence(expense: Expense): Date | null {
+export function getExpenseNextOccurrence(expense: ScheduledExpense): Date | null {
   if (!expense.dueDate) return null;
   const today = startOfToday();
 
@@ -66,7 +74,7 @@ export function addOneMonth(iso: string): string {
   return `${yyyy}-${mm}-${dd}`;
 }
 
-export function formatExpenseSchedule(expense: Expense): string {
+export function formatExpenseSchedule(expense: ScheduledExpense): string {
   if (expense.recurrence === "Aylık") {
     return expense.dueDate ? `Her ayın ${expense.dueDate}'i` : "Aylık";
   }

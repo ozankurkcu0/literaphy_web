@@ -121,6 +121,20 @@ ayın günü sorulur, yıl gerekmez) veya **Yıllık** (tam tarih). Yaklaşan/ge
 ödemeler, Siparişler sayfasının üstündeki özette gelir hatırlatmasının
 altında ayrı bir "Gider" bölümünde listelenir.
 
+## 5b) Şirket Giderleri (domain/hosting, reklam vb. — sipariş bazlı değil)
+
+**Giderler** menüsünden, herhangi bir müşteri siparişine bağlı olmayan genel
+şirket giderlerini (domain/hosting, reklam, yazılım abonelikleri, ofis
+giderleri vb.) ekleyip takip edebilirsiniz. Bunlar için sheet'te ayrıca
+**"Şirket Giderleri"** adında bir sekme kullanılıyor — 5. maddedeki
+sipariş bazlı "Giderler" sekmesinden bilinçli olarak ayrı, yoksa panel ilk
+gider eklendiğinde otomatik oluşturur.
+
+Kategori sabit bir listeden seçilir (Domain & Hosting, Reklam Giderleri,
+Yazılım & Araç Abonelikleri, Ofis & Kırtasiye, Muhasebe & Hukuk, Donanım &
+Ekipman, Diğer); tekrar tipi ve not alanı sipariş bazlı giderlerle aynı
+mantıkla çalışır (bkz. madde 5).
+
 ## 6) Gelen Kutusu (Gmail)
 
 "Gelen Kutusu" sekmesi, kutunuza (`GMAIL_IMAP_USER`) IMAP ile bağlanıp son
