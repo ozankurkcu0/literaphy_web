@@ -10,11 +10,12 @@ import { buildWhatsAppHref } from "@/lib/constants";
 import { trackEvent } from "@/lib/analytics";
 import { EASE_PREMIUM } from "@/lib/motion";
 
-// Aynı sekmede iki karta da girse tekrar açılmasın diye sessionStorage,
-// kapatıldığında/alındığında 12 saat boyunca tekrar gösterilmesin diye
-// localStorage kullanıyoruz — ikisi de erişilemezse (gizli sekme vb.)
-// popup normal davranır, sadece süre hatırlanmaz.
-const SESSION_KEY = "nfc-combo-popup-shown";
+// Kapatıldığında/alındığında 12 saat boyunca tekrar gösterilmesin diye
+// localStorage kullanıyoruz — bilinçli olarak sayfa bazlı: Google Review
+// Kartı'ndan Instagram NFC Kartı'na (ya da tam tersi) geçilince popup'ın
+// kaybolup bir daha çıkmaması yerine, yeni sayfada da normal şekilde
+// tekrar belirmesini istiyoruz. Erişilemezse (gizli sekme vb.) popup
+// normal davranır, sadece süre hatırlanmaz.
 const DISMISS_UNTIL_KEY = "nfc-combo-popup-dismissed-until";
 const SHOW_DELAY_MS = 5000;
 const COOLDOWN_HOURS = 12;
@@ -43,21 +44,15 @@ export function NfcComboPopup() {
 
   useEffect(() => {
     try {
-      if (sessionStorage.getItem(SESSION_KEY)) return;
       const dismissedUntil = Number(localStorage.getItem(DISMISS_UNTIL_KEY) ?? 0);
       if (Date.now() < dismissedUntil) return;
     } catch {
-      // localStorage/sessionStorage erişilemiyor — popup'ı yine de göster.
+      // localStorage erişilemiyor — popup'ı yine de göster.
     }
 
     const timer = setTimeout(() => {
       setOpen(true);
       setDeadline(Date.now() + COOLDOWN_MS);
-      try {
-        sessionStorage.setItem(SESSION_KEY, "1");
-      } catch {
-        // no-op
-      }
       trackEvent("nfc_combo_popup_shown", {});
     }, SHOW_DELAY_MS);
 
