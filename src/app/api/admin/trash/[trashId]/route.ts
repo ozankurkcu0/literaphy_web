@@ -20,11 +20,13 @@ export async function POST(_request: Request, { params }: RouteParams) {
     const entries = await listTrash();
     const entry = entries.find((item) => item.trashId === trashId);
     await restoreFromTrash(trashId);
-    logActivity(
-      session.name || session.phone,
-      entry?.type === "Gider" ? "Gider geri getirildi" : "Sipariş geri getirildi",
-      entry?.summary ?? trashId,
-    );
+    const actionLabel =
+      entry?.type === "Gider"
+        ? "Gider geri getirildi"
+        : entry?.type === "Şirket Gideri"
+          ? "Şirket gideri geri getirildi"
+          : "Sipariş geri getirildi";
+    logActivity(session.name || session.phone, actionLabel, entry?.summary ?? trashId);
     return NextResponse.json({ ok: true });
   } catch (error) {
     console.error("[api/admin/trash/:trashId] restoreFromTrash hata:", error);

@@ -82,10 +82,13 @@ export function IncomeExpenseChart({ data, currency }: Props) {
 
       <div className="overflow-x-auto">
         <svg viewBox={`0 0 ${width} ${CHART_HEIGHT}`} style={{ width, height: CHART_HEIGHT, maxWidth: "100%" }}>
-          {ticks.map((tick) => {
+          {ticks.map((tick, index) => {
             const y = baseline - (tick / maxValue) * innerHeight;
+            // index dahil: küçük/sıfır veri aralıklarında birden fazla
+            // fraction aynı yuvarlanmış tick değerine düşebilir (ör. hepsi 0),
+            // salt tick'i key yapmak React'te çakışan key hatası veriyordu.
             return (
-              <g key={tick}>
+              <g key={`${tick}-${index}`}>
                 <line x1={PADDING.left} x2={width - PADDING.right} y1={y} y2={y} stroke={CHART_COLORS.gridline} strokeWidth={1} />
                 <text x={PADDING.left - 8} y={y} textAnchor="end" dominantBaseline="middle" fontSize={11} fill={CHART_COLORS.textMuted}>
                   {new Intl.NumberFormat("tr-TR", { notation: "compact" }).format(tick)}

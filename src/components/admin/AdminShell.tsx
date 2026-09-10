@@ -2,13 +2,25 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { BarChart3, CalendarDays, ClipboardList, History, Inbox, LogOut, Trash2, Users, UserCog } from "lucide-react";
+import {
+  BarChart3,
+  CalendarDays,
+  ClipboardList,
+  History,
+  Inbox,
+  LogOut,
+  Trash2,
+  Users,
+  UserCog,
+  Wallet,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
   { label: "Siparişler", href: "/admin", icon: ClipboardList },
   { label: "Müşteriler", href: "/admin/musteriler", icon: Users },
   { label: "Analiz", href: "/admin/analiz", icon: BarChart3 },
+  { label: "Giderler", href: "/admin/giderler", icon: Wallet },
   { label: "Takvim", href: "/admin/takvim", icon: CalendarDays },
   { label: "Gelen Kutusu", href: "/admin/gelen-kutusu", icon: Inbox },
   { label: "Aktivite", href: "/admin/aktivite", icon: History },
