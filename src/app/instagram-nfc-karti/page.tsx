@@ -172,7 +172,7 @@ export default function InstagramNfcCardPage() {
           tone="product"
           className="mb-14"
         />
-        <QuantityPricingSection tiers={instagramNfcPricing} />
+        <QuantityPricingSection tiers={instagramNfcPricing} productName="Instagram NFC Kartı" />
       </Section>
 
       <MiniFAQ items={instagramNfcFaq} eyebrow="SSS" title="Instagram NFC Kartı hakkında merak edilenler" />

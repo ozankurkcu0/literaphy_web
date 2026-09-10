@@ -176,7 +176,7 @@ export default function GoogleReviewCardPage() {
           tone="product"
           className="mb-14"
         />
-        <QuantityPricingSection tiers={googleReviewPricing} />
+        <QuantityPricingSection tiers={googleReviewPricing} productName="Google Review Kartı" />
       </Section>
 
       <MiniFAQ items={googleReviewFaq} eyebrow="SSS" title="Google Review Kartı hakkında merak edilenler" />
