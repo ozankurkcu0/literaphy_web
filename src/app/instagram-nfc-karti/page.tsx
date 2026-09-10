@@ -15,6 +15,7 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { RevealGroup, RevealItem } from "@/components/ui/Reveal";
 import { FeatureCard } from "@/components/cards/FeatureCard";
 import { QuantityPricingSection } from "@/components/features/QuantityPricingSection";
+import { NfcComboPopup } from "@/components/features/NfcComboPopup";
 import { MiniFAQ } from "@/components/sections/MiniFAQ";
 import { CTABand } from "@/components/sections/CTABand";
 import { ButtonLink } from "@/components/ui/Button";
@@ -185,6 +186,8 @@ export default function InstagramNfcCardPage() {
         tone="product"
         urgent
       />
+
+      <NfcComboPopup />
     </>
   );
 }
