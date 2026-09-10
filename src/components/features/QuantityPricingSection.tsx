@@ -9,15 +9,27 @@ import { LiraSign } from "@/components/ui/LiraSign";
 import { RevealGroup, RevealItem } from "@/components/ui/Reveal";
 import { cn } from "@/lib/utils";
 import { EASE_STANDARD } from "@/lib/motion";
+import { CONTACT } from "@/lib/constants";
+import { trackEvent } from "@/lib/analytics";
 
 interface QuantityPricingSectionProps {
   tiers: QuantityPricingTier[];
+  /** WhatsApp'a giden ön dolgulu mesaja eklenecek ürün adı (ör. "Google Review Kartı"). */
+  productName: string;
+}
+
+function buildWhatsAppHref(productName: string, tier: QuantityPricingTier) {
+  const message = `Merhaba, ${productName} - ${tier.quantity} paketi almak istiyorum.`;
+  return `${CONTACT.whatsapp}?text=${encodeURIComponent(message)}`;
 }
 
 // PricingCard'ın (aylık/yıllık abonelik) görsel dilini birebir kullanıyor,
 // ama billing toggle yerine sabit "adet başı ₺X · toplam ₺Y" fiyatlandırma
 // gösteriyor — Google Review Kartı gibi tek seferlik/fiziksel ürünler için.
-export function QuantityPricingSection({ tiers }: QuantityPricingSectionProps) {
+// Paket satın alma CTA'ları (form yerine) doğrudan WhatsApp'a yönlendirir —
+// bu ürünler tek seferlik/fiziksel siparişler olduğundan iletişim formu yerine
+// hızlı mesajlaşma daha uygun.
+export function QuantityPricingSection({ tiers, productName }: QuantityPricingSectionProps) {
   return (
     <RevealGroup className="grid grid-cols-1 gap-8 sm:grid-cols-2 xl:grid-cols-4">
       {tiers.map((tier) => (
@@ -65,10 +77,12 @@ export function QuantityPricingSection({ tiers }: QuantityPricingSectionProps) {
             </div>
 
             <ButtonLink
-              href="/iletisim"
+              href={buildWhatsAppHref(productName, tier)}
+              external
               variant={tier.highlighted ? "primary" : "secondary"}
               tone={tier.highlighted ? "product" : "accent"}
               className="w-full"
+              onClick={() => trackEvent("whatsapp_click", { location: "quantity_pricing", tier: tier.quantity })}
             >
               {tier.ctaLabel}
             </ButtonLink>
