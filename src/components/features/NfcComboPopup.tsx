@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { X } from "lucide-react";
+import { Timer, X } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { ButtonLink } from "@/components/ui/Button";
 import { LiraSign } from "@/components/ui/LiraSign";
@@ -11,22 +11,35 @@ import { trackEvent } from "@/lib/analytics";
 import { EASE_PREMIUM } from "@/lib/motion";
 
 // Aynı sekmede iki karta da girse tekrar açılmasın diye sessionStorage,
-// kapatıldığında/tıklandığında bir süre hiç gösterilmesin diye localStorage
-// kullanıyoruz — ikisi de erişilemezse (gizli sekme vb.) popup normal davranır.
+// kapatıldığında/alındığında 12 saat boyunca tekrar gösterilmesin diye
+// localStorage kullanıyoruz — ikisi de erişilemezse (gizli sekme vb.)
+// popup normal davranır, sadece süre hatırlanmaz.
 const SESSION_KEY = "nfc-combo-popup-shown";
 const DISMISS_UNTIL_KEY = "nfc-combo-popup-dismissed-until";
 const SHOW_DELAY_MS = 5000;
-const CLOSE_COOLDOWN_DAYS = 7;
-const CONVERTED_COOLDOWN_DAYS = 90;
+const COOLDOWN_HOURS = 12;
+const COOLDOWN_MS = COOLDOWN_HOURS * 60 * 60 * 1000;
 
 const WHATSAPP_MESSAGE =
   "Merhaba, Google Review Kartı + Instagram NFC Kartı kombo kampanyasından (₺1.500) yararlanmak istiyorum.";
 
+function formatCountdown(ms: number) {
+  const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  return [hours, minutes, seconds].map((n) => String(n).padStart(2, "0")).join(":");
+}
+
 /** Google Review Kartı ve Instagram NFC Kartı ürün sayfalarında birkaç saniye
  * sonra sol alttan bir bildirim gibi beliren, ekranı kaplamayan kampanya
- * kartı — iki kartı birlikte alanlara indirim sunar. */
+ * kartı — iki kartı birlikte alanlara indirim sunar. Kapatılsın ya da
+ * kampanya alınsın, her seferinde 12 saatlik bir geri sayımla yeniden
+ * gösterilebilir hale gelir (o yüzden neredeyse her gün karşılaşılır). */
 export function NfcComboPopup() {
   const [open, setOpen] = useState(false);
+  const [deadline, setDeadline] = useState<number | null>(null);
+  const [remaining, setRemaining] = useState(COOLDOWN_MS);
 
   useEffect(() => {
     try {
@@ -39,6 +52,7 @@ export function NfcComboPopup() {
 
     const timer = setTimeout(() => {
       setOpen(true);
+      setDeadline(Date.now() + COOLDOWN_MS);
       try {
         sessionStorage.setItem(SESSION_KEY, "1");
       } catch {
@@ -50,10 +64,21 @@ export function NfcComboPopup() {
     return () => clearTimeout(timer);
   }, []);
 
-  function dismiss(cooldownDays: number) {
+  // Popup açıkken saniyede bir geri sayımı güncelle.
+  useEffect(() => {
+    if (!open || deadline === null) return;
+    setRemaining(deadline - Date.now());
+    const interval = setInterval(() => setRemaining(deadline - Date.now()), 1000);
+    return () => clearInterval(interval);
+  }, [open, deadline]);
+
+  function dismiss() {
     setOpen(false);
+    // Kampanya kartında gösterilen geri sayımla aynı an — "12 saat sonra
+    // tekrar gösterilir" hem ekranda yazan hem gerçekte olan şey.
+    const until = deadline ?? Date.now() + COOLDOWN_MS;
     try {
-      localStorage.setItem(DISMISS_UNTIL_KEY, String(Date.now() + cooldownDays * 24 * 60 * 60 * 1000));
+      localStorage.setItem(DISMISS_UNTIL_KEY, String(until));
     } catch {
       // no-op
     }
@@ -82,7 +107,7 @@ export function NfcComboPopup() {
             type="button"
             onClick={() => {
               trackEvent("nfc_combo_popup_dismiss", { method: "close_button" });
-              dismiss(CLOSE_COOLDOWN_DAYS);
+              dismiss();
             }}
             aria-label="Kapat"
             className="absolute top-3 right-3 flex size-7 items-center justify-center rounded-full text-foreground-muted transition-colors hover:bg-surface-hover hover:text-foreground"
@@ -91,9 +116,15 @@ export function NfcComboPopup() {
           </button>
 
           <div className="flex flex-col gap-4 p-6">
-            <Badge tone="solid-product" className="w-fit">
-              Sınırlı Süreli Kampanya
-            </Badge>
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge tone="solid-product" className="w-fit">
+                Sınırlı Süreli Kampanya
+              </Badge>
+              <span className="inline-flex items-center gap-1.5 font-mono text-xs text-foreground-muted">
+                <Timer className="size-3.5" aria-hidden />
+                {formatCountdown(remaining)}
+              </span>
+            </div>
 
             <div className="flex flex-col gap-1 pr-6">
               <h3 className="text-[17px] leading-[1.25] font-bold text-foreground">
@@ -124,7 +155,7 @@ export function NfcComboPopup() {
               className="w-full"
               onClick={() => {
                 trackEvent("whatsapp_click", { location: "nfc_combo_popup" });
-                dismiss(CONVERTED_COOLDOWN_DAYS);
+                dismiss();
               }}
             >
               WhatsApp&apos;tan Kampanyayı Alın
