@@ -9,7 +9,7 @@ import { LiraSign } from "@/components/ui/LiraSign";
 import { RevealGroup, RevealItem } from "@/components/ui/Reveal";
 import { cn } from "@/lib/utils";
 import { EASE_STANDARD } from "@/lib/motion";
-import { CONTACT } from "@/lib/constants";
+import { buildWhatsAppHref } from "@/lib/constants";
 import { trackEvent } from "@/lib/analytics";
 
 interface QuantityPricingSectionProps {
@@ -18,9 +18,8 @@ interface QuantityPricingSectionProps {
   productName: string;
 }
 
-function buildWhatsAppHref(productName: string, tier: QuantityPricingTier) {
-  const message = `Merhaba, ${productName} - ${tier.quantity} paketi almak istiyorum.`;
-  return `${CONTACT.whatsapp}?text=${encodeURIComponent(message)}`;
+function tierWhatsAppHref(productName: string, tier: QuantityPricingTier) {
+  return buildWhatsAppHref(`Merhaba, ${productName} - ${tier.quantity} paketi almak istiyorum.`);
 }
 
 // PricingCard'ın (aylık/yıllık abonelik) görsel dilini birebir kullanıyor,
@@ -77,7 +76,7 @@ export function QuantityPricingSection({ tiers, productName }: QuantityPricingSe
             </div>
 
             <ButtonLink
-              href={buildWhatsAppHref(productName, tier)}
+              href={tierWhatsAppHref(productName, tier)}
               external
               variant={tier.highlighted ? "primary" : "secondary"}
               tone={tier.highlighted ? "product" : "accent"}

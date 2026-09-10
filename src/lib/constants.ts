@@ -25,6 +25,12 @@ export const CONTACT = {
   workingHours: "Pazartesi – Cumartesi, 09:00 – 20:00",
 };
 
+/** CONTACT.whatsapp'a ön dolgulu mesajla giden link üretir — sipariş/kampanya
+ * CTA'larının WhatsApp'ı doğrudan bir mesaj taslağıyla açması için. */
+export function buildWhatsAppHref(message: string) {
+  return `${CONTACT.whatsapp}?text=${encodeURIComponent(message)}`;
+}
+
 // SEO denetiminde tespit edildi: bu placeholder handle'lar gerçek Literaphy
 // hesapları değildi — instagram.com/literaphy ve x.com/literaphy tamamen
 // alakasız üçüncü şahıslara ait, github.com/literaphy 404 veriyordu. Footer'da
