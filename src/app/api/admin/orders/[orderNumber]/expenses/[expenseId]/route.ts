@@ -17,6 +17,8 @@ const expensePatchSchema = z.object({
   recurrence: z.enum(EXPENSE_RECURRENCES).optional(),
   dueDate: z.string().optional(),
   note: z.string().optional(),
+  // "Ödendi" işaretlemesi bu alanı günceller — bkz. todayIso (order-format.ts).
+  lastPaidDate: z.string().optional(),
 });
 
 const NOT_CONFIGURED_MESSAGE =

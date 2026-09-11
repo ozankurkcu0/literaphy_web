@@ -6,7 +6,14 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { StatusBadge } from "@/components/admin/StatusBadge";
 import { CURRENCY_OPTIONS, EXPENSE_RECURRENCE_OPTIONS } from "@/lib/order-form-options";
-import { addOneMonth, formatCurrencyAmount, formatDateDisplay, formatExpenseSchedule } from "@/lib/order-format";
+import {
+  addOneMonth,
+  dateToIso,
+  formatCurrencyAmount,
+  formatDateDisplay,
+  formatExpenseSchedule,
+  getExpenseNextOccurrence,
+} from "@/lib/order-format";
 import { inputBaseClass } from "@/lib/utils";
 import type { Currency, Expense, ExpenseInput, ExpenseRecurrence, Order } from "@/lib/google-sheets";
 
@@ -45,6 +52,7 @@ interface OrderDetailDialogProps {
 export function OrderDetailDialog({ order: initialOrder, onClose, onEdit, onOrderUpdated }: OrderDetailDialogProps) {
   const [order, setOrder] = useState(initialOrder);
   const [markingPaid, setMarkingPaid] = useState(false);
+  const [markingExpensePaidId, setMarkingExpensePaidId] = useState<string | null>(null);
   const [expenses, setExpenses] = useState<Expense[] | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [formValues, setFormValues] = useState<ExpenseInput>(EMPTY_EXPENSE);
@@ -152,6 +160,27 @@ export function OrderDetailDialog({ order: initialOrder, onClose, onEdit, onOrde
     }
     if (editingExpenseId === expense.expenseId) cancelEdit();
     await fetchExpenses();
+  }
+
+  async function handleMarkExpensePaid(expense: Expense, occurrence: Date) {
+    setMarkingExpensePaidId(expense.expenseId);
+    try {
+      const response = await fetch(`/api/admin/orders/${order.orderNumber}/expenses/${expense.expenseId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ lastPaidDate: dateToIso(occurrence) }),
+      });
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        window.alert(data.error ?? "İşaretlenemedi.");
+        return;
+      }
+      await fetchExpenses();
+    } catch {
+      window.alert("Sunucuya ulaşılamadı, lütfen tekrar deneyin.");
+    } finally {
+      setMarkingExpensePaidId(null);
+    }
   }
 
   async function handleMarkPaid() {
@@ -279,7 +308,9 @@ export function OrderDetailDialog({ order: initialOrder, onClose, onEdit, onOrde
               </p>
             ) : (
               <ul className="mb-4 flex flex-col gap-1.5">
-                {expenses.map((expense) => (
+                {expenses.map((expense) => {
+                  const nextOccurrence = getExpenseNextOccurrence(expense);
+                  return (
                   <li
                     key={expense.expenseId}
                     className="flex items-center justify-between gap-3 rounded-md border border-hairline px-3.5 py-2.5"
@@ -289,10 +320,22 @@ export function OrderDetailDialog({ order: initialOrder, onClose, onEdit, onOrde
                       <p className="truncate text-[12px] text-foreground-muted">
                         {expense.amount ? formatCurrencyAmount(Number(expense.amount), expense.currency) : "—"}
                         {` · ${formatExpenseSchedule(expense)}`}
+                        {expense.lastPaidDate ? ` · Son ödeme: ${formatDateDisplay(expense.lastPaidDate)}` : ""}
                         {expense.note ? ` · ${expense.note}` : ""}
                       </p>
                     </div>
                     <div className="flex shrink-0 gap-1">
+                      {nextOccurrence && (
+                        <button
+                          type="button"
+                          onClick={() => handleMarkExpensePaid(expense, nextOccurrence)}
+                          disabled={markingExpensePaidId === expense.expenseId}
+                          className="flex size-7 items-center justify-center rounded-md text-foreground-muted transition-colors hover:bg-success/10 hover:text-success disabled:opacity-50"
+                          aria-label={`${expense.name} giderini ödendi olarak işaretle`}
+                        >
+                          <Check className="size-3.5" aria-hidden />
+                        </button>
+                      )}
                       <button
                         type="button"
                         onClick={() => startEdit(expense)}
@@ -311,7 +354,8 @@ export function OrderDetailDialog({ order: initialOrder, onClose, onEdit, onOrde
                       </button>
                     </div>
                   </li>
-                ))}
+                  );
+                })}
               </ul>
             )}
 
