@@ -72,6 +72,7 @@ export interface Order extends OrderInput {
  * otomatik oluşturulur (bkz. ensureExpenseSheet).
  * Sütunlar: A: Gider ID  B: Sipariş Numarası  C: Gider Adı  D: Tutar
  *           E: Para Birimi  F: Ödeme Tarihi  G: Not  H: Tekrar
+ *           I: Son Ödeme Tarihi
  */
 const EXPENSE_SHEET_NAME = "Giderler";
 const EXPENSE_HEADER_ROW = [
@@ -83,8 +84,9 @@ const EXPENSE_HEADER_ROW = [
   "Ödeme Tarihi",
   "Not",
   "Tekrar",
+  "Son Ödeme Tarihi",
 ] as const;
-const EXPENSE_DATA_COLUMNS = "A:H";
+const EXPENSE_DATA_COLUMNS = "A:I";
 
 export const EXPENSE_RECURRENCES = ["Tek seferlik", "Aylık", "Yıllık"] as const;
 export type ExpenseRecurrence = (typeof EXPENSE_RECURRENCES)[number];
@@ -104,6 +106,11 @@ export interface Expense extends ExpenseInput {
   rowNumber: number;
   expenseId: string;
   orderNumber: string;
+  // "Ödendi" olarak işaretlenen son tarih (yyyy-mm-dd, hiç ödenmediyse "").
+  // Tek seferlik giderleri hatırlatmalardan tamamen düşürür; aylık/yıllık
+  // giderlerde ise mevcut dönem geçilip bir sonraki döneme atlanır — bkz.
+  // getExpenseNextOccurrence (order-format.ts).
+  lastPaidDate: string;
 }
 
 export function isSheetsConfigured(): boolean {
@@ -386,7 +393,7 @@ async function ensureExpenseSheet(): Promise<void> {
 
   const { data } = await sheets.spreadsheets.values.get({
     spreadsheetId: sheetId,
-    range: `${EXPENSE_SHEET_NAME}!A1:H1`,
+    range: `${EXPENSE_SHEET_NAME}!A1:I1`,
   });
   const currentHeaders = data.values?.[0] ?? [];
   const needsUpdate = EXPENSE_HEADER_ROW.some((header, index) => currentHeaders[index] !== header);
@@ -394,7 +401,7 @@ async function ensureExpenseSheet(): Promise<void> {
 
   await sheets.spreadsheets.values.update({
     spreadsheetId: sheetId,
-    range: `${EXPENSE_SHEET_NAME}!A1:H1`,
+    range: `${EXPENSE_SHEET_NAME}!A1:I1`,
     valueInputOption: "USER_ENTERED",
     requestBody: { values: [[...EXPENSE_HEADER_ROW]] },
   });
@@ -432,6 +439,7 @@ function rowToExpense(row: string[], rowNumber: number): Expense | null {
     dueDate: deserializeExpenseDueDate(recurrence, row[5] ?? ""),
     note: row[6] ?? "",
     recurrence,
+    lastPaidDate: turkishDateToIso(row[8] ?? ""),
   };
 }
 
@@ -484,6 +492,7 @@ export async function createExpense(orderNumber: string, input: ExpenseInput): P
     serializeExpenseDueDate(input.recurrence, input.dueDate),
     protectFromFormula(input.note),
     input.recurrence,
+    "",
   ];
 
   await sheets.spreadsheets.values.append({
@@ -494,10 +503,13 @@ export async function createExpense(orderNumber: string, input: ExpenseInput): P
     requestBody: { values: [values] },
   });
 
-  return { rowNumber: -1, expenseId, orderNumber, ...input };
+  return { rowNumber: -1, expenseId, orderNumber, lastPaidDate: "", ...input };
 }
 
-export async function updateExpense(expenseId: string, patch: Partial<ExpenseInput>): Promise<Expense> {
+export async function updateExpense(
+  expenseId: string,
+  patch: Partial<ExpenseInput> & Partial<Pick<Expense, "lastPaidDate">>,
+): Promise<Expense> {
   const sheets = await getSheetsClient();
   const { sheetId } = getConfig();
 
@@ -517,11 +529,12 @@ export async function updateExpense(expenseId: string, patch: Partial<ExpenseInp
     serializeExpenseDueDate(merged.recurrence, merged.dueDate),
     protectFromFormula(merged.note),
     merged.recurrence,
+    isoToTurkishDate(merged.lastPaidDate),
   ];
 
   await sheets.spreadsheets.values.update({
     spreadsheetId: sheetId,
-    range: `${EXPENSE_SHEET_NAME}!A${current.rowNumber}:H${current.rowNumber}`,
+    range: `${EXPENSE_SHEET_NAME}!A${current.rowNumber}:I${current.rowNumber}`,
     valueInputOption: "USER_ENTERED",
     requestBody: { values: [values] },
   });
@@ -1259,6 +1272,7 @@ async function restoreExpenseRow(expense: Expense): Promise<void> {
     serializeExpenseDueDate(expense.recurrence, expense.dueDate),
     protectFromFormula(expense.note),
     expense.recurrence,
+    isoToTurkishDate(expense.lastPaidDate),
   ];
 
   await sheets.spreadsheets.values.append({

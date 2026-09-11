@@ -5,10 +5,13 @@ import type { ExpenseRecurrence } from "@/lib/google-sheets";
 
 /** getExpenseNextOccurrence/formatExpenseSchedule'ın ihtiyaç duyduğu asgari
  * şekil — hem sipariş bazlı Expense hem de siparişe bağlı olmayan
- * CompanyExpense bu şekle uyduğu için ikisinde de kullanılabilirler. */
+ * CompanyExpense bu şekle uyduğu için ikisinde de kullanılabilirler.
+ * lastPaidDate opsiyonel — CompanyExpense'de henüz yok, "hiç ödenmedi" gibi
+ * davranır. */
 interface ScheduledExpense {
   recurrence: ExpenseRecurrence;
   dueDate: string;
+  lastPaidDate?: string;
 }
 
 export function formatDateDisplay(iso: string): string {
@@ -35,16 +38,26 @@ function startOfToday(): Date {
 /** Bir giderin bir sonraki ödeme/yenileme tarihini hesaplar — tekrar
  * tipine göre "aylık"/"yıllık" için her zaman bugünden itibaren ileriye
  * dönük en yakın tarihi bulur (geçmiş bir tarih asla dönmez), "tek
- * seferlik" için ise sadece kayıtlı tarihi döner (geçmişse de). */
+ * seferlik" için ise sadece kayıtlı tarihi döner (geçmişse de).
+ *
+ * lastPaidDate, "Ödendi" olarak işaretlenmiş son tarihtir: "tek seferlik"
+ * giderde ödendiyse artık hatırlatılacak bir sonraki dönem olmadığından
+ * null döner; "aylık"/"yıllık" giderde ise zaten ödenmiş olan dönem
+ * atlanıp bir sonraki döneme geçilir. */
 export function getExpenseNextOccurrence(expense: ScheduledExpense): Date | null {
   if (!expense.dueDate) return null;
   const today = startOfToday();
+  const lastPaid = expense.lastPaidDate ? new Date(expense.lastPaidDate) : null;
+  const isPaidThrough = (candidate: Date) => Boolean(lastPaid && !Number.isNaN(lastPaid.getTime()) && candidate <= lastPaid);
 
   if (expense.recurrence === "Aylık") {
     const day = Number(expense.dueDate);
     if (!day || Number.isNaN(day)) return null;
     let candidate = new Date(today.getFullYear(), today.getMonth(), day);
-    if (candidate < today) candidate = new Date(today.getFullYear(), today.getMonth() + 1, day);
+    if (candidate < today) candidate = new Date(candidate.getFullYear(), candidate.getMonth() + 1, day);
+    while (isPaidThrough(candidate)) {
+      candidate = new Date(candidate.getFullYear(), candidate.getMonth() + 1, day);
+    }
     return candidate;
   }
 
@@ -52,12 +65,28 @@ export function getExpenseNextOccurrence(expense: ScheduledExpense): Date | null
     const [, month, day] = expense.dueDate.split("-");
     if (!month || !day) return null;
     let candidate = new Date(today.getFullYear(), Number(month) - 1, Number(day));
-    if (candidate < today) candidate = new Date(today.getFullYear() + 1, Number(month) - 1, Number(day));
+    if (candidate < today) candidate = new Date(candidate.getFullYear() + 1, Number(month) - 1, Number(day));
+    while (isPaidThrough(candidate)) {
+      candidate = new Date(candidate.getFullYear() + 1, Number(month) - 1, Number(day));
+    }
     return candidate;
   }
 
+  if (lastPaid) return null;
   const oneTime = new Date(expense.dueDate);
   return Number.isNaN(oneTime.getTime()) ? null : oneTime;
+}
+
+/** Date → yyyy-mm-dd. Gider "Ödendi" işaretlemesinde, hatırlatmanın ait
+ * olduğu dönemi (getExpenseNextOccurrence'ın döndürdüğü tarihi) lastPaidDate
+ * olarak yazmak için kullanılır — "bugün" değil, o dönemin kendisini
+ * ödenmiş sayar. Böylece vadesinden önce erken ödense bile o dönem doğru
+ * şekilde atlanır. */
+export function dateToIso(date: Date): string {
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, "0");
+  const dd = String(date.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
 }
 
 /** "Ödeme alındı" işaretlemesi için — hesap kesim tarihini bir ay ileri

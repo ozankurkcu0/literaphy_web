@@ -302,7 +302,12 @@ export default function AdminOrdersPage() {
       ) : (
         <>
           {orders && orders.length > 0 && (
-            <OrdersOverview orders={orders} expenses={expenses} onOrderUpdated={fetchOrders} />
+            <OrdersOverview
+              orders={orders}
+              expenses={expenses}
+              onOrderUpdated={fetchOrders}
+              onExpenseUpdated={fetchExpenses}
+            />
           )}
 
           {orders && orders.length > 0 && (

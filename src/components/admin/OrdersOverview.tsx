@@ -4,7 +4,7 @@ import { useState } from "react";
 import { AlertTriangle, Check, ClipboardList, TrendingDown, Users, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { cardSurfaceClass } from "@/lib/utils";
-import { addOneMonth, formatCurrencyAmount, getExpenseNextOccurrence } from "@/lib/order-format";
+import { addOneMonth, dateToIso, formatCurrencyAmount, getExpenseNextOccurrence } from "@/lib/order-format";
 import type { Expense, Order } from "@/lib/google-sheets";
 
 function formatCurrencyTotal(amount: number, currency: string): string {
@@ -38,18 +38,16 @@ interface ReminderItem {
   title: string;
   subtitle: string;
   diffDays: number;
-  order?: Order; // sadece gelir hatırlatmalarında — "ödeme alındı" işaretlemek için
+  onMarkPaid?: () => void; // varsa "Ödendi" butonu gösterilir
 }
 
 function ReminderPanel({
   title,
   items,
-  onMarkPaid,
   markingKey,
 }: {
   title: string;
   items: ReminderItem[];
-  onMarkPaid?: (order: Order) => void;
   markingKey?: string | null;
 }) {
   if (items.length === 0) return null;
@@ -70,14 +68,14 @@ function ReminderPanel({
               <span className={item.diffDays < 0 ? "font-medium text-danger" : "font-medium text-warning"}>
                 {reminderLabel(item.diffDays)}
               </span>
-              {item.order && onMarkPaid && (
+              {item.onMarkPaid && (
                 <Button
                   type="button"
                   variant="ghost"
                   size="md"
                   className="h-7 px-2.5 text-[12px]"
                   disabled={markingKey === item.key}
-                  onClick={() => onMarkPaid(item.order!)}
+                  onClick={item.onMarkPaid}
                 >
                   <Check className="size-3.5" aria-hidden />
                   {markingKey === item.key ? "İşaretleniyor…" : "Ödendi"}
@@ -95,19 +93,23 @@ interface OrdersOverviewProps {
   orders: Order[];
   expenses: Expense[];
   onOrderUpdated?: () => void;
+  onExpenseUpdated?: () => void;
 }
 
 /** Sipariş listesinin üstündeki özet: toplam/aktif sayılar, gelir/gider
  * toplamları ve iki ayrı bölüm halinde yaklaşan/geçmiş hatırlatmalar —
  * "Gelir" (hesap kesim tarihleri) ve "Gider" (hosting/domain vb. ödemeler).
  * Gelir hatırlatmalarında "Ödendi" butonu, hesap kesim tarihini bir ay
- * ileri alıp o siparişi bir sonraki döneme taşır. Ekstra veri çekmez,
- * zaten yüklenmiş listelerden hesaplar. */
-export function OrdersOverview({ orders, expenses, onOrderUpdated }: OrdersOverviewProps) {
+ * ileri alıp o siparişi bir sonraki döneme taşır; gider hatırlatmalarında
+ * ise ilgili giderin son ödeme tarihini bugüne çeker (bkz.
+ * getExpenseNextOccurrence). Ekstra veri çekmez, zaten yüklenmiş
+ * listelerden hesaplar. */
+export function OrdersOverview({ orders, expenses, onOrderUpdated, onExpenseUpdated }: OrdersOverviewProps) {
   const [markingKey, setMarkingKey] = useState<string | null>(null);
 
-  async function handleMarkPaid(order: Order) {
-    setMarkingKey(order.orderNumber);
+  async function handleMarkOrderPaid(order: Order) {
+    const key = `order:${order.orderNumber}`;
+    setMarkingKey(key);
     try {
       const response = await fetch(`/api/admin/orders/${order.orderNumber}`, {
         method: "PATCH",
@@ -120,6 +122,28 @@ export function OrdersOverview({ orders, expenses, onOrderUpdated }: OrdersOverv
         return;
       }
       onOrderUpdated?.();
+    } catch {
+      window.alert("Sunucuya ulaşılamadı, lütfen tekrar deneyin.");
+    } finally {
+      setMarkingKey(null);
+    }
+  }
+
+  async function handleMarkExpensePaid(expense: Expense, occurrence: Date) {
+    const key = `expense:${expense.expenseId}`;
+    setMarkingKey(key);
+    try {
+      const response = await fetch(`/api/admin/orders/${expense.orderNumber}/expenses/${expense.expenseId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ lastPaidDate: dateToIso(occurrence) }),
+      });
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        window.alert(data.error ?? "İşaretlenemedi.");
+        return;
+      }
+      onExpenseUpdated?.();
     } catch {
       window.alert("Sunucuya ulaşılamadı, lütfen tekrar deneyin.");
     } finally {
@@ -142,27 +166,32 @@ export function OrdersOverview({ orders, expenses, onOrderUpdated }: OrdersOverv
   const incomeReminders: ReminderItem[] = activeOrders
     .filter((order) => order.billingDate)
     .map((order) => ({
-      key: order.orderNumber,
+      key: `order:${order.orderNumber}`,
       title: `${order.firstName} ${order.lastName}`,
       subtitle: `#${order.orderNumber}`,
       diffDays: Math.floor((new Date(order.billingDate).getTime() - now) / 86_400_000),
-      order,
+      onMarkPaid: () => {
+        void handleMarkOrderPaid(order);
+      },
     }))
     .filter((item) => item.diffDays <= 7)
     .sort((a, b) => a.diffDays - b.diffDays);
 
   const expenseReminders: ReminderItem[] = expenses
     .filter((expense) => activeOrderNumbers.has(expense.orderNumber))
-    .map((expense) => {
+    .map((expense): ReminderItem | null => {
       const nextOccurrence = getExpenseNextOccurrence(expense);
       if (!nextOccurrence) return null;
       const order = ordersByNumber.get(expense.orderNumber);
       const customerName = order ? `${order.firstName} ${order.lastName}` : `#${expense.orderNumber}`;
       return {
-        key: expense.expenseId,
+        key: `expense:${expense.expenseId}`,
         title: expense.name,
         subtitle: customerName,
         diffDays: Math.floor((nextOccurrence.getTime() - now) / 86_400_000),
+        onMarkPaid: () => {
+          void handleMarkExpensePaid(expense, nextOccurrence);
+        },
       };
     })
     .filter((item): item is ReminderItem => item !== null && item.diffDays <= 7)
@@ -180,10 +209,13 @@ export function OrdersOverview({ orders, expenses, onOrderUpdated }: OrdersOverv
       <ReminderPanel
         title="Gelir — yaklaşan / geçmiş hesap kesim tarihleri"
         items={incomeReminders}
-        onMarkPaid={handleMarkPaid}
         markingKey={markingKey}
       />
-      <ReminderPanel title="Gider — yaklaşan / geçmiş ödemeler" items={expenseReminders} />
+      <ReminderPanel
+        title="Gider — yaklaşan / geçmiş ödemeler"
+        items={expenseReminders}
+        markingKey={markingKey}
+      />
     </div>
   );
 }
