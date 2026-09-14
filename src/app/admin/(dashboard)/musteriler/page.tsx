@@ -191,7 +191,7 @@ export default function AdminCustomersPage() {
                                   {order.fee ? formatCurrencyAmount(Number(order.fee), order.currency) : "—"}
                                 </td>
                                 <td className="px-4 py-2.5">
-                                  <StatusBadge status={order.status} />
+                                  <StatusBadge status={order.status} serviceType={order.serviceType} />
                                 </td>
                                 <td className="px-4 py-2.5">
                                   <button

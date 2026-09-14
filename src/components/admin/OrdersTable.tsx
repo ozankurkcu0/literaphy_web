@@ -170,7 +170,7 @@ export function OrdersTable({
               <td className="px-4 py-3 text-foreground-secondary">{formatInstallments(order)}</td>
               <td className="px-4 py-3 text-foreground-secondary">{formatFee(order)}</td>
               <td className="px-4 py-3">
-                <StatusBadge status={order.status} />
+                <StatusBadge status={order.status} serviceType={order.serviceType} />
               </td>
               <td className="px-4 py-3">
                 <div className="flex justify-end gap-1">
