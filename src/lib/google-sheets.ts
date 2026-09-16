@@ -39,7 +39,12 @@ const DATA_RANGE_COLUMNS = "A:N";
 export const CURRENCIES = ["TRY", "USD", "EUR"] as const;
 export type Currency = (typeof CURRENCIES)[number];
 
-export const STATUSES = ["Aktif", "Tamamlandı", "İptal"] as const;
+// "Planlandı": müşteriyle ileri bir tarih için anlaşıldı ama o tarihe kadar
+// ne ödeme alındı ne de ürün/hizmet teslim edildi — Aktif'ten farkı, henüz
+// hiçbir şeyin başlamamış olması (bkz. OrdersOverview'daki "Planlanan
+// satışlar" bölümü ve isOneTimeServiceType olmayan siparişlerde o tarih
+// geldiğinde Aktif'e geçiş).
+export const STATUSES = ["Planlandı", "Aktif", "Tamamlandı", "İptal"] as const;
 export type Status = (typeof STATUSES)[number];
 
 export interface OrderInput {

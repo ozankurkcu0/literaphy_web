@@ -20,6 +20,7 @@ import { cardSurfaceClass, cn, inputBaseClass } from "@/lib/utils";
 import type { CompanyExpense, Currency, Expense, Order } from "@/lib/google-sheets";
 
 const STATUS_TILE_CLASS: Record<string, string> = {
+  Planlandı: "border-warning/20 bg-warning/5 text-warning",
   Aktif: "border-success/20 bg-success/5 text-success",
   Tamamlandı: "border-hairline bg-surface text-foreground-secondary",
   İptal: "border-danger/20 bg-danger/5 text-danger",
@@ -85,7 +86,7 @@ export default function AdminAnalyticsPage() {
   const totalIncome = monthlyFinance.reduce((sum, point) => sum + point.income, 0);
   const totalExpense = monthlyFinance.reduce((sum, point) => sum + point.expense, 0);
   const net = totalIncome - totalExpense;
-  const orderCount = statusCounts.Aktif + statusCounts.Tamamlandı + statusCounts.İptal;
+  const orderCount = statusCounts.Planlandı + statusCounts.Aktif + statusCounts.Tamamlandı + statusCounts.İptal;
 
   return (
     <div className="flex flex-col gap-6">
@@ -158,8 +159,8 @@ export default function AdminAnalyticsPage() {
             <StatCard icon={ClipboardList} label="Sipariş sayısı" value={String(orderCount)} />
           </div>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            {(["Aktif", "Tamamlandı", "İptal"] as const).map((status) => (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {(["Planlandı", "Aktif", "Tamamlandı", "İptal"] as const).map((status) => (
               <div
                 key={status}
                 className={`flex items-center justify-between rounded-lg border px-4 py-3 text-[13.5px] font-medium ${STATUS_TILE_CLASS[status]}`}

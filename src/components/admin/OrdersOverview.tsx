@@ -4,6 +4,7 @@ import { useState } from "react";
 import { AlertTriangle, Check, ClipboardList, TrendingDown, Users, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { cardSurfaceClass } from "@/lib/utils";
+import { isOneTimeServiceType } from "@/lib/order-form-options";
 import { addOneMonth, dateToIso, formatCurrencyAmount, getExpenseNextOccurrence } from "@/lib/order-format";
 import type { Expense, Order } from "@/lib/google-sheets";
 
@@ -38,7 +39,8 @@ interface ReminderItem {
   title: string;
   subtitle: string;
   diffDays: number;
-  onMarkPaid?: () => void; // varsa "Ödendi" butonu gösterilir
+  onMarkPaid?: () => void; // varsa aksiyon butonu gösterilir
+  actionLabel?: string; // buton metni, belirtilmezse "Ödendi"
 }
 
 function ReminderPanel({
@@ -78,7 +80,7 @@ function ReminderPanel({
                   onClick={item.onMarkPaid}
                 >
                   <Check className="size-3.5" aria-hidden />
-                  {markingKey === item.key ? "İşaretleniyor…" : "Ödendi"}
+                  {markingKey === item.key ? "İşaretleniyor…" : (item.actionLabel ?? "Ödendi")}
                 </Button>
               )}
             </span>
@@ -97,12 +99,17 @@ interface OrdersOverviewProps {
 }
 
 /** Sipariş listesinin üstündeki özet: toplam/aktif sayılar, gelir/gider
- * toplamları ve iki ayrı bölüm halinde yaklaşan/geçmiş hatırlatmalar —
+ * toplamları ve üç ayrı bölüm halinde hatırlatmalar — "Planlanan satışlar"
+ * (Planlandı durumundaki, henüz ödeme/teslim yapılmayan siparişler),
  * "Gelir" (hesap kesim tarihleri) ve "Gider" (hosting/domain vb. ödemeler).
- * Gelir hatırlatmalarında "Ödendi" butonu, hesap kesim tarihini bir ay
- * ileri alıp o siparişi bir sonraki döneme taşır; gider hatırlatmalarında
- * ise ilgili giderin son ödeme tarihini bugüne çeker (bkz.
- * getExpenseNextOccurrence). Ekstra veri çekmez, zaten yüklenmiş
+ * Planlanan satışlarda "Teslim edildi" butonu siparişi Aktif'e geçirip bir
+ * sonraki hesap kesimini bir ay ileri atar; Gelir hatırlatmalarında "Ödendi"
+ * butonu hesap kesim tarihini bir ay ileri alıp o siparişi bir sonraki
+ * döneme taşır; gider hatırlatmalarında ise ilgili giderin son ödeme
+ * tarihini bugüne çeker (bkz. getExpenseNextOccurrence). "Toplam gelir"
+ * kartı Planlandı siparişlerin ücretini ana toplama katmaz — henüz
+ * gerçekleşmemiş bir gelir olduğu için ayrı bir "planlanan" rakamı olarak
+ * parantez içinde gösterilir. Ekstra veri çekmez, zaten yüklenmiş
  * listelerden hesaplar. */
 export function OrdersOverview({ orders, expenses, onOrderUpdated, onExpenseUpdated }: OrdersOverviewProps) {
   const [markingKey, setMarkingKey] = useState<string | null>(null);
@@ -111,10 +118,21 @@ export function OrdersOverview({ orders, expenses, onOrderUpdated, onExpenseUpda
     const key = `order:${order.orderNumber}`;
     setMarkingKey(key);
     try {
+      // Tek seferlik ürünlerde (Google Review/Instagram NFC kartı) hesap
+      // kesim tarihi bir sonraki aya devretmez — ödeme tarihinde sabitlenir
+      // ve sipariş tamamlanmış sayılır, bkz. isOneTimeServiceType. "Planlandı"
+      // siparişlerde bu buton "teslim edildi + ödeme alındı" anlamına gelir:
+      // sipariş Aktif'e geçer ve bir sonraki hesap kesimi (hesap kesim tarihi
+      // hiç girilmemişse başlama tarihinden) bir ay ileri atılır.
+      const patch = isOneTimeServiceType(order.serviceType)
+        ? { billingDate: dateToIso(new Date()), status: "Tamamlandı" }
+        : order.status === "Planlandı"
+          ? { billingDate: addOneMonth(order.billingDate || order.startDate), status: "Aktif" }
+          : { billingDate: addOneMonth(order.billingDate) };
       const response = await fetch(`/api/admin/orders/${order.orderNumber}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ billingDate: addOneMonth(order.billingDate) }),
+        body: JSON.stringify(patch),
       });
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
@@ -155,13 +173,35 @@ export function OrdersOverview({ orders, expenses, onOrderUpdated, onExpenseUpda
   const activeOrderNumbers = new Set(activeOrders.map((order) => order.orderNumber));
   const ordersByNumber = new Map(orders.map((order) => [order.orderNumber, order]));
 
+  // "Planlandı": müşteriyle ileri bir tarih için anlaşıldı ama o tarihe
+  // kadar ne ödeme alındı ne de ürün/hizmet teslim edildi — henüz gerçekleşmemiş
+  // bir gelir olduğu için "Toplam gelir"e dahil edilmez, ayrı bir "planlanan"
+  // rakamı olarak parantez içinde gösterilir (bkz. StatCard hint).
   const revenueLabel = sumByCurrency(
-    orders.filter((order) => order.status !== "İptal"),
+    orders.filter((order) => order.status !== "İptal" && order.status !== "Planlandı"),
     (order) => order.fee,
   );
   const expenseLabel = sumByCurrency(expenses, (expense) => expense.amount);
 
   const now = Date.now();
+
+  const scheduledOrders = orders.filter((order) => order.status === "Planlandı");
+  const scheduledRevenueRaw = sumByCurrency(scheduledOrders, (order) => order.fee);
+  const scheduledRevenueLabel = scheduledRevenueRaw === "—" ? null : `+${scheduledRevenueRaw} planlanan`;
+
+  const scheduledReminders: ReminderItem[] = scheduledOrders
+    .filter((order) => order.startDate)
+    .map((order) => ({
+      key: `order:${order.orderNumber}`,
+      title: `${order.firstName} ${order.lastName}`,
+      subtitle: `#${order.orderNumber}`,
+      diffDays: Math.floor((new Date(order.startDate).getTime() - now) / 86_400_000),
+      actionLabel: "Teslim edildi",
+      onMarkPaid: () => {
+        void handleMarkOrderPaid(order);
+      },
+    }))
+    .sort((a, b) => a.diffDays - b.diffDays);
 
   const incomeReminders: ReminderItem[] = activeOrders
     .filter((order) => order.billingDate)
@@ -202,10 +242,15 @@ export function OrdersOverview({ orders, expenses, onOrderUpdated, onExpenseUpda
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard icon={ClipboardList} label="Toplam sipariş" value={String(orders.length)} />
         <StatCard icon={Users} label="Aktif müşteri" value={String(activeOrders.length)} />
-        <StatCard icon={Wallet} label="Toplam gelir" value={revenueLabel} />
+        <StatCard icon={Wallet} label="Toplam gelir" value={revenueLabel} hint={scheduledRevenueLabel} />
         <StatCard icon={TrendingDown} label="Toplam gider" value={expenseLabel} />
       </div>
 
+      <ReminderPanel
+        title="Planlanan satışlar — henüz ödeme/teslim yapılmayan anlaşmalar"
+        items={scheduledReminders}
+        markingKey={markingKey}
+      />
       <ReminderPanel
         title="Gelir — yaklaşan / geçmiş hesap kesim tarihleri"
         items={incomeReminders}
@@ -224,10 +269,15 @@ function StatCard({
   icon: Icon,
   label,
   value,
+  hint,
 }: {
   icon: React.ComponentType<{ className?: string }>;
   label: string;
   value: string;
+  // Örn. "Toplam gelir" kartında henüz gerçekleşmemiş "Planlandı" tutarını
+  // ana rakama katmadan parantez içinde ayrıca göstermek için (bkz.
+  // scheduledRevenueLabel).
+  hint?: string | null;
 }) {
   return (
     <div className={`${cardSurfaceClass} flex items-center gap-3 px-5 py-4`}>
@@ -236,7 +286,10 @@ function StatCard({
       </div>
       <div>
         <p className="text-[12px] text-foreground-muted">{label}</p>
-        <p className="text-[17px] font-semibold text-foreground">{value}</p>
+        <p className="text-[17px] font-semibold text-foreground">
+          {value}
+          {hint && <span className="ml-1.5 text-[12px] font-normal text-warning">({hint})</span>}
+        </p>
       </div>
     </div>
   );
