@@ -27,7 +27,6 @@ export default function AdminOrdersPage() {
   const [search, setSearch] = useState("");
   const [serviceFilter, setServiceFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
-  const [exportOpen, setExportOpen] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [bulkStatusOpen, setBulkStatusOpen] = useState(false);
   const [bulkBusy, setBulkBusy] = useState(false);
@@ -213,30 +212,6 @@ export default function AdminOrdersPage() {
       rows,
     );
     downloadCsv(`siparisler-${new Date().toISOString().slice(0, 10)}.csv`, csv);
-    setExportOpen(false);
-  }
-
-  function handleExportExpenses() {
-    const ordersByNumber = new Map((orders ?? []).map((order) => [order.orderNumber, order]));
-    const rows = expenses.map((expense) => {
-      const order = ordersByNumber.get(expense.orderNumber);
-      return [
-        expense.orderNumber,
-        order ? `${order.firstName} ${order.lastName}` : "",
-        expense.name,
-        expense.amount,
-        expense.currency,
-        expense.recurrence,
-        expense.dueDate,
-        expense.note,
-      ];
-    });
-    const csv = toCsv(
-      ["Sipariş No", "Müşteri", "Gider Adı", "Tutar", "Para Birimi", "Tekrar", "Tarih", "Not"],
-      rows,
-    );
-    downloadCsv(`giderler-${new Date().toISOString().slice(0, 10)}.csv`, csv);
-    setExportOpen(false);
   }
 
   return (
@@ -249,33 +224,10 @@ export default function AdminOrdersPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <div className="relative">
-            <Button type="button" variant="secondary" size="md" onClick={() => setExportOpen((value) => !value)}>
-              <Download className="size-4" aria-hidden />
-              Dışa Aktar
-            </Button>
-            {exportOpen && (
-              <>
-                <div className="fixed inset-0 z-0" onClick={() => setExportOpen(false)} />
-                <div className="absolute right-0 z-10 mt-2 w-56 rounded-md border border-hairline bg-base py-1.5 shadow-lg">
-                  <button
-                    type="button"
-                    onClick={handleExportOrders}
-                    className="block w-full px-3.5 py-2 text-left text-[13.5px] text-foreground-secondary hover:bg-surface hover:text-foreground"
-                  >
-                    Siparişleri indir (CSV)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleExportExpenses}
-                    className="block w-full px-3.5 py-2 text-left text-[13.5px] text-foreground-secondary hover:bg-surface hover:text-foreground"
-                  >
-                    Giderleri indir (CSV)
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
+          <Button type="button" variant="secondary" size="md" onClick={handleExportOrders}>
+            <Download className="size-4" aria-hidden />
+            Dışa Aktar
+          </Button>
           <Button
             type="button"
             variant="primary"

@@ -1,11 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useState, type FormEvent } from "react";
-import { ChevronDown, Info, Pencil as PencilIcon, Plus, Trash2 } from "lucide-react";
+import { ChevronDown, Download, Info, Pencil as PencilIcon, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { CURRENCY_OPTIONS, EXPENSE_RECURRENCE_OPTIONS } from "@/lib/order-form-options";
 import { formatCurrencyAmount, formatExpenseSchedule } from "@/lib/order-format";
+import { downloadCsv, toCsv } from "@/lib/csv-export";
 import { cardSurfaceClass, cn, inputBaseClass } from "@/lib/utils";
 import type { CompanyExpense, CompanyExpenseCategory, CompanyExpenseInput, Currency, ExpenseRecurrence } from "@/lib/google-sheets";
 
@@ -147,13 +148,34 @@ export default function AdminCompanyExpensesPage() {
     totalsByCurrency.set(expense.currency, (totalsByCurrency.get(expense.currency) ?? 0) + amount);
   }
 
+  function handleExportExpenses() {
+    const rows = (expenses ?? []).map((expense) => [
+      expense.category,
+      expense.amount,
+      expense.currency,
+      expense.recurrence,
+      expense.dueDate,
+      expense.note,
+    ]);
+    const csv = toCsv(["Kategori", "Tutar", "Para Birimi", "Tekrar", "Tarih", "Not"], rows);
+    downloadCsv(`giderler-${new Date().toISOString().slice(0, 10)}.csv`, csv);
+  }
+
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-[22px] font-semibold text-foreground">Şirket Giderleri</h1>
-        <p className="mt-1 text-[14px] text-foreground-muted">
-          Herhangi bir siparişe bağlı olmayan genel giderler — domain/hosting, reklam, abonelikler ve benzerleri.
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-[22px] font-semibold text-foreground">Şirket Giderleri</h1>
+          <p className="mt-1 text-[14px] text-foreground-muted">
+            Herhangi bir siparişe bağlı olmayan genel giderler — domain/hosting, reklam, abonelikler ve benzerleri.
+          </p>
+        </div>
+        {expenses && expenses.length > 0 && (
+          <Button type="button" variant="secondary" size="md" onClick={handleExportExpenses}>
+            <Download className="size-4" aria-hidden />
+            Giderleri indir (CSV)
+          </Button>
+        )}
       </div>
 
       {source === "unconfigured" ? (
