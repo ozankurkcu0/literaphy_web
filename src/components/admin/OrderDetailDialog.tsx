@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { Check, Pencil as PencilIcon, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { StatusBadge } from "@/components/admin/StatusBadge";
-import { addOneMonth, formatCurrencyAmount, formatDateDisplay } from "@/lib/order-format";
+import { isOneTimeServiceType } from "@/lib/order-form-options";
+import { addOneMonth, dateToIso, formatCurrencyAmount, formatDateDisplay } from "@/lib/order-format";
 import type { Order } from "@/lib/google-sheets";
 
 function InfoField({ label, value }: { label: string; value: string }) {
@@ -45,10 +46,21 @@ export function OrderDetailDialog({ order: initialOrder, onClose, onEdit, onOrde
   async function handleMarkPaid() {
     setMarkingPaid(true);
     try {
+      // Tek seferlik ürünlerde (Google Review/Instagram NFC kartı) hesap
+      // kesim tarihi bir sonraki aya devretmez — ödeme tarihinde sabitlenir
+      // ve sipariş tamamlanmış sayılır, bkz. isOneTimeServiceType. "Planlandı"
+      // siparişlerde bu buton "teslim edildi + ödeme alındı" anlamına gelir:
+      // sipariş Aktif'e geçer ve bir sonraki hesap kesimi (hesap kesim tarihi
+      // hiç girilmemişse başlama tarihinden) bir ay ileri atılır.
+      const patch = isOneTimeServiceType(order.serviceType)
+        ? { billingDate: dateToIso(new Date()), status: "Tamamlandı" }
+        : order.status === "Planlandı"
+          ? { billingDate: addOneMonth(order.billingDate || order.startDate), status: "Aktif" }
+          : { billingDate: addOneMonth(order.billingDate) };
       const response = await fetch(`/api/admin/orders/${order.orderNumber}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ billingDate: addOneMonth(order.billingDate) }),
+        body: JSON.stringify(patch),
       });
       const data = await response.json();
       if (!response.ok) {
@@ -100,7 +112,7 @@ export function OrderDetailDialog({ order: initialOrder, onClose, onEdit, onOrde
                 <p className="text-[12px] text-foreground-muted">Hesap kesim tarihi</p>
                 <div className="flex items-center gap-2">
                   <p className="text-[14px] text-foreground">{formatDateDisplay(order.billingDate) || "—"}</p>
-                  {order.billingDate && order.status === "Aktif" && (
+                  {((order.billingDate && order.status === "Aktif") || order.status === "Planlandı") && (
                     <button
                       type="button"
                       onClick={handleMarkPaid}
@@ -108,7 +120,7 @@ export function OrderDetailDialog({ order: initialOrder, onClose, onEdit, onOrde
                       className="inline-flex items-center gap-1 rounded-full border border-success/20 bg-success/10 px-2 py-0.5 text-[11px] font-medium text-success transition-opacity hover:opacity-80 disabled:opacity-50"
                     >
                       <Check className="size-3" aria-hidden />
-                      {markingPaid ? "…" : "Ödendi"}
+                      {markingPaid ? "…" : order.status === "Planlandı" ? "Teslim edildi" : "Ödendi"}
                     </button>
                   )}
                 </div>

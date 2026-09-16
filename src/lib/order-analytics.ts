@@ -191,7 +191,7 @@ export function buildServiceRevenue(orders: Order[], range: PeriodRange, currenc
 }
 
 export function buildStatusCounts(orders: Order[], range: PeriodRange): Record<Status, number> {
-  const counts: Record<Status, number> = { Aktif: 0, Tamamlandı: 0, İptal: 0 };
+  const counts: Record<Status, number> = { Planlandı: 0, Aktif: 0, Tamamlandı: 0, İptal: 0 };
   for (const order of orders) {
     if (!isWithinRange(order.startDate, range)) continue;
     counts[order.status] += 1;

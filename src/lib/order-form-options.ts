@@ -19,6 +19,7 @@ export const CURRENCY_OPTIONS: { label: string; value: Currency }[] = [
 ];
 
 export const STATUS_OPTIONS: { label: string; value: Status }[] = [
+  { label: "Planlandı", value: "Planlandı" },
   { label: "Aktif", value: "Aktif" },
   { label: "Tamamlandı", value: "Tamamlandı" },
   { label: "İptal", value: "İptal" },
@@ -29,3 +30,14 @@ export const EXPENSE_RECURRENCE_OPTIONS: { label: string; value: ExpenseRecurren
   { label: "Aylık", value: "Aylık" },
   { label: "Yıllık", value: "Yıllık" },
 ];
+
+/** Google Review / Instagram NFC kartları abonelik değil, tek seferlik
+ * fiziksel ürün — StatusBadge'de "Tek seferlik" rozeti göstermek ve
+ * "Ödendi" işaretlemesinde hesap kesim tarihini bir ay ileri atmak yerine
+ * ödeme tarihinde sabitleyip siparişi tamamlanmış saymak için kullanılır
+ * (bkz. OrderDetailDialog/OrdersOverview handleMarkPaid). */
+export const ONE_TIME_SERVICE_TYPES = ["Google Review Kartı", "Instagram NFC Kartı"] as const;
+
+export function isOneTimeServiceType(serviceType: string): boolean {
+  return (ONE_TIME_SERVICE_TYPES as readonly string[]).includes(serviceType);
+}
