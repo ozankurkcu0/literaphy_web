@@ -111,3 +111,5 @@ export function PricingCard({ plan, billing }: PricingCardProps) {
     </motion.div>
   );
 }
+
+

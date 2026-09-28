@@ -1365,3 +1365,1333 @@ export async function permanentlyDeleteTrashEntry(trashId: string): Promise<void
   }
   await deleteTrashRow(entry.rowNumber);
 }
+
+/**
+ * /calismaprogram — kişisel ders programı + esnek etkinlik planlayıcı. Admin
+ * panelindeki sipariş/gider sistemine bağlı değil, kendi iki sekmesi var.
+ * Çöp kutusu sistemine bilerek entegre edilmedi (kişisel/tek kullanıcı,
+ * kurtarma ihtiyacı yok) — silme doğrudan satırı kaldırır.
+ */
+
+const CLASS_SCHEDULE_SHEET_NAME = "Ders Programı";
+const CLASS_SCHEDULE_HEADER_ROW = ["Kayıt ID", "Gün", "Başlangıç", "Bitiş", "Ders Adı", "Yer", "Not", "Tip"] as const;
+const CLASS_SCHEDULE_DATA_COLUMNS = "A:H";
+
+// WEEKDAYS/TIMELINE_KINDS client component'lerden de kullanılıyor, bu
+// yüzden bu "server-only" dosyada değil, calisma-program-constants.ts'te
+// tanımlı — burada sadece reuse ediliyor.
+import { WEEKDAYS, TIMELINE_KINDS, type Weekday, type TimelineKind } from "@/lib/calisma-program-constants";
+export { WEEKDAYS, TIMELINE_KINDS, type Weekday, type TimelineKind };
+
+export interface ClassScheduleEntryInput {
+  weekday: Weekday;
+  startTime: string; // "HH:MM"
+  endTime: string; // "HH:MM"
+  courseName: string;
+  location: string;
+  note: string;
+  // "Ders" (varsayılan) veya spor/toplantı/diğer gibi her hafta tekrar eden
+  // kişisel bir aktivite — bkz. calisma-program-constants.ts TIMELINE_KINDS.
+  kind: TimelineKind;
+}
+
+export interface ClassScheduleEntry extends ClassScheduleEntryInput {
+  rowNumber: number;
+  entryId: string;
+}
+
+async function ensureClassScheduleSheet(): Promise<void> {
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const existingSheetId = await getNumericSheetId(CLASS_SCHEDULE_SHEET_NAME);
+  if (existingSheetId === null) {
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId: sheetId,
+      requestBody: { requests: [{ addSheet: { properties: { title: CLASS_SCHEDULE_SHEET_NAME } } }] },
+    });
+  }
+
+  const { data } = await sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range: `${CLASS_SCHEDULE_SHEET_NAME}!A1:H1`,
+  });
+  const currentHeaders = data.values?.[0] ?? [];
+  const needsUpdate = CLASS_SCHEDULE_HEADER_ROW.some((header, index) => currentHeaders[index] !== header);
+  if (!needsUpdate) return;
+
+  await sheets.spreadsheets.values.update({
+    spreadsheetId: sheetId,
+    range: `${CLASS_SCHEDULE_SHEET_NAME}!A1:H1`,
+    valueInputOption: "USER_ENTERED",
+    requestBody: { values: [[...CLASS_SCHEDULE_HEADER_ROW]] },
+  });
+}
+
+function toWeekday(value: string | undefined): Weekday {
+  return (WEEKDAYS as readonly string[]).includes(value ?? "") ? (value as Weekday) : "Pazartesi";
+}
+
+function toTimelineKind(value: string | undefined): TimelineKind {
+  return (TIMELINE_KINDS as readonly string[]).includes(value ?? "") ? (value as TimelineKind) : "Ders";
+}
+
+function generateShortId(existing: Set<string>): string {
+  for (let attempt = 0; attempt < 50; attempt++) {
+    const candidate = String(Math.floor(100000 + Math.random() * 900000));
+    if (!existing.has(candidate)) return candidate;
+  }
+  throw new Error("Benzersiz kayıt numarası üretilemedi, lütfen tekrar deneyin.");
+}
+
+function rowToClassScheduleEntry(row: string[], rowNumber: number): ClassScheduleEntry | null {
+  const entryId = row[0]?.trim();
+  if (!entryId) return null;
+
+  return {
+    rowNumber,
+    entryId,
+    weekday: toWeekday(row[1]),
+    startTime: row[2] ?? "",
+    endTime: row[3] ?? "",
+    courseName: row[4] ?? "",
+    location: row[5] ?? "",
+    note: row[6] ?? "",
+    kind: toTimelineKind(row[7]),
+  };
+}
+
+export async function listClassScheduleEntries(): Promise<ClassScheduleEntry[]> {
+  await ensureClassScheduleSheet();
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const { data } = await sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range: `${CLASS_SCHEDULE_SHEET_NAME}!A2:${CLASS_SCHEDULE_DATA_COLUMNS.split(":")[1]}`,
+  });
+
+  const rows = data.values ?? [];
+  const entries: ClassScheduleEntry[] = [];
+  rows.forEach((row, index) => {
+    const entry = rowToClassScheduleEntry(row as string[], index + 2);
+    if (entry) entries.push(entry);
+  });
+  return entries;
+}
+
+export async function createClassScheduleEntry(input: ClassScheduleEntryInput): Promise<ClassScheduleEntry> {
+  await ensureClassScheduleSheet();
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const existing = await listClassScheduleEntries();
+  const entryId = generateShortId(new Set(existing.map((entry) => entry.entryId)));
+
+  const values = [
+    entryId,
+    input.weekday,
+    input.startTime,
+    input.endTime,
+    protectFromFormula(input.courseName),
+    protectFromFormula(input.location),
+    protectFromFormula(input.note),
+    input.kind,
+  ];
+
+  await sheets.spreadsheets.values.append({
+    spreadsheetId: sheetId,
+    range: `${CLASS_SCHEDULE_SHEET_NAME}!${CLASS_SCHEDULE_DATA_COLUMNS}`,
+    valueInputOption: "USER_ENTERED",
+    insertDataOption: "INSERT_ROWS",
+    requestBody: { values: [values] },
+  });
+
+  return { rowNumber: -1, entryId, ...input };
+}
+
+export async function updateClassScheduleEntry(
+  entryId: string,
+  patch: Partial<ClassScheduleEntryInput>,
+): Promise<ClassScheduleEntry> {
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const all = await listClassScheduleEntries();
+  const current = all.find((entry) => entry.entryId === entryId);
+  if (!current) {
+    throw new Error(`${entryId} numaralı ders kaydı bulunamadı.`);
+  }
+
+  const merged: ClassScheduleEntry = { ...current, ...patch };
+  const values = [
+    merged.entryId,
+    merged.weekday,
+    merged.startTime,
+    merged.endTime,
+    protectFromFormula(merged.courseName),
+    protectFromFormula(merged.location),
+    protectFromFormula(merged.note),
+    merged.kind,
+  ];
+
+  await sheets.spreadsheets.values.update({
+    spreadsheetId: sheetId,
+    range: `${CLASS_SCHEDULE_SHEET_NAME}!A${current.rowNumber}:H${current.rowNumber}`,
+    valueInputOption: "USER_ENTERED",
+    requestBody: { values: [values] },
+  });
+
+  return merged;
+}
+
+export async function deleteClassScheduleEntry(entryId: string): Promise<void> {
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const all = await listClassScheduleEntries();
+  const current = all.find((entry) => entry.entryId === entryId);
+  if (!current) {
+    throw new Error(`${entryId} numaralı ders kaydı bulunamadı.`);
+  }
+
+  const numericSheetId = await getNumericSheetId(CLASS_SCHEDULE_SHEET_NAME);
+  if (numericSheetId === null) {
+    throw new Error(`"${CLASS_SCHEDULE_SHEET_NAME}" adlı sayfa bulunamadı.`);
+  }
+
+  await sheets.spreadsheets.batchUpdate({
+    spreadsheetId: sheetId,
+    requestBody: {
+      requests: [
+        {
+          deleteDimension: {
+            range: { sheetId: numericSheetId, dimension: "ROWS", startIndex: current.rowNumber - 1, endIndex: current.rowNumber },
+          },
+        },
+      ],
+    },
+  });
+}
+
+/**
+ * Serbest günlük/etkinlik planlayıcı — sınav, quiz, spor, toplantı, veya
+ * herhangi bir plan. Ders programındaki gibi haftalık tekrar etmez, belirli
+ * bir tarihe bağlıdır.
+ * Sütunlar: A: Etkinlik ID  B: Tarih  C: Başlangıç  D: Bitiş  E: Tip
+ *           F: Başlık  G: Not  H: Tamamlandı
+ */
+const SCHEDULE_EVENT_SHEET_NAME = "Etkinlikler";
+const SCHEDULE_EVENT_HEADER_ROW = [
+  "Etkinlik ID",
+  "Tarih",
+  "Başlangıç",
+  "Bitiş",
+  "Tip",
+  "Başlık",
+  "Not",
+  "Tamamlandı",
+] as const;
+const SCHEDULE_EVENT_DATA_COLUMNS = "A:H";
+
+// SCHEDULE_EVENT_TYPES da aynı sebeple calisma-program-constants.ts'te.
+import { SCHEDULE_EVENT_TYPES, type ScheduleEventType } from "@/lib/calisma-program-constants";
+export { SCHEDULE_EVENT_TYPES, type ScheduleEventType };
+
+export interface ScheduleEventInput {
+  date: string; // yyyy-mm-dd
+  startTime: string; // "HH:MM", boş olabilir
+  endTime: string; // "HH:MM", boş olabilir
+  type: ScheduleEventType;
+  title: string;
+  note: string;
+  done: boolean;
+}
+
+export interface ScheduleEvent extends ScheduleEventInput {
+  rowNumber: number;
+  eventId: string;
+}
+
+async function ensureScheduleEventSheet(): Promise<void> {
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const existingSheetId = await getNumericSheetId(SCHEDULE_EVENT_SHEET_NAME);
+  if (existingSheetId === null) {
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId: sheetId,
+      requestBody: { requests: [{ addSheet: { properties: { title: SCHEDULE_EVENT_SHEET_NAME } } }] },
+    });
+  }
+
+  const { data } = await sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range: `${SCHEDULE_EVENT_SHEET_NAME}!A1:H1`,
+  });
+  const currentHeaders = data.values?.[0] ?? [];
+  const needsUpdate = SCHEDULE_EVENT_HEADER_ROW.some((header, index) => currentHeaders[index] !== header);
+  if (!needsUpdate) return;
+
+  await sheets.spreadsheets.values.update({
+    spreadsheetId: sheetId,
+    range: `${SCHEDULE_EVENT_SHEET_NAME}!A1:H1`,
+    valueInputOption: "USER_ENTERED",
+    requestBody: { values: [[...SCHEDULE_EVENT_HEADER_ROW]] },
+  });
+}
+
+function toScheduleEventType(value: string | undefined): ScheduleEventType {
+  return (SCHEDULE_EVENT_TYPES as readonly string[]).includes(value ?? "")
+    ? (value as ScheduleEventType)
+    : "Diğer";
+}
+
+function rowToScheduleEvent(row: string[], rowNumber: number): ScheduleEvent | null {
+  const eventId = row[0]?.trim();
+  if (!eventId) return null;
+
+  return {
+    rowNumber,
+    eventId,
+    date: turkishDateToIso(row[1] ?? ""),
+    startTime: row[2] ?? "",
+    endTime: row[3] ?? "",
+    type: toScheduleEventType(row[4]),
+    title: row[5] ?? "",
+    note: row[6] ?? "",
+    done: (row[7] ?? "").trim().toUpperCase() === "TRUE",
+  };
+}
+
+export async function listScheduleEvents(): Promise<ScheduleEvent[]> {
+  await ensureScheduleEventSheet();
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const { data } = await sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range: `${SCHEDULE_EVENT_SHEET_NAME}!A2:${SCHEDULE_EVENT_DATA_COLUMNS.split(":")[1]}`,
+  });
+
+  const rows = data.values ?? [];
+  const events: ScheduleEvent[] = [];
+  rows.forEach((row, index) => {
+    const event = rowToScheduleEvent(row as string[], index + 2);
+    if (event) events.push(event);
+  });
+  return events;
+}
+
+export async function createScheduleEvent(input: ScheduleEventInput): Promise<ScheduleEvent> {
+  await ensureScheduleEventSheet();
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const existing = await listScheduleEvents();
+  const eventId = generateShortId(new Set(existing.map((event) => event.eventId)));
+
+  const values = [
+    eventId,
+    isoToTurkishDate(input.date),
+    input.startTime,
+    input.endTime,
+    input.type,
+    protectFromFormula(input.title),
+    protectFromFormula(input.note),
+    input.done ? "TRUE" : "FALSE",
+  ];
+
+  await sheets.spreadsheets.values.append({
+    spreadsheetId: sheetId,
+    range: `${SCHEDULE_EVENT_SHEET_NAME}!${SCHEDULE_EVENT_DATA_COLUMNS}`,
+    valueInputOption: "USER_ENTERED",
+    insertDataOption: "INSERT_ROWS",
+    requestBody: { values: [values] },
+  });
+
+  return { rowNumber: -1, eventId, ...input };
+}
+
+export async function updateScheduleEvent(
+  eventId: string,
+  patch: Partial<ScheduleEventInput>,
+): Promise<ScheduleEvent> {
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const all = await listScheduleEvents();
+  const current = all.find((event) => event.eventId === eventId);
+  if (!current) {
+    throw new Error(`${eventId} numaralı etkinlik bulunamadı.`);
+  }
+
+  const merged: ScheduleEvent = { ...current, ...patch };
+  const values = [
+    merged.eventId,
+    isoToTurkishDate(merged.date),
+    merged.startTime,
+    merged.endTime,
+    merged.type,
+    protectFromFormula(merged.title),
+    protectFromFormula(merged.note),
+    merged.done ? "TRUE" : "FALSE",
+  ];
+
+  await sheets.spreadsheets.values.update({
+    spreadsheetId: sheetId,
+    range: `${SCHEDULE_EVENT_SHEET_NAME}!A${current.rowNumber}:H${current.rowNumber}`,
+    valueInputOption: "USER_ENTERED",
+    requestBody: { values: [values] },
+  });
+
+  return merged;
+}
+
+export async function deleteScheduleEvent(eventId: string): Promise<void> {
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const all = await listScheduleEvents();
+  const current = all.find((event) => event.eventId === eventId);
+  if (!current) {
+    throw new Error(`${eventId} numaralı etkinlik bulunamadı.`);
+  }
+
+  const numericSheetId = await getNumericSheetId(SCHEDULE_EVENT_SHEET_NAME);
+  if (numericSheetId === null) {
+    throw new Error(`"${SCHEDULE_EVENT_SHEET_NAME}" adlı sayfa bulunamadı.`);
+  }
+
+  await sheets.spreadsheets.batchUpdate({
+    spreadsheetId: sheetId,
+    requestBody: {
+      requests: [
+        {
+          deleteDimension: {
+            range: { sheetId: numericSheetId, dimension: "ROWS", startIndex: current.rowNumber - 1, endIndex: current.rowNumber },
+          },
+        },
+      ],
+    },
+  });
+}
+
+/**
+ * /yagmurumprofugececek — Yağmur'un kendi haftalık ders programı. /calismaprogram
+ * ile aynı veri şekli (gün/saat/başlık/yer/not/tip) ama tamamen ayrı bir
+ * sekmede tutuluyor — iki kişinin verisi karışmasın diye.
+ */
+const YAGMUR_SCHEDULE_SHEET_NAME = "Yağmur Programı";
+const YAGMUR_SCHEDULE_HEADER_ROW = ["Kayıt ID", "Gün", "Başlangıç", "Bitiş", "Başlık", "Yer", "Not", "Tip"] as const;
+const YAGMUR_SCHEDULE_DATA_COLUMNS = "A:H";
+
+export interface YagmurScheduleEntryInput {
+  weekday: Weekday;
+  startTime: string; // "HH:MM"
+  endTime: string; // "HH:MM"
+  title: string;
+  location: string;
+  note: string;
+  kind: TimelineKind;
+}
+
+export interface YagmurScheduleEntry extends YagmurScheduleEntryInput {
+  rowNumber: number;
+  entryId: string;
+}
+
+async function ensureYagmurScheduleSheet(): Promise<void> {
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const existingSheetId = await getNumericSheetId(YAGMUR_SCHEDULE_SHEET_NAME);
+  if (existingSheetId === null) {
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId: sheetId,
+      requestBody: { requests: [{ addSheet: { properties: { title: YAGMUR_SCHEDULE_SHEET_NAME } } }] },
+    });
+  }
+
+  const { data } = await sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range: `${YAGMUR_SCHEDULE_SHEET_NAME}!A1:H1`,
+  });
+  const currentHeaders = data.values?.[0] ?? [];
+  const needsUpdate = YAGMUR_SCHEDULE_HEADER_ROW.some((header, index) => currentHeaders[index] !== header);
+  if (!needsUpdate) return;
+
+  await sheets.spreadsheets.values.update({
+    spreadsheetId: sheetId,
+    range: `${YAGMUR_SCHEDULE_SHEET_NAME}!A1:H1`,
+    valueInputOption: "USER_ENTERED",
+    requestBody: { values: [[...YAGMUR_SCHEDULE_HEADER_ROW]] },
+  });
+}
+
+function rowToYagmurScheduleEntry(row: string[], rowNumber: number): YagmurScheduleEntry | null {
+  const entryId = row[0]?.trim();
+  if (!entryId) return null;
+
+  return {
+    rowNumber,
+    entryId,
+    weekday: toWeekday(row[1]),
+    startTime: row[2] ?? "",
+    endTime: row[3] ?? "",
+    title: row[4] ?? "",
+    location: row[5] ?? "",
+    note: row[6] ?? "",
+    kind: toTimelineKind(row[7]),
+  };
+}
+
+export async function listYagmurScheduleEntries(): Promise<YagmurScheduleEntry[]> {
+  await ensureYagmurScheduleSheet();
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const { data } = await sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range: `${YAGMUR_SCHEDULE_SHEET_NAME}!A2:${YAGMUR_SCHEDULE_DATA_COLUMNS.split(":")[1]}`,
+  });
+
+  const rows = data.values ?? [];
+  const entries: YagmurScheduleEntry[] = [];
+  rows.forEach((row, index) => {
+    const entry = rowToYagmurScheduleEntry(row as string[], index + 2);
+    if (entry) entries.push(entry);
+  });
+  return entries;
+}
+
+export async function createYagmurScheduleEntry(input: YagmurScheduleEntryInput): Promise<YagmurScheduleEntry> {
+  await ensureYagmurScheduleSheet();
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const existing = await listYagmurScheduleEntries();
+  const entryId = generateShortId(new Set(existing.map((entry) => entry.entryId)));
+
+  const values = [
+    entryId,
+    input.weekday,
+    input.startTime,
+    input.endTime,
+    protectFromFormula(input.title),
+    protectFromFormula(input.location),
+    protectFromFormula(input.note),
+    input.kind,
+  ];
+
+  await sheets.spreadsheets.values.append({
+    spreadsheetId: sheetId,
+    range: `${YAGMUR_SCHEDULE_SHEET_NAME}!${YAGMUR_SCHEDULE_DATA_COLUMNS}`,
+    valueInputOption: "USER_ENTERED",
+    insertDataOption: "INSERT_ROWS",
+    requestBody: { values: [values] },
+  });
+
+  return { rowNumber: -1, entryId, ...input };
+}
+
+export async function updateYagmurScheduleEntry(
+  entryId: string,
+  patch: Partial<YagmurScheduleEntryInput>,
+): Promise<YagmurScheduleEntry> {
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const all = await listYagmurScheduleEntries();
+  const current = all.find((entry) => entry.entryId === entryId);
+  if (!current) {
+    throw new Error(`${entryId} numaralı kayıt bulunamadı.`);
+  }
+
+  const merged: YagmurScheduleEntry = { ...current, ...patch };
+  const values = [
+    merged.entryId,
+    merged.weekday,
+    merged.startTime,
+    merged.endTime,
+    protectFromFormula(merged.title),
+    protectFromFormula(merged.location),
+    protectFromFormula(merged.note),
+    merged.kind,
+  ];
+
+  await sheets.spreadsheets.values.update({
+    spreadsheetId: sheetId,
+    range: `${YAGMUR_SCHEDULE_SHEET_NAME}!A${current.rowNumber}:H${current.rowNumber}`,
+    valueInputOption: "USER_ENTERED",
+    requestBody: { values: [values] },
+  });
+
+  return merged;
+}
+
+export async function deleteYagmurScheduleEntry(entryId: string): Promise<void> {
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const all = await listYagmurScheduleEntries();
+  const current = all.find((entry) => entry.entryId === entryId);
+  if (!current) {
+    throw new Error(`${entryId} numaralı kayıt bulunamadı.`);
+  }
+
+  const numericSheetId = await getNumericSheetId(YAGMUR_SCHEDULE_SHEET_NAME);
+  if (numericSheetId === null) {
+    throw new Error(`"${YAGMUR_SCHEDULE_SHEET_NAME}" adlı sayfa bulunamadı.`);
+  }
+
+  await sheets.spreadsheets.batchUpdate({
+    spreadsheetId: sheetId,
+    requestBody: {
+      requests: [
+        {
+          deleteDimension: {
+            range: { sheetId: numericSheetId, dimension: "ROWS", startIndex: current.rowNumber - 1, endIndex: current.rowNumber },
+          },
+        },
+      ],
+    },
+  });
+}
+
+/**
+ * /yagmurumprofugececek — kelime hedefleri (Oxford 3000 / Oxford 5000).
+ * Sabit iki satır: toplam kelime sayısı sabit, "öğrenilen" alanı Yağmur
+ * tarafından güncellenir ve ilerleme yüzdesi buradan hesaplanır.
+ */
+const YAGMUR_GOALS_SHEET_NAME = "Yağmur Hedefleri";
+const YAGMUR_GOALS_HEADER_ROW = ["Hedef ID", "Ad", "Toplam", "Öğrenilen"] as const;
+const YAGMUR_GOALS_DATA_COLUMNS = "A:D";
+
+const YAGMUR_DEFAULT_GOALS: { goalId: string; name: string; total: number }[] = [
+  { goalId: "oxford3000", name: "Oxford 3000", total: 3000 },
+  { goalId: "oxford5000", name: "Oxford 5000", total: 5000 },
+];
+
+export interface YagmurGoal {
+  rowNumber: number;
+  goalId: string;
+  name: string;
+  total: number;
+  learned: number;
+}
+
+async function ensureYagmurGoalsSheet(): Promise<void> {
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const existingSheetId = await getNumericSheetId(YAGMUR_GOALS_SHEET_NAME);
+  if (existingSheetId === null) {
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId: sheetId,
+      requestBody: { requests: [{ addSheet: { properties: { title: YAGMUR_GOALS_SHEET_NAME } } }] },
+    });
+  }
+
+  const { data } = await sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range: `${YAGMUR_GOALS_SHEET_NAME}!A1:D1`,
+  });
+  const currentHeaders = data.values?.[0] ?? [];
+  const needsHeaderUpdate = YAGMUR_GOALS_HEADER_ROW.some((header, index) => currentHeaders[index] !== header);
+  if (needsHeaderUpdate) {
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: sheetId,
+      range: `${YAGMUR_GOALS_SHEET_NAME}!A1:D1`,
+      valueInputOption: "USER_ENTERED",
+      requestBody: { values: [[...YAGMUR_GOALS_HEADER_ROW]] },
+    });
+  }
+
+  const { data: rowsData } = await sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range: `${YAGMUR_GOALS_SHEET_NAME}!${YAGMUR_GOALS_DATA_COLUMNS}`,
+  });
+  const hasRows = (rowsData.values?.length ?? 0) > 1;
+  if (!hasRows) {
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: sheetId,
+      range: `${YAGMUR_GOALS_SHEET_NAME}!${YAGMUR_GOALS_DATA_COLUMNS}`,
+      valueInputOption: "USER_ENTERED",
+      insertDataOption: "INSERT_ROWS",
+      requestBody: {
+        values: YAGMUR_DEFAULT_GOALS.map((goal) => [goal.goalId, goal.name, String(goal.total), "0"]),
+      },
+    });
+  }
+}
+
+function rowToYagmurGoal(row: string[], rowNumber: number): YagmurGoal | null {
+  const goalId = row[0]?.trim();
+  if (!goalId) return null;
+
+  return {
+    rowNumber,
+    goalId,
+    name: row[1] ?? "",
+    total: Number(row[2]) || 0,
+    learned: Number(row[3]) || 0,
+  };
+}
+
+export async function listYagmurGoals(): Promise<YagmurGoal[]> {
+  await ensureYagmurGoalsSheet();
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const { data } = await sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range: `${YAGMUR_GOALS_SHEET_NAME}!A2:${YAGMUR_GOALS_DATA_COLUMNS.split(":")[1]}`,
+  });
+
+  const rows = data.values ?? [];
+  const goals: YagmurGoal[] = [];
+  rows.forEach((row, index) => {
+    const goal = rowToYagmurGoal(row as string[], index + 2);
+    if (goal) goals.push(goal);
+  });
+  return goals;
+}
+
+export async function updateYagmurGoalLearned(goalId: string, learned: number): Promise<YagmurGoal> {
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const all = await listYagmurGoals();
+  const current = all.find((goal) => goal.goalId === goalId);
+  if (!current) {
+    throw new Error(`${goalId} adlı hedef bulunamadı.`);
+  }
+
+  const clamped = Math.max(0, Math.min(learned, current.total));
+  await sheets.spreadsheets.values.update({
+    spreadsheetId: sheetId,
+    range: `${YAGMUR_GOALS_SHEET_NAME}!D${current.rowNumber}`,
+    valueInputOption: "USER_ENTERED",
+    requestBody: { values: [[String(clamped)]] },
+  });
+
+  return { ...current, learned: clamped };
+}
+
+/**
+ * /yagmurumprofugececek — haftalık İngilizce çalışma programının to-do
+ * işaretleri. Görevlerin kendisi yagmur-study-plan.ts'te sabit; burada
+ * sadece "hangi hafta hangi görev işaretlendi" tutulur (Hafta = o haftanın
+ * Pazartesi'si, bkz. getCurrentWeekKey). Yeni hafta = yeni anahtar = hiçbir
+ * satır eşleşmez = liste otomatik "temiz" görünür, ayrıca sıfırlama
+ * gerekmez.
+ */
+const YAGMUR_STUDY_SHEET_NAME = "Yağmur Çalışma Takip";
+const YAGMUR_STUDY_HEADER_ROW = ["Hafta", "Görev ID"] as const;
+const YAGMUR_STUDY_DATA_COLUMNS = "A:B";
+
+interface YagmurStudyCheckRow {
+  rowNumber: number;
+  weekKey: string;
+  taskId: string;
+}
+
+async function ensureYagmurStudySheet(): Promise<void> {
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const existingSheetId = await getNumericSheetId(YAGMUR_STUDY_SHEET_NAME);
+  if (existingSheetId === null) {
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId: sheetId,
+      requestBody: { requests: [{ addSheet: { properties: { title: YAGMUR_STUDY_SHEET_NAME } } }] },
+    });
+  }
+
+  const { data } = await sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range: `${YAGMUR_STUDY_SHEET_NAME}!A1:B1`,
+  });
+  const currentHeaders = data.values?.[0] ?? [];
+  const needsUpdate = YAGMUR_STUDY_HEADER_ROW.some((header, index) => currentHeaders[index] !== header);
+  if (!needsUpdate) return;
+
+  await sheets.spreadsheets.values.update({
+    spreadsheetId: sheetId,
+    range: `${YAGMUR_STUDY_SHEET_NAME}!A1:B1`,
+    valueInputOption: "USER_ENTERED",
+    requestBody: { values: [[...YAGMUR_STUDY_HEADER_ROW]] },
+  });
+}
+
+async function listYagmurStudyCheckRows(): Promise<YagmurStudyCheckRow[]> {
+  await ensureYagmurStudySheet();
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const { data } = await sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range: `${YAGMUR_STUDY_SHEET_NAME}!${YAGMUR_STUDY_DATA_COLUMNS}`,
+  });
+
+  const rows = data.values ?? [];
+  const result: YagmurStudyCheckRow[] = [];
+  rows.forEach((row, index) => {
+    const weekKey = row[0]?.trim();
+    const taskId = row[1]?.trim();
+    if (weekKey && taskId) result.push({ rowNumber: index + 2, weekKey, taskId });
+  });
+  return result;
+}
+
+export async function listYagmurStudyChecks(weekKey: string): Promise<string[]> {
+  const rows = await listYagmurStudyCheckRows();
+  return rows.filter((row) => row.weekKey === weekKey).map((row) => row.taskId);
+}
+
+export async function setYagmurStudyCheck(weekKey: string, taskId: string, checked: boolean): Promise<void> {
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const rows = await listYagmurStudyCheckRows();
+  const existing = rows.find((row) => row.weekKey === weekKey && row.taskId === taskId);
+
+  if (checked) {
+    if (existing) return;
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: sheetId,
+      range: `${YAGMUR_STUDY_SHEET_NAME}!${YAGMUR_STUDY_DATA_COLUMNS}`,
+      valueInputOption: "USER_ENTERED",
+      insertDataOption: "INSERT_ROWS",
+      requestBody: { values: [[weekKey, taskId]] },
+    });
+    return;
+  }
+
+  if (!existing) return;
+  const numericSheetId = await getNumericSheetId(YAGMUR_STUDY_SHEET_NAME);
+  if (numericSheetId === null) {
+    throw new Error(`"${YAGMUR_STUDY_SHEET_NAME}" adlı sayfa bulunamadı.`);
+  }
+  await sheets.spreadsheets.batchUpdate({
+    spreadsheetId: sheetId,
+    requestBody: {
+      requests: [
+        {
+          deleteDimension: {
+            range: { sheetId: numericSheetId, dimension: "ROWS", startIndex: existing.rowNumber - 1, endIndex: existing.rowNumber },
+          },
+        },
+      ],
+    },
+  });
+}
+
+/**
+ * /yagmurumprofugececek — haftalık çalışma programına Yağmur'un kendi
+ * eklediği görevler. Sabit örnek programın (yagmur-study-plan.ts) yanına,
+ * günlere göre eklenir; her hafta aynı gün altında tekrar görünür (tamamlanma
+ * durumu YAGMUR_STUDY_SHEET_NAME'de haftaya göre ayrı tutulduğu için statik
+ * görevlerle aynı şekilde her Pazartesi sıfırlanır).
+ */
+const YAGMUR_CUSTOM_TASKS_SHEET_NAME = "Yağmur Çalışma Görevleri";
+const YAGMUR_CUSTOM_TASKS_HEADER_ROW = ["Görev ID", "Gün", "Kategori", "Başlık"] as const;
+const YAGMUR_CUSTOM_TASKS_DATA_COLUMNS = "A:D";
+
+export interface YagmurCustomStudyTask {
+  rowNumber: number;
+  taskId: string;
+  weekday: Weekday;
+  category: string;
+  label: string;
+}
+
+async function ensureYagmurCustomTasksSheet(): Promise<void> {
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const existingSheetId = await getNumericSheetId(YAGMUR_CUSTOM_TASKS_SHEET_NAME);
+  if (existingSheetId === null) {
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId: sheetId,
+      requestBody: { requests: [{ addSheet: { properties: { title: YAGMUR_CUSTOM_TASKS_SHEET_NAME } } }] },
+    });
+  }
+
+  const { data } = await sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range: `${YAGMUR_CUSTOM_TASKS_SHEET_NAME}!A1:D1`,
+  });
+  const currentHeaders = data.values?.[0] ?? [];
+  const needsUpdate = YAGMUR_CUSTOM_TASKS_HEADER_ROW.some((header, index) => currentHeaders[index] !== header);
+  if (!needsUpdate) return;
+
+  await sheets.spreadsheets.values.update({
+    spreadsheetId: sheetId,
+    range: `${YAGMUR_CUSTOM_TASKS_SHEET_NAME}!A1:D1`,
+    valueInputOption: "USER_ENTERED",
+    requestBody: { values: [[...YAGMUR_CUSTOM_TASKS_HEADER_ROW]] },
+  });
+}
+
+function rowToYagmurCustomTask(row: string[], rowNumber: number): YagmurCustomStudyTask | null {
+  const taskId = row[0]?.trim();
+  if (!taskId) return null;
+
+  return {
+    rowNumber,
+    taskId,
+    weekday: toWeekday(row[1]),
+    category: row[2] ?? "Diğer",
+    label: row[3] ?? "",
+  };
+}
+
+export async function listYagmurCustomTasks(): Promise<YagmurCustomStudyTask[]> {
+  await ensureYagmurCustomTasksSheet();
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const { data } = await sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range: `${YAGMUR_CUSTOM_TASKS_SHEET_NAME}!A2:${YAGMUR_CUSTOM_TASKS_DATA_COLUMNS.split(":")[1]}`,
+  });
+
+  const rows = data.values ?? [];
+  const tasks: YagmurCustomStudyTask[] = [];
+  rows.forEach((row, index) => {
+    const task = rowToYagmurCustomTask(row as string[], index + 2);
+    if (task) tasks.push(task);
+  });
+  return tasks;
+}
+
+export async function createYagmurCustomTask(input: { weekday: Weekday; category: string; label: string }): Promise<YagmurCustomStudyTask> {
+  await ensureYagmurCustomTasksSheet();
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const existing = await listYagmurCustomTasks();
+  const taskId = `c${generateShortId(new Set(existing.map((task) => task.taskId)))}`;
+
+  const values = [taskId, input.weekday, protectFromFormula(input.category), protectFromFormula(input.label)];
+
+  await sheets.spreadsheets.values.append({
+    spreadsheetId: sheetId,
+    range: `${YAGMUR_CUSTOM_TASKS_SHEET_NAME}!${YAGMUR_CUSTOM_TASKS_DATA_COLUMNS}`,
+    valueInputOption: "USER_ENTERED",
+    insertDataOption: "INSERT_ROWS",
+    requestBody: { values: [values] },
+  });
+
+  return { rowNumber: -1, taskId, ...input };
+}
+
+export async function deleteYagmurCustomTask(taskId: string): Promise<void> {
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const all = await listYagmurCustomTasks();
+  const current = all.find((task) => task.taskId === taskId);
+  if (!current) {
+    throw new Error(`${taskId} numaralı görev bulunamadı.`);
+  }
+
+  const numericSheetId = await getNumericSheetId(YAGMUR_CUSTOM_TASKS_SHEET_NAME);
+  if (numericSheetId === null) {
+    throw new Error(`"${YAGMUR_CUSTOM_TASKS_SHEET_NAME}" adlı sayfa bulunamadı.`);
+  }
+
+  await sheets.spreadsheets.batchUpdate({
+    spreadsheetId: sheetId,
+    requestBody: {
+      requests: [
+        {
+          deleteDimension: {
+            range: { sheetId: numericSheetId, dimension: "ROWS", startIndex: current.rowNumber - 1, endIndex: current.rowNumber },
+          },
+        },
+      ],
+    },
+  });
+
+  // Bu görevin geçmiş haftalardaki işaretlerini de temizle — silinen bir
+  // görev artık listede yokken "işaretli" satırları sheet'te asılı kalmasın.
+  const checkRows = await listYagmurStudyCheckRows();
+  const staleRows = checkRows.filter((row) => row.taskId === taskId);
+  if (staleRows.length === 0) return;
+
+  const studySheetId = await getNumericSheetId(YAGMUR_STUDY_SHEET_NAME);
+  if (studySheetId === null) return;
+
+  await sheets.spreadsheets.batchUpdate({
+    spreadsheetId: sheetId,
+    requestBody: {
+      requests: staleRows
+        .sort((a, b) => b.rowNumber - a.rowNumber)
+        .map((row) => ({
+          deleteDimension: {
+            range: { sheetId: studySheetId, dimension: "ROWS", startIndex: row.rowNumber - 1, endIndex: row.rowNumber },
+          },
+        })),
+    },
+  });
+}
+
+/**
+ * /calismaprogram — derslerle ilgili bitirilmiş/devam eden YouTube
+ * playlistlerinin ilerleme takibi. Videolar YouTube üzerinden izleniyor,
+ * burada sadece "kaç video izlendi" sayısı tutuluyor.
+ * Sütunlar: A: Playlist ID  B: Ders  C: Başlık  D: Link  E: Toplam Video
+ *           F: İzlenen Video  G: Tamamlandı
+ */
+const STUDY_PLAYLIST_SHEET_NAME = "Playlistler";
+const STUDY_PLAYLIST_HEADER_ROW = [
+  "Playlist ID",
+  "Ders",
+  "Başlık",
+  "Link",
+  "Toplam Video",
+  "İzlenen Video",
+  "Tamamlandı",
+] as const;
+const STUDY_PLAYLIST_DATA_COLUMNS = "A:G";
+
+export interface StudyPlaylistInput {
+  courseName: string; // opsiyonel, ör. "Lineer Cebir"
+  title: string;
+  url: string;
+  totalVideos: number;
+  watchedVideos: number;
+  done: boolean;
+}
+
+export interface StudyPlaylist extends StudyPlaylistInput {
+  rowNumber: number;
+  playlistId: string;
+}
+
+async function ensureStudyPlaylistSheet(): Promise<void> {
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const existingSheetId = await getNumericSheetId(STUDY_PLAYLIST_SHEET_NAME);
+  if (existingSheetId === null) {
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId: sheetId,
+      requestBody: { requests: [{ addSheet: { properties: { title: STUDY_PLAYLIST_SHEET_NAME } } }] },
+    });
+  }
+
+  const { data } = await sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range: `${STUDY_PLAYLIST_SHEET_NAME}!A1:G1`,
+  });
+  const currentHeaders = data.values?.[0] ?? [];
+  const needsUpdate = STUDY_PLAYLIST_HEADER_ROW.some((header, index) => currentHeaders[index] !== header);
+  if (!needsUpdate) return;
+
+  await sheets.spreadsheets.values.update({
+    spreadsheetId: sheetId,
+    range: `${STUDY_PLAYLIST_SHEET_NAME}!A1:G1`,
+    valueInputOption: "USER_ENTERED",
+    requestBody: { values: [[...STUDY_PLAYLIST_HEADER_ROW]] },
+  });
+}
+
+function toNonNegativeInt(value: string | undefined): number {
+  const n = Number.parseInt(value ?? "", 10);
+  return Number.isFinite(n) && n >= 0 ? n : 0;
+}
+
+function rowToStudyPlaylist(row: string[], rowNumber: number): StudyPlaylist | null {
+  const playlistId = row[0]?.trim();
+  if (!playlistId) return null;
+
+  return {
+    rowNumber,
+    playlistId,
+    courseName: row[1] ?? "",
+    title: row[2] ?? "",
+    url: row[3] ?? "",
+    totalVideos: toNonNegativeInt(row[4]),
+    watchedVideos: toNonNegativeInt(row[5]),
+    done: (row[6] ?? "").trim().toUpperCase() === "TRUE",
+  };
+}
+
+export async function listStudyPlaylists(): Promise<StudyPlaylist[]> {
+  await ensureStudyPlaylistSheet();
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const { data } = await sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range: `${STUDY_PLAYLIST_SHEET_NAME}!A2:${STUDY_PLAYLIST_DATA_COLUMNS.split(":")[1]}`,
+  });
+
+  const rows = data.values ?? [];
+  const playlists: StudyPlaylist[] = [];
+  rows.forEach((row, index) => {
+    const playlist = rowToStudyPlaylist(row as string[], index + 2);
+    if (playlist) playlists.push(playlist);
+  });
+  return playlists;
+}
+
+export async function createStudyPlaylist(input: StudyPlaylistInput): Promise<StudyPlaylist> {
+  await ensureStudyPlaylistSheet();
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const existing = await listStudyPlaylists();
+  const playlistId = generateShortId(new Set(existing.map((playlist) => playlist.playlistId)));
+
+  const values = [
+    playlistId,
+    protectFromFormula(input.courseName),
+    protectFromFormula(input.title),
+    protectFromFormula(input.url),
+    String(input.totalVideos),
+    String(input.watchedVideos),
+    input.done ? "TRUE" : "FALSE",
+  ];
+
+  await sheets.spreadsheets.values.append({
+    spreadsheetId: sheetId,
+    range: `${STUDY_PLAYLIST_SHEET_NAME}!${STUDY_PLAYLIST_DATA_COLUMNS}`,
+    valueInputOption: "USER_ENTERED",
+    insertDataOption: "INSERT_ROWS",
+    requestBody: { values: [values] },
+  });
+
+  return { rowNumber: -1, playlistId, ...input };
+}
+
+export async function updateStudyPlaylist(
+  playlistId: string,
+  patch: Partial<StudyPlaylistInput>,
+): Promise<StudyPlaylist> {
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const all = await listStudyPlaylists();
+  const current = all.find((playlist) => playlist.playlistId === playlistId);
+  if (!current) {
+    throw new Error(`${playlistId} numaralı playlist bulunamadı.`);
+  }
+
+  const merged: StudyPlaylist = { ...current, ...patch };
+  const values = [
+    merged.playlistId,
+    protectFromFormula(merged.courseName),
+    protectFromFormula(merged.title),
+    protectFromFormula(merged.url),
+    String(merged.totalVideos),
+    String(merged.watchedVideos),
+    merged.done ? "TRUE" : "FALSE",
+  ];
+
+  await sheets.spreadsheets.values.update({
+    spreadsheetId: sheetId,
+    range: `${STUDY_PLAYLIST_SHEET_NAME}!A${current.rowNumber}:G${current.rowNumber}`,
+    valueInputOption: "USER_ENTERED",
+    requestBody: { values: [values] },
+  });
+
+  return merged;
+}
+
+export async function deleteStudyPlaylist(playlistId: string): Promise<void> {
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const all = await listStudyPlaylists();
+  const current = all.find((playlist) => playlist.playlistId === playlistId);
+  if (!current) {
+    throw new Error(`${playlistId} numaralı playlist bulunamadı.`);
+  }
+
+  const numericSheetId = await getNumericSheetId(STUDY_PLAYLIST_SHEET_NAME);
+  if (numericSheetId === null) {
+    throw new Error(`"${STUDY_PLAYLIST_SHEET_NAME}" adlı sayfa bulunamadı.`);
+  }
+
+  await sheets.spreadsheets.batchUpdate({
+    spreadsheetId: sheetId,
+    requestBody: {
+      requests: [
+        {
+          deleteDimension: {
+            range: { sheetId: numericSheetId, dimension: "ROWS", startIndex: current.rowNumber - 1, endIndex: current.rowNumber },
+          },
+        },
+      ],
+    },
+  });
+}
+
+/**
+ * /calismaprogram — günlük yerine haftalık notlar. Her satır bir haftaya
+ * (o haftanın Pazartesi'si) bağlı bir not/yapılacak satırı; "günün notları"
+ * yerine "haftanın notları" olarak kullanılıyor (bkz. weekStartIso).
+ * Sütunlar: A: Not ID  B: Hafta  C: Metin  D: Tamamlandı
+ */
+const WEEKLY_NOTE_SHEET_NAME = "Haftalık Notlar";
+const WEEKLY_NOTE_HEADER_ROW = ["Not ID", "Hafta", "Metin", "Tamamlandı"] as const;
+const WEEKLY_NOTE_DATA_COLUMNS = "A:D";
+
+export interface WeeklyNoteInput {
+  weekStart: string; // yyyy-mm-dd, o haftanın Pazartesi'si
+  text: string;
+  done: boolean;
+}
+
+export interface WeeklyNote extends WeeklyNoteInput {
+  rowNumber: number;
+  noteId: string;
+}
+
+async function ensureWeeklyNoteSheet(): Promise<void> {
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const existingSheetId = await getNumericSheetId(WEEKLY_NOTE_SHEET_NAME);
+  if (existingSheetId === null) {
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId: sheetId,
+      requestBody: { requests: [{ addSheet: { properties: { title: WEEKLY_NOTE_SHEET_NAME } } }] },
+    });
+  }
+
+  const { data } = await sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range: `${WEEKLY_NOTE_SHEET_NAME}!A1:D1`,
+  });
+  const currentHeaders = data.values?.[0] ?? [];
+  const needsUpdate = WEEKLY_NOTE_HEADER_ROW.some((header, index) => currentHeaders[index] !== header);
+  if (!needsUpdate) return;
+
+  await sheets.spreadsheets.values.update({
+    spreadsheetId: sheetId,
+    range: `${WEEKLY_NOTE_SHEET_NAME}!A1:D1`,
+    valueInputOption: "USER_ENTERED",
+    requestBody: { values: [[...WEEKLY_NOTE_HEADER_ROW]] },
+  });
+}
+
+function rowToWeeklyNote(row: string[], rowNumber: number): WeeklyNote | null {
+  const noteId = row[0]?.trim();
+  if (!noteId) return null;
+
+  return {
+    rowNumber,
+    noteId,
+    weekStart: turkishDateToIso(row[1] ?? ""),
+    text: row[2] ?? "",
+    done: (row[3] ?? "").trim().toUpperCase() === "TRUE",
+  };
+}
+
+export async function listWeeklyNotes(): Promise<WeeklyNote[]> {
+  await ensureWeeklyNoteSheet();
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const { data } = await sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range: `${WEEKLY_NOTE_SHEET_NAME}!A2:${WEEKLY_NOTE_DATA_COLUMNS.split(":")[1]}`,
+  });
+
+  const rows = data.values ?? [];
+  const notes: WeeklyNote[] = [];
+  rows.forEach((row, index) => {
+    const note = rowToWeeklyNote(row as string[], index + 2);
+    if (note) notes.push(note);
+  });
+  return notes;
+}
+
+export async function createWeeklyNote(input: WeeklyNoteInput): Promise<WeeklyNote> {
+  await ensureWeeklyNoteSheet();
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const existing = await listWeeklyNotes();
+  const noteId = generateShortId(new Set(existing.map((note) => note.noteId)));
+
+  const values = [
+    noteId,
+    isoToTurkishDate(input.weekStart),
+    protectFromFormula(input.text),
+    input.done ? "TRUE" : "FALSE",
+  ];
+
+  await sheets.spreadsheets.values.append({
+    spreadsheetId: sheetId,
+    range: `${WEEKLY_NOTE_SHEET_NAME}!${WEEKLY_NOTE_DATA_COLUMNS}`,
+    valueInputOption: "USER_ENTERED",
+    insertDataOption: "INSERT_ROWS",
+    requestBody: { values: [values] },
+  });
+
+  return { rowNumber: -1, noteId, ...input };
+}
+
+export async function updateWeeklyNote(noteId: string, patch: Partial<WeeklyNoteInput>): Promise<WeeklyNote> {
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const all = await listWeeklyNotes();
+  const current = all.find((note) => note.noteId === noteId);
+  if (!current) {
+    throw new Error(`${noteId} numaralı not bulunamadı.`);
+  }
+
+  const merged: WeeklyNote = { ...current, ...patch };
+  const values = [
+    merged.noteId,
+    isoToTurkishDate(merged.weekStart),
+    protectFromFormula(merged.text),
+    merged.done ? "TRUE" : "FALSE",
+  ];
+
+  await sheets.spreadsheets.values.update({
+    spreadsheetId: sheetId,
+    range: `${WEEKLY_NOTE_SHEET_NAME}!A${current.rowNumber}:D${current.rowNumber}`,
+    valueInputOption: "USER_ENTERED",
+    requestBody: { values: [values] },
+  });
+
+  return merged;
+}
+
+export async function deleteWeeklyNote(noteId: string): Promise<void> {
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const all = await listWeeklyNotes();
+  const current = all.find((note) => note.noteId === noteId);
+  if (!current) {
+    throw new Error(`${noteId} numaralı not bulunamadı.`);
+  }
+
+  const numericSheetId = await getNumericSheetId(WEEKLY_NOTE_SHEET_NAME);
+  if (numericSheetId === null) {
+    throw new Error(`"${WEEKLY_NOTE_SHEET_NAME}" adlı sayfa bulunamadı.`);
+  }
+
+  await sheets.spreadsheets.batchUpdate({
+    spreadsheetId: sheetId,
+    requestBody: {
+      requests: [
+        {
+          deleteDimension: {
+            range: { sheetId: numericSheetId, dimension: "ROWS", startIndex: current.rowNumber - 1, endIndex: current.rowNumber },
+          },
+        },
+      ],
+    },
+  });
+}

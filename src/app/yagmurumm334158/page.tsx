@@ -206,7 +206,7 @@ const blocks: Block[] = [
     kicker: "01 — İlk Bakış",
     line: "Gözlerin ilk kez değdiğinde kalbime, zaman orada durdu sandım.",
     sub: "İlk görüştüğümüz yer, artık kalbimde ayrı bir yer tutuyor.",
-    mapQuery: undefined, // örn. "Kadıköy, İstanbul" ya da "40.99,29.02"
+    mapQuery: "41.0003197,29.0301973", // Ayrılık Çeşmesi (Marmaray) — ilk görüştüğümüz yer
     tint: "#ff3d81",
   },
   {
