@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion } from "motion/react";
-import { ChevronDown, ImageIcon, MapPin, Quote } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
+import { ChevronDown, Eye, Heart, ImageIcon, MapPin, Quote } from "lucide-react";
 
 // 14 Ekim 2025 — sevgili olma tarihi.
 const ANNIVERSARY = new Date(2025, 9, 14, 0, 0, 0);
@@ -177,6 +177,8 @@ type PhotoBlock = {
   line: string;
   sub: string;
   image: string | undefined;
+  video?: string;
+  landscape?: boolean; // yatay medya: 16:10 çerçeve, dikey: 4:5
   alt: string;
   tint: string;
 };
@@ -215,13 +217,13 @@ const blocks: Block[] = [
     kicker: "02 — Gülüşün",
     line: "Gülüşün, en karanlık günümü bile aydınlatmaya yetiyor.",
     sub: "Sen gülünce, dünya biraz daha güzelleşiyor.",
-    image: undefined, // public/yagmurumm334158/foto-2.jpg
+    image: "/yagmurumm334158/foto-2.jpg",
     alt: "Gülüşün",
     tint: "#ff5e9c",
   },
   {
     type: "quote",
-    text: undefined,
+    text: "Yağmur yağarken bile içim açık, çünkü bir Yağmurum var.",
     tint: "#ff77b0",
   },
   {
@@ -230,7 +232,8 @@ const blocks: Block[] = [
     kicker: "03 — Elin",
     line: "Elini tuttuğumda, her şeyin yolunda olacağını biliyorum.",
     sub: "Senin elin, benim en güvenli limanım.",
-    image: undefined, // public/yagmurumm334158/foto-3.jpg
+    image: "/yagmurumm334158/foto-3.jpg",
+    landscape: true,
     alt: "Elini tuttuğumuz an",
     tint: "#ff8fc0",
   },
@@ -240,13 +243,15 @@ const blocks: Block[] = [
     kicker: "04 — Sesin",
     line: "Sesini duymak, en yorgun günümde bile beni dinlendiriyor.",
     sub: "Seninle konuşmak, en sevdiğim alışkanlığım.",
-    image: undefined, // public/yagmurumm334158/foto-4.jpg
+    image: undefined,
+    video: "/yagmurumm334158/video-4.mp4", // döngülü, sessiz oynar
+    landscape: true,
     alt: "Birlikte sohbet",
     tint: "#ffa5cd",
   },
   {
     type: "quote",
-    text: undefined,
+    text: "Ev dediğin bir yer değilmiş, bir insanmış. Benimki sensin.",
     tint: "#ffb0d4",
   },
   {
@@ -255,7 +260,7 @@ const blocks: Block[] = [
     kicker: "05 — Yanımdasın",
     line: "Yanımda olduğun her an, kendimi eksiksiz hissediyorum.",
     sub: "Sen, tamamlayan parçamsın.",
-    image: undefined, // public/yagmurumm334158/foto-5.jpg
+    image: "/yagmurumm334158/foto-5.jpg",
     alt: "Yan yana",
     tint: "#ffbcdb",
   },
@@ -265,7 +270,8 @@ const blocks: Block[] = [
     kicker: "06 — Sonsuza Kadar",
     line: "Seninle geçirdiğim her gün, sonsuza kadar sürsün istiyorum.",
     sub: "Çünkü sen, benim en güzel hikayemsin.",
-    image: undefined, // public/yagmurumm334158/foto-6.jpg
+    image: "/yagmurumm334158/foto-6.jpg",
+    landscape: true,
     alt: "Sonsuza kadar",
     tint: "#ffc8e2",
   },
@@ -301,7 +307,31 @@ const fadeUp = {
 // kartlarıyla aynı dil (kağıt zemin, kalın mercan kenarlık, sert gölge).
 const paperFrame = "border-[3px] border-[#d97b73] bg-[#fdf4ef] shadow-[0_10px_0_-4px_rgba(185,85,77,0.25)]";
 
-function PhotoFrame({ image, alt, className }: { image: string | undefined; alt: string; className: string }) {
+function PhotoFrame({
+  image,
+  video,
+  alt,
+  className,
+}: {
+  image: string | undefined;
+  video?: string;
+  alt: string;
+  className: string;
+}) {
+  if (video) {
+    return (
+      <video
+        src={video}
+        aria-label={alt}
+        className={`${className} ${paperFrame} object-cover p-2`}
+        autoPlay
+        loop
+        muted
+        playsInline
+        preload="metadata"
+      />
+    );
+  }
   if (image) {
     return (
       // eslint-disable-next-line @next/next/no-img-element
@@ -352,33 +382,339 @@ function MapFrame({ mapQuery, className }: { mapQuery: string | undefined; class
 // sitenin geri kalanıyla hiç çakışmaz.
 const INTRO_DONE_MESSAGE = "yagmurumm-proposal-intro:done";
 
+type Phase = "intro" | "puzzle" | "story";
+
 function useProposalIntro() {
-  const [showIntro, setShowIntro] = useState(true);
+  const [phase, setPhase] = useState<Phase>("intro");
 
   useEffect(() => {
     function handleMessage(event: MessageEvent) {
       if (event.origin !== window.location.origin) return;
-      if (event.data === INTRO_DONE_MESSAGE) setShowIntro(false);
+      if (event.data === INTRO_DONE_MESSAGE) setPhase((p) => (p === "intro" ? "puzzle" : p));
     }
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
   }, []);
 
-  return { showIntro };
+  return { phase, startStory: () => setPhase("story") };
+}
+
+// Açılıştan sonraki kilit: fotoğrafı yerine oturtmadan hikayeye geçilmez.
+// Parçaya dokun → başka parçaya dokun = yer değiştir (telefonda en rahatı);
+// sürükleyip bırakmak da aynı işi görür. Doğru yerdeki parça kilitlenir.
+const PUZZLE_IMAGE = "/yagmurumm334158/puzzle.jpg";
+const PUZZLE_COLS = 4;
+const PUZZLE_ROWS = 4;
+const PUZZLE_RATIO = 1435 / 1127; // kırpılmış fotoğrafın en/boy oranı
+
+function shuffledOrder(): number[] {
+  const n = PUZZLE_COLS * PUZZLE_ROWS;
+  let order: number[];
+  do {
+    order = Array.from({ length: n }, (_, i) => i);
+    for (let i = n - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [order[i], order[j]] = [order[j]!, order[i]!];
+    }
+    // Hiç parçası yerinde olmayan bir karışım: baştan "neredeyse çözülmüş" görünmesin.
+  } while (order.some((piece, pos) => piece === pos));
+  return order;
+}
+
+function PuzzleGate({ onDone }: { onDone: () => void }) {
+  // order[konum] = o konumda duran parçanın numarası; çözülünce order[i] === i.
+  const [order, setOrder] = useState<number[]>(shuffledOrder);
+  const [selected, setSelected] = useState<number | null>(null);
+  const [hint, setHint] = useState(false);
+  const [moves, setMoves] = useState(0);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const dragFrom = useRef<number | null>(null);
+
+  const solved = order.every((piece, pos) => piece === pos);
+
+  useEffect(() => {
+    if (solved) fireConfetti(canvasRef.current);
+  }, [solved]);
+
+  function swap(a: number, b: number) {
+    if (a === b || order[a] === a || order[b] === b) return;
+    setOrder((prev) => {
+      const next = [...prev];
+      [next[a], next[b]] = [next[b]!, next[a]!];
+      return next;
+    });
+    setMoves((m) => m + 1);
+  }
+
+  function handlePointerDown(pos: number) {
+    if (solved || order[pos] === pos) return;
+    dragFrom.current = pos;
+  }
+
+  function handlePointerUp(e: React.PointerEvent) {
+    const from = dragFrom.current;
+    dragFrom.current = null;
+    if (from === null || solved) return;
+    const el = document.elementFromPoint(e.clientX, e.clientY)?.closest<HTMLElement>("[data-pos]");
+    const to = el ? Number(el.dataset.pos) : from;
+    if (to !== from) {
+      // sürükle-bırak
+      swap(from, to);
+      setSelected(null);
+    } else if (selected === null) {
+      setSelected(from);
+    } else {
+      // dokun-dokun
+      swap(selected, from);
+      setSelected(null);
+    }
+  }
+
+  function showHint() {
+    setHint(true);
+    window.setTimeout(() => setHint(false), 2000);
+  }
+
+  const placed = order.filter((piece, pos) => piece === pos).length;
+  const total = PUZZLE_COLS * PUZZLE_ROWS;
+
+  return (
+    <div
+      className="fixed inset-0 flex flex-col items-center justify-center gap-5 overflow-hidden bg-[#f7efe3] px-4 text-center"
+      style={{ fontFamily: FONT_BODY, color: INK }}
+    >
+      <canvas ref={canvasRef} className="pointer-events-none fixed inset-0 z-50" aria-hidden="true" />
+      <div className="pointer-events-none absolute left-[8%] top-[10%] h-80 w-80 rounded-full bg-[#ffc1d4]/70 blur-[100px]" />
+      <div className="pointer-events-none absolute bottom-[8%] right-[6%] h-80 w-80 rounded-full bg-[#ffe1c4]/70 blur-[110px]" />
+
+      <p className="relative uppercase tracking-[0.3em]" style={{ fontFamily: FONT_PIX, color: INK_SOFT, fontSize: 10 }}>
+        küçük bir sınav
+      </p>
+      <h1 className="relative max-w-md text-[clamp(1.4rem,4.5vw,2rem)] font-semibold leading-snug" style={{ color: INK }}>
+        {solved ? "Bulduk! 💗" : "Bu fotoğrafı yerine oturt, sonra devam edebilirsin"}
+      </h1>
+
+      <div
+        className={`relative touch-none select-none ${paperFrame} p-2`}
+        style={{
+          width: `min(92vw, 640px, calc((100dvh - 260px) * ${PUZZLE_RATIO}))`,
+          aspectRatio: String(PUZZLE_RATIO),
+        }}
+      >
+        <div
+          className="grid h-full w-full"
+          style={{
+            gridTemplateColumns: `repeat(${PUZZLE_COLS}, 1fr)`,
+            gridTemplateRows: `repeat(${PUZZLE_ROWS}, 1fr)`,
+            gap: solved ? 0 : 2,
+          }}
+        >
+          {order.map((piece, pos) => {
+            const col = piece % PUZZLE_COLS;
+            const row = Math.floor(piece / PUZZLE_COLS);
+            const locked = piece === pos;
+            return (
+              <div
+                key={pos}
+                data-pos={pos}
+                onPointerDown={() => handlePointerDown(pos)}
+                onPointerUp={handlePointerUp}
+                className={`transition-[outline-color,filter] duration-150 ${locked ? "cursor-default" : "cursor-pointer"}`}
+                style={{
+                  backgroundImage: `url(${PUZZLE_IMAGE})`,
+                  backgroundSize: `${PUZZLE_COLS * 100}% ${PUZZLE_ROWS * 100}%`,
+                  backgroundPosition: `${(col / (PUZZLE_COLS - 1)) * 100}% ${(row / (PUZZLE_ROWS - 1)) * 100}%`,
+                  outline: selected === pos ? `3px solid ${RED_DK}` : "3px solid transparent",
+                  outlineOffset: -3,
+                  filter: locked && !solved ? "brightness(1.04) saturate(1.05)" : undefined,
+                  zIndex: selected === pos ? 1 : 0,
+                }}
+              />
+            );
+          })}
+        </div>
+
+        {hint && (
+          <div
+            className="pointer-events-none absolute inset-2"
+            style={{ backgroundImage: `url(${PUZZLE_IMAGE})`, backgroundSize: "100% 100%" }}
+          />
+        )}
+      </div>
+
+      <div className="relative flex min-h-[52px] items-center gap-4">
+        {solved ? (
+          <button
+            type="button"
+            onClick={onDone}
+            className="inline-flex items-center gap-2 rounded-md border-[3px] px-9 py-3.5 uppercase tracking-[0.2em] transition-colors duration-150 hover:bg-[#e23b4e] hover:text-white"
+            style={{ fontFamily: FONT_PIX, fontSize: 12, borderColor: CORAL, background: PAPER, color: INK_SOFT, boxShadow: `0 4px 0 0 ${CORAL}` }}
+          >
+            Devam Et
+            <ChevronDown className="h-4 w-4" />
+          </button>
+        ) : (
+          <>
+            <span className="text-sm" style={{ color: INK_SOFT }}>
+              {placed}/{total} yerinde · {moves} hamle
+            </span>
+            <button
+              type="button"
+              onClick={showHint}
+              className="inline-flex items-center gap-2 rounded-md border-[3px] px-4 py-2 text-sm transition-colors duration-150 hover:bg-[#fff1ea]"
+              style={{ borderColor: CORAL, background: PAPER, color: INK_SOFT }}
+            >
+              <Eye className="h-4 w-4" />
+              İpucu
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// Kapanıştaki mektup: zarfa dokununca kapak açılır, ardından not ekrana gelir.
+// Notu değiştirmek için sadece LETTER_TEXT'i düzenle (boş satır = yeni paragraf).
+const LETTER_TEXT = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
+Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+
+Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+
+Seni seviyorum.`;
+const LETTER_SIGNATURE = "— Senin";
+
+function LoveLetter() {
+  const [open, setOpen] = useState(false);
+  const [showLetter, setShowLetter] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+    const id = window.setTimeout(() => setShowLetter(true), 700);
+    return () => window.clearTimeout(id);
+  }, [open]);
+
+  useEffect(() => {
+    if (!showLetter) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") closeLetter();
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [showLetter]);
+
+  function closeLetter() {
+    setShowLetter(false);
+    setOpen(false);
+  }
+
+  return (
+    <>
+      <motion.button
+        {...fadeUp}
+        transition={{ ...fadeUp.transition, delay: 0.3 }}
+        type="button"
+        onClick={() => !open && setOpen(true)}
+        aria-label="Mektubu aç"
+        className="group relative mt-6 block h-[150px] w-[230px] cursor-pointer [perspective:700px]"
+      >
+        <span className="absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs" style={{ fontFamily: FONT_PIX, color: INK_SOFT, fontSize: 10 }}>
+          {open ? "" : "sana bir mektubum var"}
+        </span>
+        {/* gövde */}
+        <span className={`absolute inset-0 overflow-hidden rounded-md ${paperFrame} transition-transform duration-150 group-hover:-translate-y-1`}>
+          <span className="absolute inset-0 bg-[#f6e3da] [clip-path:polygon(0_0,50%_58%,0_100%)]" />
+          <span className="absolute inset-0 bg-[#f6e3da] [clip-path:polygon(100%_0,50%_58%,100%_100%)]" />
+          <span className="absolute inset-0 bg-[#efd2c7] [clip-path:polygon(0_100%,50%_48%,100%_100%)]" />
+        </span>
+        {/* kapak */}
+        <motion.span
+          animate={{ rotateX: open ? 180 : 0 }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="absolute inset-x-0 top-0 h-[62%] [transform-origin:top] [transform-style:preserve-3d]"
+          style={{ zIndex: open ? 0 : 2 }}
+        >
+          <span
+            className="absolute inset-0 [clip-path:polygon(0_0,100%_0,50%_100%)]"
+            style={{ background: "#e9b8ab", backfaceVisibility: "hidden" }}
+          />
+        </motion.span>
+        {/* mühür */}
+        {!open && (
+          <span
+            className="absolute left-1/2 top-[52%] z-[3] flex h-9 w-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-[3px]"
+            style={{ borderColor: RED_DK, background: "#e23b4e" }}
+          >
+            <Heart className="h-4 w-4 fill-white text-white" />
+          </span>
+        )}
+      </motion.button>
+
+      <AnimatePresence>
+        {showLetter && (
+          <motion.div
+            key="letter"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[60] flex items-center justify-center bg-[#3a1018]/45 px-4"
+            onClick={closeLetter}
+          >
+            <motion.div
+              initial={{ y: 60, scale: 0.92, opacity: 0 }}
+              animate={{ y: 0, scale: 1, opacity: 1 }}
+              exit={{ y: 30, scale: 0.96, opacity: 0 }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+              onClick={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-label="Mektup"
+              className={`relative max-h-[82dvh] w-full max-w-md overflow-y-auto rounded-md px-7 pb-8 pt-9 text-left ${paperFrame}`}
+              style={{
+                fontFamily: FONT_BODY,
+                color: INK,
+                backgroundImage: "repeating-linear-gradient(transparent 0 31px, rgba(217,123,115,0.22) 31px 32px)",
+                backgroundPositionY: 20,
+              }}
+            >
+              <p className="text-[clamp(1.05rem,3.4vw,1.25rem)] leading-[32px]" style={{ whiteSpace: "pre-line" }}>
+                {LETTER_TEXT}
+              </p>
+              <p className="mt-2 text-right text-lg font-semibold leading-[32px]" style={{ color: RED_DK }}>
+                {LETTER_SIGNATURE}
+              </p>
+              <div className="mt-4 flex justify-center">
+                <button
+                  type="button"
+                  onClick={closeLetter}
+                  className="rounded-md border-[3px] px-6 py-2 text-xs uppercase tracking-[0.2em] transition-colors duration-150 hover:bg-[#e23b4e] hover:text-white"
+                  style={{ fontFamily: FONT_PIX, borderColor: CORAL, background: PAPER, color: INK_SOFT, boxShadow: `0 3px 0 0 ${CORAL}` }}
+                >
+                  Kapat
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  );
 }
 
 export default function Yagmurumm2Page() {
   const elapsed = useElapsedSince(ANNIVERSARY);
   const scrollRef = useRef<HTMLDivElement>(null);
   const confettiCanvasRef = useRef<HTMLCanvasElement>(null);
-  const { showIntro } = useProposalIntro();
+  const { phase, startStory } = useProposalIntro();
 
   function handleContinue() {
     fireConfetti(confettiCanvasRef.current);
     scrollRef.current?.scrollBy({ top: scrollRef.current.clientHeight, behavior: "smooth" });
   }
 
-  if (showIntro) {
+  if (phase === "puzzle") return <PuzzleGate onDone={startStory} />;
+
+  if (phase === "intro") {
     return (
       <iframe
         src="/yagmurumm334158/intro/index.html"
@@ -575,18 +911,19 @@ export default function Yagmurumm2Page() {
 
               <motion.div
                 {...fadeUp}
-                className={`relative shrink-0 ${isTop ? "w-full max-w-xl" : "w-full max-w-md sm:w-[48%]"}`}
+                className={`relative shrink-0 ${isTop ? (block.type === "photo" && block.landscape ? "w-full max-w-xl" : "w-full max-w-xs sm:max-w-sm") : "w-full max-w-md sm:w-[48%]"}`}
               >
                 {block.type === "map" ? (
                   <MapFrame
                     mapQuery={block.mapQuery}
-                    className={`w-full rounded-2xl ${isTop ? "aspect-[16/10]" : "aspect-[4/5]"}`}
+                    className={`w-full rounded-2xl aspect-[4/5]`}
                   />
                 ) : (
                   <PhotoFrame
                     image={block.image}
+                    video={block.video}
                     alt={block.alt}
-                    className={`w-full rounded-2xl ${isTop ? "aspect-[16/10]" : "aspect-[4/5]"}`}
+                    className={`w-full rounded-2xl ${block.landscape ? "aspect-[16/10]" : "aspect-[4/5]"}`}
                   />
                 )}
               </motion.div>
@@ -625,9 +962,10 @@ export default function Yagmurumm2Page() {
           <motion.p {...fadeUp} transition={{ ...fadeUp.transition, delay: 0.15 }} className="text-lg" style={{ color: INK_SOFT }}>
             Ve bu hikaye daha yeni başlıyor.
           </motion.p>
+          <LoveLetter />
           <motion.a
             {...fadeUp}
-            transition={{ ...fadeUp.transition, delay: 0.3 }}
+            transition={{ ...fadeUp.transition, delay: 0.4 }}
             href="/yagmurumm33334141"
             className="mt-6 text-sm font-medium underline underline-offset-4"
             style={{ color: INK_SOFT }}
@@ -656,3 +994,6 @@ export default function Yagmurumm2Page() {
     </div>
   );
 }
+
+
+
