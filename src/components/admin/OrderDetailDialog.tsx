@@ -106,6 +106,7 @@ export function OrderDetailDialog({ order: initialOrder, onClose, onEdit, onOrde
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
               <InfoField label="Telefon" value={order.phone} />
               <InfoField label="E-posta" value={order.email} />
+              <InfoField label="İşletme adı" value={order.businessName} />
               <InfoField label="Hizmet türü" value={order.serviceType} />
               <InfoField label="Başlama tarihi" value={formatDateDisplay(order.startDate)} />
               <div>

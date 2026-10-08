@@ -11,6 +11,7 @@ export interface Customer {
   lastName: string;
   phone: string;
   email: string;
+  businessName: string;
   orders: Order[];
 }
 
@@ -36,6 +37,7 @@ export function groupOrdersByCustomer(orders: Order[]): Customer[] {
       // telefon/e-posta girmişse ve elimizdeki boşsa güncelle.
       if (!existing.phone && order.phone) existing.phone = order.phone;
       if (!existing.email && order.email) existing.email = order.email;
+      if (!existing.businessName && order.businessName) existing.businessName = order.businessName;
     } else {
       map.set(key, {
         key,
@@ -43,6 +45,7 @@ export function groupOrdersByCustomer(orders: Order[]): Customer[] {
         lastName: order.lastName,
         phone: order.phone,
         email: order.email,
+        businessName: order.businessName,
         orders: [order],
       });
     }

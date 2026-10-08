@@ -23,6 +23,7 @@ const EMPTY_FORM: OrderInput = {
   paidInstallments: "",
   status: "Aktif",
   note: "",
+  businessName: "",
 };
 
 interface OrderFormDialogProps {
@@ -127,6 +128,14 @@ export function OrderFormDialog({ order, onClose, onSubmit }: OrderFormDialogPro
               />
             </div>
           </div>
+
+          <Input
+            label="İşletme adı (opsiyonel)"
+            name="businessName"
+            placeholder="Örn. RAFF Coffee"
+            value={values.businessName}
+            onChange={(event) => update("businessName", event.target.value)}
+          />
 
           <div className="grid grid-cols-2 gap-4">
             <Input

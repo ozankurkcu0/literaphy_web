@@ -17,6 +17,7 @@ const orderPatchSchema = z.object({
   paidInstallments: z.string().optional(),
   status: z.enum(STATUSES).optional(),
   note: z.string().optional(),
+  businessName: z.string().optional(),
 });
 
 const NOT_CONFIGURED_MESSAGE =

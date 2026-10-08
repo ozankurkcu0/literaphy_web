@@ -17,6 +17,7 @@ const orderInputSchema = z.object({
   paidInstallments: z.string().optional().default(""),
   status: z.enum(STATUSES).optional().default("Aktif"),
   note: z.string().optional().default(""),
+  businessName: z.string().optional().default(""),
 });
 
 const NOT_CONFIGURED_MESSAGE =
