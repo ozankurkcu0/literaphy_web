@@ -264,10 +264,44 @@ const blocks: Block[] = [
     alt: "Yan yana",
     tint: "#ffbcdb",
   },
+  // Yeni fotoğraf yerleri (06–08): yollar hazır. Sadece public/yagmurumm334158/
+  // altına foto-7.jpg / foto-8.jpg / foto-9.jpg koy — dosya yokken yer tutucu çıkar.
+  // kicker/line/sub metinlerini istediğin gibi düzenle.
+  {
+    type: "photo",
+    layout: "left",
+    kicker: "06 — Birlikte",
+    line: "Seninle her yer, en güzel yer oluyor.",
+    sub: "Birlikte geçen her an, saklamak istediğim bir kare.",
+    image: "/yagmurumm334158/foto-7.jpg",
+    alt: "Birlikte bir an",
+    tint: "#ffc0dc",
+  },
   {
     type: "photo",
     layout: "top",
-    kicker: "06 — Sonsuza Kadar",
+    kicker: "07 — Anılarımız",
+    line: "Her anımızı yeniden yaşamak isterim.",
+    sub: "Küçük anlar, en büyük hazinelerim.",
+    image: "/yagmurumm334158/foto-8.jpg",
+    landscape: true,
+    alt: "Anılarımızdan bir kare",
+    tint: "#ffc4de",
+  },
+  {
+    type: "photo",
+    layout: "right",
+    kicker: "08 — Biz",
+    line: "Sen ve ben, en güzel cümleyiz.",
+    sub: "Daha yazacak çok sayfamız var.",
+    image: "/yagmurumm334158/foto-9.jpg",
+    alt: "Biz",
+    tint: "#ffc6e0",
+  },
+  {
+    type: "photo",
+    layout: "top",
+    kicker: "09 — Sonsuza Kadar",
     line: "Seninle geçirdiğim her gün, sonsuza kadar sürsün istiyorum.",
     sub: "Çünkü sen, benim en güzel hikayemsin.",
     image: "/yagmurumm334158/foto-6.jpg",
@@ -318,6 +352,8 @@ function PhotoFrame({
   alt: string;
   className: string;
 }) {
+  // Dosya henüz yüklenmediyse kırık resim yerine yer tutucu göster.
+  const [failed, setFailed] = useState(false);
   if (video) {
     return (
       <video
@@ -332,12 +368,15 @@ function PhotoFrame({
       />
     );
   }
-  if (image) {
+  if (image && !failed) {
     return (
       // eslint-disable-next-line @next/next/no-img-element
       <img
+        onError={() => setFailed(true)}
         src={image}
         alt={alt}
+        loading="lazy"
+        decoding="async"
         className={`${className} ${paperFrame} object-cover p-2`}
       />
     );
@@ -484,8 +523,8 @@ function PuzzleGate({ onDone }: { onDone: () => void }) {
       style={{ fontFamily: FONT_BODY, color: INK }}
     >
       <canvas ref={canvasRef} className="pointer-events-none fixed inset-0 z-50" aria-hidden="true" />
-      <div className="pointer-events-none absolute left-[8%] top-[10%] h-80 w-80 rounded-full bg-[#ffc1d4]/70 blur-[100px]" />
-      <div className="pointer-events-none absolute bottom-[8%] right-[6%] h-80 w-80 rounded-full bg-[#ffe1c4]/70 blur-[110px]" />
+      <div className="pointer-events-none absolute left-[8%] top-[10%] h-[28rem] w-[28rem] rounded-full" style={{ background: "radial-gradient(closest-side, rgba(255,193,212,.75), transparent)" }} />
+      <div className="pointer-events-none absolute bottom-[8%] right-[6%] h-[28rem] w-[28rem] rounded-full" style={{ background: "radial-gradient(closest-side, rgba(255,225,196,.75), transparent)" }} />
 
       <p className="relative uppercase tracking-[0.3em]" style={{ fontFamily: FONT_PIX, color: INK_SOFT, fontSize: 10 }}>
         küçük bir sınav
@@ -575,15 +614,97 @@ function PuzzleGate({ onDone }: { onDone: () => void }) {
 }
 
 // Kapanıştaki mektup: zarfa dokununca kapak açılır, ardından not ekrana gelir.
-// Notu değiştirmek için sadece LETTER_TEXT'i düzenle (boş satır = yeni paragraf).
-const LETTER_TEXT = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+// Notu değiştirmek için LETTER_BEFORE / LETTER_POEM / LETTER_AFTER'ı düzenle (boş satır = yeni paragraf).
+const LETTER_BEFORE = `Balım, ellerimle yazıyor olduğum mektubuma başlamadan önce seni çok sevdiğimi söylemek istiyorum. Bu gün günlerden 14 Ekim 2026; sayın çok sevdiğim Birtanem'in, hayatımın, aşkımın doğduğu gün. Ayrıca kimilerine göre yıl dönümümüz (🤨), kimilerine göre de sadece doğum günün...
 
-Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Ancak önemli olan devam etmektir, iyi ki beraberiz minnoşum 😘 seni çoookkk seviyorum.
 
-Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+Araya giren o saçma sapan 5 aylık boşluk, bana sadece sensiz buraların ne kadar tatsız tuzsuz olduğunu gösterdi maalesef 🥲. Şimdi o sayfaları tamamen kapattık; önümüzde çooookkkkk daha güzel, çok daha bizlikk bi sayfa var. Bu siteyi yaparken o fotoğraflarımıza, mutlu anlarımıza falan baktım da... Cidden ne kadarr güzel gülmüşüz beraber. O gülüşüne ayrı, sana ayrı hastayım biliyorsun bebişimmm 😍. Bundan sonra o güzel yüzünü çok daha fazla güldürücem, söz veriyorum ki seni hep seveceğim. İyi ki doğdun, iyi ki yeniden hayatımdasın Yağmur'um, benim güzeller güzeli sevgilim.
 
-Seni seviyorum.`;
-const LETTER_SIGNATURE = "— Senin";
+İyi ki doğdun Sevgilimmm 💗, iyi ki varsın.
+
+İki mısra yazdım sana bi de;`;
+// Şiir ayrı parça: italik ve ortalı gösterilir, iki mısra alt alta durur.
+const LETTER_POEM = `Güller açıp sana baksa gül kendini gül mü görür?
+Senin o kara gözlerin varken benim gönlüm başka neyi görür?`;
+const LETTER_AFTER = `Hadi şimdi şu ekrana bakmayı bırak da bana dön, seni ne kadar çoookkk sevdiğimi bi de o güzel gözlerine bakarak söyleyeyim...
+
+Seni seviyorum 💗`;
+// Daktilo tek metin üzerinden sayar; parçalar araya satır sonu eklenmeden birleşir.
+const LETTER_TEXT = LETTER_BEFORE + LETTER_POEM + LETTER_AFTER;
+const LETTER_SIGNATURE = "— Seni çok seven Sevgilin, Ozan💗";
+
+// Mektup metnini daktilo gibi yazar. Yazılmamış kısım görünmez ama yerini
+// tuttuğu için kağıt boyutu/satır kırılımları baştan sabit kalır (zıplama yok).
+// Sayıyı bu bileşen tuttuğu için her harfte sadece metin yeniden render olur.
+// Kağıda dokunmak yazıyı atlatır; "azaltılmış hareket" tercihinde direkt tam metin.
+function TypedLetter() {
+  const [count, setCount] = useState(0);
+  const caretRef = useRef<HTMLSpanElement>(null);
+  const total = LETTER_TEXT.length;
+  const done = count >= total;
+
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setCount(total);
+      return;
+    }
+    let i = 0;
+    let id: number;
+    const tick = () => {
+      i++;
+      setCount(i);
+      if (i >= total) return;
+      const prev = LETTER_TEXT[i - 1];
+      // Noktalama ve satır sonunda kısa nefes payı.
+      const delay = prev === "\n" ? 380 : ".!?…".includes(prev ?? "") ? 260 : prev === "," ? 120 : 34;
+      id = window.setTimeout(tick, delay);
+    };
+    id = window.setTimeout(tick, 400);
+    return () => window.clearTimeout(id);
+  }, [total]);
+
+  // Yazı kağıdın altına inince kaydırma imleci takip etsin.
+  useEffect(() => {
+    if (count % 12 === 0 || done) caretRef.current?.scrollIntoView({ block: "nearest" });
+  }, [count, done]);
+
+  return (
+    <div onClick={() => setCount(total)}>
+      <p className="sr-only">{[LETTER_BEFORE, LETTER_POEM, LETTER_AFTER].join("\n\n")}</p>
+      <div
+        aria-hidden="true"
+        className="text-[clamp(1.05rem,3.4vw,1.25rem)] leading-[32px]"
+        style={{ whiteSpace: "pre-line" }}
+      >
+        {[
+          { text: LETTER_BEFORE, className: "" },
+          { text: LETTER_POEM, className: "my-3 text-center italic" },
+          { text: LETTER_AFTER, className: "" },
+        ].map((part, idx, parts) => {
+          const start = parts.slice(0, idx).reduce((n, p) => n + p.text.length, 0);
+          const shown = Math.max(0, Math.min(part.text.length, count - start));
+          const isCaretHere = count < total && count >= start && (count < start + part.text.length || idx === parts.length - 1);
+          return (
+            <div key={idx} className={part.className}>
+              {part.text.slice(0, shown)}
+              {isCaretHere && (
+                <span ref={caretRef} className="inline-block w-[2px] bg-current align-middle" style={{ height: "1.1em" }} />
+              )}
+              <span className="opacity-0">{part.text.slice(shown)}</span>
+            </div>
+          );
+        })}
+      </div>
+      <p
+        className="mt-2 text-right text-lg font-semibold leading-[32px] transition-opacity duration-700"
+        style={{ color: RED_DK, opacity: done ? 1 : 0 }}
+      >
+        {LETTER_SIGNATURE}
+      </p>
+    </div>
+  );
+}
 
 function LoveLetter() {
   const [open, setOpen] = useState(false);
@@ -677,12 +798,7 @@ function LoveLetter() {
                 backgroundPositionY: 20,
               }}
             >
-              <p className="text-[clamp(1.05rem,3.4vw,1.25rem)] leading-[32px]" style={{ whiteSpace: "pre-line" }}>
-                {LETTER_TEXT}
-              </p>
-              <p className="mt-2 text-right text-lg font-semibold leading-[32px]" style={{ color: RED_DK }}>
-                {LETTER_SIGNATURE}
-              </p>
+              <TypedLetter />
               <div className="mt-4 flex justify-center">
                 <button
                   type="button"
@@ -701,8 +817,39 @@ function LoveLetter() {
   );
 }
 
-export default function Yagmurumm2Page() {
+// Saniyelik sayaç kendi bileşeninde: her saniye yalnızca bu küçük kutular
+// yeniden render olur, tüm sayfa (bölümler, kalpler, arka plan) değil.
+function AnniversaryCounter() {
   const elapsed = useElapsedSince(ANNIVERSARY);
+  return (
+    <motion.div
+      {...fadeUp}
+      transition={{ ...fadeUp.transition, delay: 0.2 }}
+      className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4"
+    >
+      {[
+        { label: "gün", value: elapsed?.days },
+        { label: "saat", value: elapsed?.hours },
+        { label: "dakika", value: elapsed?.minutes },
+        { label: "saniye", value: elapsed?.seconds },
+      ].map((stat) => (
+        <div
+          key={stat.label}
+          className={`flex w-24 flex-col items-center gap-1 rounded-xl px-4 py-5 sm:w-28 ${paperFrame}`}
+        >
+          <span className="text-3xl font-bold tabular-nums sm:text-4xl" style={{ color: RED_DK }}>
+            {stat.value ?? "–"}
+          </span>
+          <span className="text-[10px] uppercase tracking-widest" style={{ fontFamily: FONT_PIX, color: INK_SOFT }}>
+            {stat.label}
+          </span>
+        </div>
+      ))}
+    </motion.div>
+  );
+}
+
+export default function Yagmurumm2Page() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const confettiCanvasRef = useRef<HTMLCanvasElement>(null);
   const { phase, startStory } = useProposalIntro();
@@ -733,9 +880,9 @@ export default function Yagmurumm2Page() {
       {/* Açılış ekranıyla aynı krem zemin + mercan/pembe aurora lekeleri — sabit
           kalır, kaydırma bunu etkilemez, üstündeki bölümler yarı saydam. */}
       <div className="fixed inset-0 -z-10 overflow-hidden bg-[#f7efe3]">
-        <div className="absolute left-[10%] top-[15%] h-96 w-96 rounded-full bg-[#ffc1d4]/70 blur-[110px] [animation:yagmurumm2-blob-a_14s_ease-in-out_infinite]" />
-        <div className="absolute right-[8%] top-[55%] h-[26rem] w-[26rem] rounded-full bg-[#ffe1c4]/70 blur-[120px] [animation:yagmurumm2-blob-b_18s_ease-in-out_infinite]" />
-        <div className="absolute bottom-[5%] left-[35%] h-72 w-72 rounded-full bg-[#f0b6c6]/60 blur-[100px] [animation:yagmurumm2-blob-a_16s_ease-in-out_infinite_reverse]" />
+        <div className="absolute left-[10%] top-[15%] h-[32rem] w-[32rem] rounded-full will-change-transform [animation:yagmurumm2-blob-a_14s_ease-in-out_infinite]" style={{ background: "radial-gradient(closest-side, rgba(255,193,212,.75), transparent)" }} />
+        <div className="absolute right-[8%] top-[55%] h-[34rem] w-[34rem] rounded-full will-change-transform [animation:yagmurumm2-blob-b_18s_ease-in-out_infinite]" style={{ background: "radial-gradient(closest-side, rgba(255,225,196,.75), transparent)" }} />
+        <div className="absolute bottom-[5%] left-[35%] h-[28rem] w-[28rem] rounded-full will-change-transform [animation:yagmurumm2-blob-a_16s_ease-in-out_infinite_reverse]" style={{ background: "radial-gradient(closest-side, rgba(240,182,198,.65), transparent)" }} />
         <div
           className="absolute inset-0"
           style={{ background: "radial-gradient(125% 110% at 50% 38%, transparent 55%, rgba(120,40,50,.08) 100%)" }}
@@ -744,7 +891,7 @@ export default function Yagmurumm2Page() {
           {hearts.map((h, i) => (
             <span
               key={i}
-              className="absolute bottom-[-10%] opacity-0 [animation-name:yagmurumm2-float] [animation-timing-function:linear] [animation-iteration-count:infinite]"
+              className="absolute bottom-[-10%] opacity-0 will-change-transform [animation-name:yagmurumm2-float] [animation-timing-function:linear] [animation-iteration-count:infinite]"
               style={{ left: h.left, fontSize: h.size, animationDuration: `${h.duration}s`, animationDelay: `${h.delay}s` }}
             >
               {h.emoji}
@@ -833,30 +980,7 @@ export default function Yagmurumm2Page() {
             14 Ekim hem senin doğum günün, hem de 2025&apos;ten beri yıldönümümüz — aynı günde iki kat şanslıyım.
           </motion.p>
 
-          <motion.div
-            {...fadeUp}
-            transition={{ ...fadeUp.transition, delay: 0.2 }}
-            className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4"
-          >
-            {[
-              { label: "gün", value: elapsed?.days },
-              { label: "saat", value: elapsed?.hours },
-              { label: "dakika", value: elapsed?.minutes },
-              { label: "saniye", value: elapsed?.seconds },
-            ].map((stat) => (
-              <div
-                key={stat.label}
-                className={`flex w-24 flex-col items-center gap-1 rounded-xl px-4 py-5 sm:w-28 ${paperFrame}`}
-              >
-                <span className="text-3xl font-bold tabular-nums sm:text-4xl" style={{ color: RED_DK }}>
-                  {stat.value ?? "–"}
-                </span>
-                <span className="text-[10px] uppercase tracking-widest" style={{ fontFamily: FONT_PIX, color: INK_SOFT }}>
-                  {stat.label}
-                </span>
-              </div>
-            ))}
-          </motion.div>
+          <AnniversaryCounter />
 
           <motion.p {...fadeUp} transition={{ ...fadeUp.transition, delay: 0.3 }} className="text-lg" style={{ color: INK_SOFT }}>
             Ve her gün biraz daha çok. 💗
@@ -989,6 +1113,9 @@ export default function Yagmurumm2Page() {
           8% { opacity: 0.85; }
           85% { opacity: 0.85; }
           100% { transform: translateY(-115vh) scale(1.15); opacity: 0; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          [class*="yagmurumm2-"] { animation: none !important; }
         }
       `}</style>
     </div>
