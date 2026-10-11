@@ -6,6 +6,9 @@ import { ChevronDown, Eye, Heart, ImageIcon, MapPin, Quote } from "lucide-react"
 
 // 14 Ekim 2025 — sevgili olma tarihi.
 const ANNIVERSARY = new Date(2025, 9, 14, 0, 0, 0);
+// Tam 365. gün (1. yıl dönümü) — sayaç bu an 365'e ulaşır, konfeti patlar.
+const FIRST_YEAR = new Date(2026, 9, 14, 0, 0, 0);
+const FIRST_YEAR_SEEN_KEY = "yagmurumm334158-first-year-confetti";
 
 // Açılış ekranıyla (public/yagmurumm334158/intro) aynı pixel/cottagecore
 // palet ve font çifti — bu iki dosya arasında görsel tutarlılık için.
@@ -146,6 +149,237 @@ function fireConfetti(canvas: HTMLCanvasElement | null) {
       ctx!.restore();
     }
     if (frame < maxFrames) {
+      requestAnimationFrame(step);
+    } else {
+      ctx!.clearRect(0, 0, width, height);
+    }
+  }
+  requestAnimationFrame(step);
+}
+
+// 365. gün için ihtişamlı final: yukarı fırlayıp patlayan roketler (daire ve
+// kalp şeklinde), iki yandan konfeti topları, ortada dev patlama ve en sonda
+// tepeden yağan altın/pembe yağmur. ~9 sn sürer; tek canvas, tek rAF döngüsü.
+type FinaleParticle = {
+  x: number;
+  y: number;
+  px: number;
+  py: number;
+  vx: number;
+  vy: number;
+  size: number;
+  color: string;
+  rotation: number;
+  vr: number;
+  life: number;
+  decay: number;
+  gravity: number;
+  drag: number;
+  kind: "rect" | "circle" | "spark" | "heart";
+};
+
+const FINALE_COLORS = [...CONFETTI_COLORS, "#ffd166", "#ffe8a3", "#ffffff"];
+
+function finaleColor(): string {
+  return FINALE_COLORS[Math.floor(Math.random() * FINALE_COLORS.length)] ?? "#ffffff";
+}
+
+function fireGrandFinale(canvas: HTMLCanvasElement | null) {
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = width * dpr;
+  canvas.height = height * dpr;
+  canvas.style.width = `${width}px`;
+  canvas.style.height = `${height}px`;
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.scale(dpr, dpr);
+
+  const scale = Math.min(width, 900) / 900 + 0.35; // küçük ekranda patlamalar da küçük
+  const particles: FinaleParticle[] = [];
+  const rockets: { x: number; y: number; vy: number; targetY: number; heart: boolean; color: string }[] = [];
+
+  function add(p: Partial<FinaleParticle> & Pick<FinaleParticle, "x" | "y" | "vx" | "vy">) {
+    particles.push({
+      px: p.x,
+      py: p.y,
+      size: 4,
+      color: finaleColor(),
+      rotation: Math.random() * 360,
+      vr: (Math.random() - 0.5) * 20,
+      life: 1,
+      decay: 1 / 150,
+      gravity: 0.16,
+      drag: 0.99,
+      kind: "rect",
+      ...p,
+    });
+  }
+
+  function burst(x: number, y: number, heart: boolean, color: string) {
+    const n = Math.round((heart ? 70 : 90) * Math.min(scale, 1.2));
+    for (let i = 0; i < n; i++) {
+      let vx: number;
+      let vy: number;
+      if (heart) {
+        const t = (i / n) * Math.PI * 2;
+        vx = (16 * Math.sin(t) ** 3) * 0.33 * scale;
+        vy = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)) * 0.33 * scale;
+      } else {
+        const a = (i / n) * Math.PI * 2;
+        const s = (3 + Math.random() * 4) * scale;
+        vx = Math.cos(a) * s;
+        vy = Math.sin(a) * s;
+      }
+      add({ x, y, vx, vy, color: Math.random() < 0.7 ? color : "#ffe8a3", kind: "spark", size: 2.6, decay: 1 / (85 + Math.random() * 25), gravity: 0.07, drag: 0.975 });
+    }
+    // Patlamanın içinde minik konfeti.
+    for (let i = 0; i < 14; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const s = (1 + Math.random() * 3) * scale;
+      add({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, size: 5 + Math.random() * 3, decay: 1 / 120 });
+    }
+  }
+
+  function launchRocket(heart: boolean) {
+    rockets.push({
+      x: width * (0.15 + Math.random() * 0.7),
+      y: height + 10,
+      vy: -(height * 0.017 + Math.random() * 3),
+      targetY: height * (0.15 + Math.random() * 0.3),
+      heart,
+      color: finaleColor(),
+    });
+  }
+
+  function cannon(side: "left" | "right") {
+    const x = side === "left" ? -10 : width + 10;
+    const y = height * 0.85;
+    for (let i = 0; i < 70; i++) {
+      const angle = side === "left" ? -(0.45 + Math.random() * 0.8) : -Math.PI + (0.45 + Math.random() * 0.8);
+      const s = (9 + Math.random() * 11) * scale;
+      add({ x, y, vx: Math.cos(angle) * s, vy: Math.sin(angle) * s, size: 6 + Math.random() * 6, kind: Math.random() > 0.35 ? "rect" : "circle", decay: 1 / 170, drag: 0.985 });
+    }
+  }
+
+  function centerBlast() {
+    for (let i = 0; i < 260; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const s = (2 + Math.random() * 15) * scale;
+      add({ x: width / 2, y: height / 2, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 2, size: 5 + Math.random() * 7, kind: Math.random() > 0.7 ? "heart" : Math.random() > 0.5 ? "rect" : "circle", decay: 1 / 190, drag: 0.985 });
+    }
+  }
+
+  function rain() {
+    for (let i = 0; i < 12; i++) {
+      add({ x: Math.random() * width, y: -10, vx: (Math.random() - 0.5) * 1.5, vy: 1 + Math.random() * 2.5, size: 5 + Math.random() * 5, kind: Math.random() > 0.8 ? "heart" : "rect", color: Math.random() > 0.5 ? "#ffd166" : finaleColor(), decay: 1 / 200, gravity: 0.03, drag: 0.995 });
+    }
+  }
+
+  // Zaman çizelgesi (kare = ~1/60 sn).
+  const schedule: Record<number, () => void> = {
+    0: centerBlast,
+    20: () => { cannon("left"); cannon("right"); },
+    45: () => launchRocket(false),
+    65: () => launchRocket(true),
+    85: () => launchRocket(false),
+    110: () => { cannon("left"); cannon("right"); launchRocket(true); },
+    130: () => launchRocket(false),
+    150: () => launchRocket(true),
+    165: () => launchRocket(false),
+    185: () => { centerBlast(); launchRocket(true); },
+    205: () => launchRocket(false),
+    220: () => launchRocket(true),
+    240: () => { cannon("left"); cannon("right"); },
+  };
+  const RAIN_FROM = 250;
+  const RAIN_TO = 400;
+  const END = 560;
+  let frame = 0;
+
+  function drawHeart(size: number) {
+    const s = size / 16;
+    ctx!.beginPath();
+    ctx!.moveTo(0, 4 * s);
+    ctx!.bezierCurveTo(-10 * s, -4 * s, -6 * s, -12 * s, 0, -6 * s);
+    ctx!.bezierCurveTo(6 * s, -12 * s, 10 * s, -4 * s, 0, 4 * s);
+    ctx!.fill();
+  }
+
+  function step() {
+    schedule[frame]?.();
+    if (frame >= RAIN_FROM && frame < RAIN_TO && frame % 3 === 0) rain();
+
+    ctx!.clearRect(0, 0, width, height);
+    ctx!.globalCompositeOperation = "source-over";
+
+    // Roketler: iz bırakarak yükselir, hedef yükseklikte patlar.
+    for (let i = rockets.length - 1; i >= 0; i--) {
+      const r = rockets[i]!;
+      r.y += r.vy;
+      r.vy *= 0.985;
+      add({ x: r.x + (Math.random() - 0.5) * 2, y: r.y, vx: (Math.random() - 0.5) * 0.6, vy: 0.6 + Math.random(), size: 2, color: "#ffe8a3", kind: "spark", decay: 1 / 22, gravity: 0.02, drag: 0.95 });
+      ctx!.globalAlpha = 1;
+      ctx!.fillStyle = "#fff";
+      ctx!.beginPath();
+      ctx!.arc(r.x, r.y, 2.4, 0, Math.PI * 2);
+      ctx!.fill();
+      if (r.y <= r.targetY || r.vy > -1.5) {
+        burst(r.x, r.y, r.heart, r.color);
+        rockets.splice(i, 1);
+      }
+    }
+
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i]!;
+      p.vx *= p.drag;
+      p.vy = p.vy * p.drag + p.gravity;
+      p.px = p.x;
+      p.py = p.y;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.rotation += p.vr;
+      p.life -= p.decay;
+      if (p.life <= 0 || p.y > height + 40) {
+        particles.splice(i, 1);
+        continue;
+      }
+      ctx!.globalAlpha = Math.min(p.life * 1.4, 1);
+      ctx!.fillStyle = p.color;
+      if (p.kind === "spark") {
+        ctx!.globalCompositeOperation = "lighter";
+        ctx!.strokeStyle = p.color;
+        ctx!.lineWidth = p.size;
+        ctx!.lineCap = "round";
+        ctx!.beginPath();
+        ctx!.moveTo(p.px, p.py);
+        ctx!.lineTo(p.x, p.y);
+        ctx!.stroke();
+        ctx!.globalCompositeOperation = "source-over";
+        continue;
+      }
+      ctx!.save();
+      ctx!.translate(p.x, p.y);
+      // Konfeti dönerken yan görünüp ince kalsın (kâğıt gibi çevrilsin).
+      ctx!.rotate((p.rotation * Math.PI) / 180);
+      if (p.kind === "rect") {
+        ctx!.fillRect(-p.size / 2, -p.size / 4, p.size, (p.size / 2) * Math.abs(Math.cos(frame / 6 + i)));
+      } else if (p.kind === "heart") {
+        drawHeart(p.size * 1.6);
+      } else {
+        ctx!.beginPath();
+        ctx!.arc(0, 0, p.size / 2, 0, Math.PI * 2);
+        ctx!.fill();
+      }
+      ctx!.restore();
+    }
+
+    frame++;
+    if (frame < END || particles.length > 0 || rockets.length > 0) {
       requestAnimationFrame(step);
     } else {
       ctx!.clearRect(0, 0, width, height);
@@ -853,6 +1087,36 @@ export default function Yagmurumm2Page() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const confettiCanvasRef = useRef<HTMLCanvasElement>(null);
   const { phase, startStory } = useProposalIntro();
+
+  // 365. günde konfeti: sayfa o an açıksa tam anında, sonradan açılırsa bir kez.
+  // Deneme için adrese ?yildonumu=1 eklenir (her seferinde 1.5 sn sonra patlar).
+  useEffect(() => {
+    if (phase !== "story") return;
+    const isTest = new URLSearchParams(window.location.search).has("yildonumu");
+    const fire = () => {
+      fireGrandFinale(confettiCanvasRef.current);
+      try {
+        localStorage.setItem(FIRST_YEAR_SEEN_KEY, "1");
+      } catch {}
+    };
+    if (isTest) {
+      const id = setTimeout(fire, 1500);
+      return () => clearTimeout(id);
+    }
+    let seen = false;
+    try {
+      seen = localStorage.getItem(FIRST_YEAR_SEEN_KEY) === "1";
+    } catch {}
+    if (seen) return;
+    const wait = FIRST_YEAR.getTime() - Date.now();
+    if (wait <= 0) {
+      const id = setTimeout(fire, 1500);
+      return () => clearTimeout(id);
+    }
+    if (wait > 2 ** 31 - 1) return; // setTimeout sınırı (~24 gün) — o zaman sayfa yeniden açılır
+    const id = setTimeout(fire, wait);
+    return () => clearTimeout(id);
+  }, [phase]);
 
   function handleContinue() {
     fireConfetti(confettiCanvasRef.current);
