@@ -8,9 +8,9 @@ import { ChevronDown, Eye, Heart, ImageIcon, MapPin, Quote } from "lucide-react"
 const ANNIVERSARY = new Date(2025, 9, 14, 0, 0, 0);
 // Tam 365. gün (1. yıl dönümü) — sayaç bu an 365'e ulaşır, konfeti patlar.
 const FIRST_YEAR = new Date(2026, 9, 14, 0, 0, 0);
-const FIRST_YEAR_SEEN_KEY = "yagmurumm334158-first-year-confetti";
+const FIRST_YEAR_SEEN_KEY = "iyikidogdunaskim-first-year-confetti";
 
-// Açılış ekranıyla (public/yagmurumm334158/intro) aynı pixel/cottagecore
+// Açılış ekranıyla (public/iyikidogdunaskim/intro) aynı pixel/cottagecore
 // palet ve font çifti — bu iki dosya arasında görsel tutarlılık için.
 const FONT_PIX = '"Press Start 2P", monospace';
 const FONT_BODY = '"Pixelify Sans", "Press Start 2P", monospace';
@@ -392,8 +392,8 @@ function fireGrandFinale(canvas: HTMLCanvasElement | null) {
  * Kaydırmalı aşk hikayesi. Fotoğraflı bölümlerin fotoğrafı henüz yok —
  * `image` alanını `undefined` bırakıyoruz, dolu bir kutu yerine kibarca
  * "buraya fotoğraf gelecek" yer tutucusu gösteriyoruz. Fotoğraf eklerken:
- *   1) dosyayı public/yagmurumm334158/foto-N.jpg olarak koy,
- *   2) ilgili bloğun `image` alanına "/yagmurumm334158/foto-N.jpg" yaz.
+ *   1) dosyayı public/iyikidogdunaskim/foto-N.jpg olarak koy,
+ *   2) ilgili bloğun `image` alanına "/iyikidogdunaskim/foto-N.jpg" yaz.
  * (google-review-karti / instagram-nfc-karti sayfalarındaki aynı pattern.)
  *
  * "quote" bloklar fotoğrafsız — ileride elle yazılacak özlü sözler için
@@ -451,7 +451,7 @@ const blocks: Block[] = [
     kicker: "02 — Gülüşün",
     line: "Gülüşün, en karanlık günümü bile aydınlatmaya yetiyor.",
     sub: "Sen gülünce, dünya biraz daha güzelleşiyor.",
-    image: "/yagmurumm334158/foto-2.jpg",
+    image: "/iyikidogdunaskim/foto-2.jpg",
     alt: "Gülüşün",
     tint: "#ff5e9c",
   },
@@ -466,7 +466,7 @@ const blocks: Block[] = [
     kicker: "03 — Elin",
     line: "Elini tuttuğumda, her şeyin yolunda olacağını biliyorum.",
     sub: "Senin elin, benim en güvenli limanım.",
-    image: "/yagmurumm334158/foto-3.jpg",
+    image: "/iyikidogdunaskim/foto-3.jpg",
     landscape: true,
     alt: "Elini tuttuğumuz an",
     tint: "#ff8fc0",
@@ -478,7 +478,7 @@ const blocks: Block[] = [
     line: "Sesini duymak, en yorgun günümde bile beni dinlendiriyor.",
     sub: "Seninle konuşmak, en sevdiğim alışkanlığım.",
     image: undefined,
-    video: "/yagmurumm334158/video-4.mp4", // döngülü, sessiz oynar
+    video: "/iyikidogdunaskim/video-4.mp4", // döngülü, sessiz oynar
     landscape: true,
     alt: "Birlikte sohbet",
     tint: "#ffa5cd",
@@ -494,11 +494,11 @@ const blocks: Block[] = [
     kicker: "05 — Yanımdasın",
     line: "Yanımda olduğun her an, kendimi eksiksiz hissediyorum.",
     sub: "Sen, tamamlayan parçamsın.",
-    image: "/yagmurumm334158/foto-5.jpg",
+    image: "/iyikidogdunaskim/foto-5.jpg",
     alt: "Yan yana",
     tint: "#ffbcdb",
   },
-  // Yeni fotoğraf yerleri (06–08): yollar hazır. Sadece public/yagmurumm334158/
+  // Yeni fotoğraf yerleri (06–08): yollar hazır. Sadece public/iyikidogdunaskim/
   // altına foto-7.jpg / foto-8.jpg / foto-9.jpg koy — dosya yokken yer tutucu çıkar.
   // kicker/line/sub metinlerini istediğin gibi düzenle.
   {
@@ -507,7 +507,7 @@ const blocks: Block[] = [
     kicker: "06 — Birlikte",
     line: "Seninle her yer, en güzel yer oluyor.",
     sub: "Birlikte geçen her an, saklamak istediğim bir kare.",
-    image: "/yagmurumm334158/foto-7.jpg",
+    image: "/iyikidogdunaskim/foto-7.jpg",
     alt: "Birlikte bir an",
     tint: "#ffc0dc",
   },
@@ -517,7 +517,7 @@ const blocks: Block[] = [
     kicker: "07 — Anılarımız",
     line: "Her anımızı yeniden yaşamak isterim.",
     sub: "Küçük anlar, en büyük hazinelerim.",
-    image: "/yagmurumm334158/foto-8.jpg",
+    image: "/iyikidogdunaskim/foto-8.jpg",
     landscape: true,
     alt: "Anılarımızdan bir kare",
     tint: "#ffc4de",
@@ -528,7 +528,7 @@ const blocks: Block[] = [
     kicker: "08 — Biz",
     line: "Sen ve ben, en güzel cümleyiz.",
     sub: "Daha yazacak çok sayfamız var.",
-    image: "/yagmurumm334158/foto-9.jpg",
+    image: "/iyikidogdunaskim/foto-9.jpg",
     alt: "Biz",
     tint: "#ffc6e0",
   },
@@ -538,7 +538,7 @@ const blocks: Block[] = [
     kicker: "09 — Sonsuza Kadar",
     line: "Seninle geçirdiğim her gün, sonsuza kadar sürsün istiyorum.",
     sub: "Çünkü sen, benim en güzel hikayemsin.",
-    image: "/yagmurumm334158/foto-6.jpg",
+    image: "/iyikidogdunaskim/foto-6.jpg",
     landscape: true,
     alt: "Sonsuza kadar",
     tint: "#ffc8e2",
@@ -563,6 +563,90 @@ const hearts = [
   { left: "97%", size: 18, duration: 17.5, delay: 0.9, emoji: "💘" },
   { left: "58%", size: 13, duration: 14, delay: 13.6, emoji: "💕" },
 ];
+
+// En çok konuşulan 15 dilde "seni seviyorum" (Türkçe dahil). Hem arka planda
+// süzülen yazılarda hem de mektubun altındaki dönen satırda kullanılır.
+const LOVE_LANGS = [
+  { lang: "tr", name: "Türkçe", text: "Seni seviyorum" },
+  { lang: "en", name: "İngilizce", text: "I love you" },
+  { lang: "zh", name: "Çince", text: "我爱你" },
+  { lang: "hi", name: "Hintçe", text: "मैं तुमसे प्यार करता हूँ" },
+  { lang: "es", name: "İspanyolca", text: "Te quiero" },
+  { lang: "fr", name: "Fransızca", text: "Je t'aime" },
+  { lang: "ar", name: "Arapça", text: "أحبك" },
+  { lang: "bn", name: "Bengalce", text: "আমি তোমাকে ভালোবাসি" },
+  { lang: "pt", name: "Portekizce", text: "Eu te amo" },
+  { lang: "ru", name: "Rusça", text: "Я тебя люблю" },
+  { lang: "id", name: "Endonezce", text: "Aku cinta kamu" },
+  { lang: "de", name: "Almanca", text: "Ich liebe dich" },
+  { lang: "ja", name: "Japonca", text: "愛してる" },
+  { lang: "ko", name: "Korece", text: "사랑해" },
+  { lang: "it", name: "İtalyanca", text: "Ti amo" },
+] as const;
+
+// Pixelify Sans sadece Latin/Kiril kapsıyor; diğer yazılar sistem fontuna düşer.
+const LOVE_FONT = `${FONT_BODY}, "Noto Sans", "Noto Sans JP", "Noto Sans KR", "Noto Sans SC", "Noto Sans Devanagari", "Noto Sans Bengali", "Noto Sans Arabic", sans-serif`;
+
+// Arka planda süzülen yazılar — kalplerle aynı animasyon, soluk renk.
+// Sabit değerler (SSR/CSR aynı çıksın diye Math.random() yok).
+const floatingLove = [
+  { left: "7%", size: 15, duration: 24, delay: 2, i: 1 },
+  { left: "15%", size: 17, duration: 27, delay: 9, i: 2 },
+  { left: "23%", size: 20, duration: 26, delay: 15, i: 12 },
+  { left: "31%", size: 15, duration: 23, delay: 5, i: 5 },
+  { left: "39%", size: 18, duration: 28, delay: 11, i: 6 },
+  { left: "47%", size: 22, duration: 25, delay: 0, i: 12 },
+  { left: "55%", size: 16, duration: 29, delay: 17, i: 9 },
+  { left: "63%", size: 19, duration: 24, delay: 7, i: 13 },
+  { left: "71%", size: 15, duration: 26, delay: 13, i: 3 },
+  { left: "79%", size: 18, duration: 27, delay: 4, i: 10 },
+  { left: "86%", size: 20, duration: 25, delay: 19, i: 14 },
+  { left: "93%", size: 16, duration: 28, delay: 8, i: 4 },
+];
+
+// Mektubun altında dil dil dönen satır. Azaltılmış harekette sabit Türkçe kalır.
+function LoveRotator({ visible }: { visible: boolean }) {
+  const [idx, setIdx] = useState(0);
+
+  useEffect(() => {
+    if (!visible) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const id = window.setInterval(() => setIdx((n) => (n + 1) % LOVE_LANGS.length), 2800);
+    return () => window.clearInterval(id);
+  }, [visible]);
+
+  const item = LOVE_LANGS[idx] ?? LOVE_LANGS[0];
+  return (
+    <div
+      className="mt-5 flex min-h-[64px] flex-col items-center justify-center gap-1 text-center transition-opacity duration-700"
+      style={{ opacity: visible ? 1 : 0 }}
+      aria-hidden="true"
+    >
+      <AnimatePresence mode="wait">
+        <motion.span
+          key={item.lang}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+          className="flex flex-col items-center gap-1"
+        >
+          <span
+            lang={item.lang}
+            dir={item.lang === "ar" ? "rtl" : "ltr"}
+            className="text-[22px] font-semibold leading-tight"
+            style={{ fontFamily: LOVE_FONT, color: RED_DK }}
+          >
+            {item.text}
+          </span>
+          <span className="text-[8px] uppercase tracking-[0.2em]" style={{ fontFamily: FONT_PIX, color: INK_SOFT }}>
+            {item.name}
+          </span>
+        </motion.span>
+      </AnimatePresence>
+    </div>
+  );
+}
 
 const fadeUp = {
   initial: { opacity: 0, y: 48 },
@@ -650,7 +734,7 @@ function MapFrame({ mapQuery, className }: { mapQuery: string | undefined; class
 }
 
 // Açılış: okla zarfı aç, "Evet" de, sonra "Devam Et" ile asıl sayfaya geç.
-// İzole HTML/CSS/JS (public/yagmurumm334158/intro) bir iframe içinde çalışır,
+// İzole HTML/CSS/JS (public/iyikidogdunaskim/intro) bir iframe içinde çalışır,
 // bitince postMessage ile bu bileşene haber verir — böylece kendi stil/scriptleri
 // sitenin geri kalanıyla hiç çakışmaz.
 const INTRO_DONE_MESSAGE = "yagmurumm-proposal-intro:done";
@@ -675,7 +759,7 @@ function useProposalIntro() {
 // Açılıştan sonraki kilit: fotoğrafı yerine oturtmadan hikayeye geçilmez.
 // Parçaya dokun → başka parçaya dokun = yer değiştir (telefonda en rahatı);
 // sürükleyip bırakmak da aynı işi görür. Doğru yerdeki parça kilitlenir.
-const PUZZLE_IMAGE = "/yagmurumm334158/puzzle.jpg";
+const PUZZLE_IMAGE = "/iyikidogdunaskim/puzzle.jpg";
 const PUZZLE_COLS = 4;
 const PUZZLE_ROWS = 4;
 const PUZZLE_RATIO = 1435 / 1127; // kırpılmış fotoğrafın en/boy oranı
@@ -936,6 +1020,7 @@ function TypedLetter() {
       >
         {LETTER_SIGNATURE}
       </p>
+      <LoveRotator visible={done} />
     </div>
   );
 }
@@ -1128,7 +1213,7 @@ export default function Yagmurumm2Page() {
   if (phase === "intro") {
     return (
       <iframe
-        src="/yagmurumm334158/intro/index.html"
+        src="/iyikidogdunaskim/intro/index.html"
         title="Yağmurum için küçük bir sürpriz"
         className="fixed inset-0 h-full w-full border-0"
       />
@@ -1161,6 +1246,27 @@ export default function Yagmurumm2Page() {
               {h.emoji}
             </span>
           ))}
+          {floatingLove.map((w, k) => {
+            const item = LOVE_LANGS[w.i] ?? LOVE_LANGS[0];
+            return (
+              <span
+                key={`love-${k}`}
+                lang={item.lang}
+                dir={item.lang === "ar" ? "rtl" : "ltr"}
+                className="absolute bottom-[-10%] whitespace-nowrap opacity-0 will-change-transform [animation-name:yagmurumm2-float] [animation-timing-function:linear] [animation-iteration-count:infinite]"
+                style={{
+                  left: w.left,
+                  fontSize: w.size,
+                  fontFamily: LOVE_FONT,
+                  color: "rgba(178,42,59,.45)",
+                  animationDuration: `${w.duration}s`,
+                  animationDelay: `${w.delay}s`,
+                }}
+              >
+                {item.text}
+              </span>
+            );
+          })}
         </div>
       </div>
 
@@ -1238,7 +1344,7 @@ export default function Yagmurumm2Page() {
           <motion.p
             {...fadeUp}
             transition={{ ...fadeUp.transition, delay: 0.15 }}
-            className="max-w-md text-base"
+            className="max-w-md text-[16px]"
             style={{ color: INK_SOFT }}
           >
             14 Ekim hem senin doğum günün, hem de 2025&apos;ten beri yıldönümümüz — aynı günde iki kat şanslıyım.
@@ -1330,7 +1436,7 @@ export default function Yagmurumm2Page() {
                 >
                   {block.line}
                 </p>
-                <p className="mt-4 text-base" style={{ color: INK_SOFT }}>
+                <p className="mt-4 text-[16px]" style={{ color: INK_SOFT }}>
                   {block.sub}
                 </p>
               </motion.div>

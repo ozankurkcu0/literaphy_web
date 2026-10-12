@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-// Bu sayfaya özel pixel/cottagecore fontları — açılış ekranıyla (public/yagmurumm334158/intro)
+// Bu sayfaya özel pixel/cottagecore fontları — açılış ekranıyla (public/iyikidogdunaskim/intro)
 // aynı tema. Sadece bu route'ta yüklenir, sitenin geri kalanını etkilemez.
 export default function Yagmurumm334158Layout({ children }: { children: React.ReactNode }) {
   return (

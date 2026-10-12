@@ -10,14 +10,15 @@ import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
  * /mypanel altındaki sayfalar (calismaprogram, yagmurumprofugececek dahil,
  * bkz. admin/(dashboard)/layout.tsx, mypanel/(panel)/layout.tsx) kendi
  * kabuğunu kullandığı için burada hiçbir marketing chrome'u render edilmez.
- * Aynı şekilde /yagmurum* ile başlayan tek seferlik/özel tam ekran sürpriz
- * sayfalar (ör. /yagmurumm334158) da chrome'suz kalır — bunlar bilerek
+ * Aynı şekilde /yagmurum* ve /iyikidogdunaskim gibi tek seferlik/özel tam ekran sürpriz
+ * sayfalar (ör. /iyikidogdunaskim) da chrome'suz kalır — bunlar bilerek
  * /mypanel dışında, şifresiz kalıyor. */
 export function SiteChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isAdmin = pathname?.startsWith("/admin");
   const isMypanel = pathname?.startsWith("/mypanel");
-  const isStandalone = pathname?.startsWith("/yagmurum");
+  const isStandalone =
+    pathname?.startsWith("/yagmurum") || pathname?.startsWith("/iyikidogdunaskim");
 
   if (isAdmin || isMypanel || isStandalone) {
     return <>{children}</>;
