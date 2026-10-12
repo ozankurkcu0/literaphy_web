@@ -537,7 +537,7 @@ const blocks: Block[] = [
     layout: "top",
     kicker: "09 — Sonsuza Kadar",
     line: "Seninle geçirdiğim her gün, sonsuza kadar sürsün istiyorum.",
-    sub: "Çünkü sen, benim en güzel hikayemsin.",
+    sub: "Çünkü ben sana aşığım bitanem benim.",
     image: "/iyikidogdunaskim/foto-6.jpg",
     landscape: true,
     alt: "Sonsuza kadar",
@@ -945,9 +945,9 @@ Araya giren o saçma sapan 5 aylık boşluk, bana sadece sensiz buraların ne ka
 // Şiir ayrı parça: italik ve ortalı gösterilir, iki mısra alt alta durur.
 const LETTER_POEM = `Güller açıp sana baksa gül kendini gül mü görür?
 Senin o kara gözlerin varken benim gönlüm başka neyi görür?`;
-const LETTER_AFTER = `Hadi şimdi şu ekrana bakmayı bırak da bana dön, seni ne kadar çoookkk sevdiğimi bi de o güzel gözlerine bakarak söyleyeyim...
+const LETTER_AFTER = `Hadi şimdi şu ekrana bakmayı bırak da beni düşün ve ne kadar sevdiğimi tekrar hatırla.
 
-Seni seviyorum 💗`;
+Seni seviyorum iyi ki doğdun en değerlim benim 💗`;
 // Daktilo tek metin üzerinden sayar; parçalar araya satır sonu eklenmeden birleşir.
 const LETTER_TEXT = LETTER_BEFORE + LETTER_POEM + LETTER_AFTER;
 const LETTER_SIGNATURE = "— Seni çok seven Sevgilin, Ozan💗";
