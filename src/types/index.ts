@@ -96,11 +96,10 @@ export interface FaqItem {
 
 export interface PricingPlan {
   name: string;
-  monthlyPrice: number;
-  yearlyPrice: number;
-  /** "4000+" gibi açık uçlu bir fiyatsa true — fiyatın sonuna "+" eklenir,
-   * yıllık toplam satırı da buna göre işaretlenir. Fiyatlar yine sayı
-   * kalmalı (yıllık toplam hesaplaması fiyat * 12 yapıyor). */
+  /** Yıllık toplam fiyat (₺). */
+  price: number;
+  /** "50000+" gibi açık uçlu bir fiyatsa true — fiyatın sonuna "+" eklenir.
+   * Fiyat yine sayı kalmalı. */
   startingAt?: boolean;
   description: string;
   features: string[];

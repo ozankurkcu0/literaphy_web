@@ -59,13 +59,13 @@ export const faqItems: FaqItem[] = [
     category: "Fiyatlandırma",
     question: "Proje fiyatları nasıl belirleniyor?",
     answer:
-      "Web geliştirme, yazılım geliştirme, AI otomasyonu, WhatsApp otomasyonu ve API entegrasyonu projeleri kapsam bazlı fiyatlandırılır; keşif görüşmesi sonrası size özel bir teklif hazırlanır. QR Menü Sistemleri ise sabit aylık paketlerle sunulur.",
+      "Web geliştirme, yazılım geliştirme, AI otomasyonu, WhatsApp otomasyonu ve API entegrasyonu projeleri kapsam bazlı fiyatlandırılır; keşif görüşmesi sonrası size özel bir teklif hazırlanır. QR Menü Sistemleri ise sabit yıllık paketlerle sunulur.",
   },
   {
     category: "Fiyatlandırma",
     question: "Ödeme planı sunuyor musunuz?",
     answer:
-      "Proje bazlı hizmetlerde genellikle aşama bazlı ödeme planı (keşif/başlangıç, orta aşama, teslim) uyguluyoruz. QR Menü Sistemleri'nde ise aylık veya yıllık abonelik modeli geçerlidir.",
+      "Proje bazlı hizmetlerde genellikle aşama bazlı ödeme planı (keşif/başlangıç, orta aşama, teslim) uyguluyoruz. QR Menü Sistemleri'nde ise yıllık abonelik modeli geçerlidir.",
   },
   {
     category: "Süreç",

@@ -40,31 +40,19 @@ function recommendPlanName(branches: number, languages: LanguageNeed, order: Ord
   return "Premium";
 }
 
-type Billing = "monthly" | "yearly";
-
-interface PricingCalculatorProps {
-  /** Verilirse aylık/yıllık seçimi dışarıdan kontrol edilir (altındaki paket
-   * kartlarıyla senkron kalması için) — verilmezse kendi içinde yönetir. */
-  billing?: Billing;
-  onBillingChange?: (billing: Billing) => void;
-}
-
 /** QR Menü fiyatlandırma sayfasında paket kartlarının üstünde oturan,
  * birkaç soruya göre uygun paketi ve tahmini fiyatı canlı gösteren
  * interaktif hesaplayıcı. Ziyaretçiyi 3 basit soruyla paket kartlarına
  * kıyasla çok daha hızlı bir "size uygun olan bu" cevabına götürür. */
-export function PricingCalculator({ billing: billingProp, onBillingChange }: PricingCalculatorProps = {}) {
+export function PricingCalculator() {
   const [branches, setBranches] = useState(1);
   const [languages, setLanguages] = useState<LanguageNeed>("1");
   const [order, setOrder] = useState<OrderFlow>("none");
-  const [internalBilling, setInternalBilling] = useState<Billing>("monthly");
-  const billing = billingProp ?? internalBilling;
-  const setBilling = onBillingChange ?? setInternalBilling;
 
   const planName = recommendPlanName(branches, languages, order);
   // qrMenuPricing her zaman dolu bir sabit dizi olduğu için [0] fallback'i güvenli.
   const plan = qrMenuPricing.find((item) => item.name === planName) ?? qrMenuPricing[0]!;
-  const price = billing === "monthly" ? plan.monthlyPrice : plan.yearlyPrice;
+  const price = plan.price;
 
   const reason = useMemo(() => {
     if (order === "pos") return "Siparişlerin doğrudan POS sisteminize işlenmesi için özel entegrasyon kapsamı gerekiyor.";
@@ -155,28 +143,13 @@ export function PricingCalculator({ billing: billingProp, onBillingChange }: Pri
         </div>
 
         <div className="flex flex-col gap-3">
-          <div className="flex items-center gap-1">
-            {(["monthly", "yearly"] as const).map((option) => (
-              <button
-                key={option}
-                type="button"
-                onClick={() => setBilling(option)}
-                className={cn(
-                  "rounded-full px-3 py-1 text-xs font-medium transition-colors duration-150 ease-standard",
-                  billing === option ? "bg-foreground text-white" : "text-foreground-muted hover:text-foreground",
-                )}
-              >
-                {option === "monthly" ? "Aylık" : "Yıllık (%20 indirim)"}
-              </button>
-            ))}
-          </div>
           <div className="flex items-end gap-1.5">
             <span className="font-mono text-[32px] leading-none font-semibold text-foreground">
               <LiraSign />
               {price.toLocaleString("tr-TR")}
               {plan.startingAt && "+"}
             </span>
-            <span className="pb-1 text-sm text-foreground-muted">/ ay</span>
+            <span className="pb-1 text-sm text-foreground-muted">/ yıl</span>
           </div>
           <ButtonLink
             href="/qr-menu-sistemleri/demo"

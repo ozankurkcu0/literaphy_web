@@ -70,8 +70,7 @@ export const qrMenuFeatures = [
 export const qrMenuPricing: PricingPlan[] = [
   {
     name: "Başlangıç",
-    monthlyPrice: 1000,
-    yearlyPrice: 800,
+    price: 12500,
     description: "Tek şube, temel dijital menü ihtiyacı olan işletmeler için.",
     features: [
       "1 şube / 1 QR menü",
@@ -85,8 +84,7 @@ export const qrMenuPricing: PricingPlan[] = [
   },
   {
     name: "Standart",
-    monthlyPrice: 2000,
-    yearlyPrice: 1600,
+    price: 23500,
     description: "Büyüyen cafe ve restoranlar için en çok tercih edilen paket.",
     features: [
       "Başlangıç paketindeki tüm özellikler dahildir",
@@ -102,8 +100,7 @@ export const qrMenuPricing: PricingPlan[] = [
   },
   {
     name: "Premium",
-    monthlyPrice: 2500,
-    yearlyPrice: 2000,
+    price: 30000,
     description: "Çoklu şube zincirleri ve özel entegrasyon ihtiyacı olan işletmeler için.",
     features: [
       "Standart paketindeki tüm özellikler dahildir",
@@ -119,8 +116,7 @@ export const qrMenuPricing: PricingPlan[] = [
   },
   {
     name: "Expert",
-    monthlyPrice: 4000,
-    yearlyPrice: 3200,
+    price: 50000,
     startingAt: true,
     description: "Kendi özel ihtiyaçları olan, kurumsal ve çok şubeli işletmeler için.",
     features: [
@@ -150,8 +146,8 @@ export const qrMenuFaq = [
     answer: "Hayır, tüm paketlerde kurulum ücretsizdir. Menünüzü birlikte tasarlayıp 24-48 saat içinde yayına alıyoruz.",
   },
   {
-    question: "Aylık mı yıllık mı ödeme yapabiliyorum?",
-    answer: "Her iki seçenek de mevcut; yıllık ödemede aylık fiyata göre yaklaşık %20 indirim uygulanır.",
+    question: "Ödeme nasıl yapılıyor?",
+    answer: "Tüm paketler yıllık tek fiyatla sunulur; aylık abonelik seçeneği bulunmaz. Fiyata kurulum, barındırma ve yıl boyunca destek dahildir.",
   },
   {
     question: "Menümü kendim güncelleyebilir miyim?",

@@ -40,7 +40,7 @@ export default function QrMenuLandingPage() {
           description:
             "Cafe ve restoranlar için anlık güncellenebilir, çoklu dilli QR menü sistemi.",
           path: "/qr-menu-sistemleri",
-          price: String(qrMenuPricing[0]?.monthlyPrice ?? 349),
+          price: String(qrMenuPricing[0]?.price ?? 12500),
         })}
       />
 

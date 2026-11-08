@@ -11,7 +11,7 @@ import { CTABand } from "@/components/sections/CTABand";
 export const metadata: Metadata = buildMetadata({
   title: "Fiyatlandırma",
   description:
-    "QR Menü Sistemleri fiyatlandırma paketleri: Başlangıç, Standart ve Premium. Kurulum ücretsiz, yıllık ödemede %20 indirim.",
+    "QR Menü Sistemleri fiyatlandırma paketleri: Başlangıç, Standart ve Premium. Kurulum ücretsiz, tüm paketler yıllık tek fiyatla.",
   path: "/qr-menu-sistemleri/fiyatlandirma",
 });
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion } from "motion/react";
+import { motion } from "motion/react";
 import { Check } from "lucide-react";
 import type { PricingPlan } from "@/types";
 import { Badge } from "@/components/ui/Badge";
@@ -9,14 +9,7 @@ import { LiraSign } from "@/components/ui/LiraSign";
 import { cn } from "@/lib/utils";
 import { EASE_STANDARD } from "@/lib/motion";
 
-interface PricingCardProps {
-  plan: PricingPlan;
-  billing: "monthly" | "yearly";
-}
-
-export function PricingCard({ plan, billing }: PricingCardProps) {
-  const price = billing === "monthly" ? plan.monthlyPrice : plan.yearlyPrice;
-
+export function PricingCard({ plan }: { plan: PricingPlan }) {
   return (
     <motion.div
       layout
@@ -52,44 +45,14 @@ export function PricingCard({ plan, billing }: PricingCardProps) {
         <p className="text-sm text-foreground-muted">{plan.description}</p>
       </div>
 
-      <motion.div layout transition={{ duration: 0.25, ease: EASE_STANDARD }} className="flex flex-col gap-1.5">
-        <div className="flex items-end gap-1.5">
-          <span className="relative block h-11 overflow-hidden font-mono text-[40px] leading-none font-semibold text-foreground">
-            <AnimatePresence mode="popLayout" initial={false}>
-              <motion.span
-                key={billing}
-                initial={{ y: 28, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                exit={{ y: -28, opacity: 0 }}
-                transition={{ duration: 0.28, ease: EASE_STANDARD }}
-                className="block"
-              >
-                <LiraSign />
-                {price}
-                {plan.startingAt && "+"}
-              </motion.span>
-            </AnimatePresence>
-          </span>
-          <span className="pb-1 text-sm text-foreground-muted">/ ay</span>
-        </div>
-
-        <AnimatePresence mode="wait" initial={false}>
-          {billing === "yearly" && (
-            <motion.p
-              key="yearly-total"
-              initial={{ opacity: 0, y: -4 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -4 }}
-              transition={{ duration: 0.2, ease: EASE_STANDARD }}
-              className="font-mono text-xs text-foreground-muted"
-            >
-              Yıllık <LiraSign />
-              {(plan.yearlyPrice * 12).toLocaleString("tr-TR")}
-              {plan.startingAt && "+"} olarak faturalandırılır
-            </motion.p>
-          )}
-        </AnimatePresence>
-      </motion.div>
+      <div className="flex items-end gap-1.5">
+        <span className="font-mono text-[40px] leading-none font-semibold text-foreground">
+          <LiraSign />
+          {plan.price.toLocaleString("tr-TR")}
+          {plan.startingAt && "+"}
+        </span>
+        <span className="pb-1 text-sm text-foreground-muted">/ yıl</span>
+      </div>
 
       <ButtonLink
         href="/iletisim"
