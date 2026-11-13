@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Check, Plus, X } from "lucide-react";
+import { Check, Pencil, Plus, RotateCcw, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { WEEKDAYS, type Weekday } from "@/lib/calisma-program-constants";
 import { YAGMUR_STUDY_PLAN, STUDY_CATEGORY_META, STUDY_CATEGORIES, type StudyCategory } from "@/lib/yagmur-study-plan";
@@ -12,6 +12,7 @@ interface DisplayTask {
   category: StudyCategory;
   label: string;
   custom: boolean;
+  overridden: boolean;
 }
 
 function AddTaskRow({ weekday, onAdded }: { weekday: Weekday; onAdded: () => void }) {
@@ -95,10 +96,81 @@ function AddTaskRow({ weekday, onAdded }: { weekday: Weekday; onAdded: () => voi
   );
 }
 
+function EditTaskRow({
+  task,
+  onCancel,
+  onSaved,
+}: {
+  task: DisplayTask;
+  onCancel: () => void;
+  onSaved: (label: string, category: StudyCategory) => void;
+}) {
+  const [label, setLabel] = useState(task.label);
+  const [category, setCategory] = useState<StudyCategory>(task.category);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleSave() {
+    const trimmed = label.trim();
+    if (!trimmed) return;
+    setSaving(true);
+    setError(null);
+    const response = await fetch(`/api/yagmur/study-tasks/${task.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ category, label: trimmed }),
+    });
+    setSaving(false);
+    if (response.ok) onSaved(trimmed, category);
+    else setError("Kaydedilemedi, tekrar dene.");
+  }
+
+  return (
+    <div className="flex flex-col gap-1.5 rounded-lg border border-pink-200 bg-pink-50/50 p-2">
+      <input
+        value={label}
+        onChange={(e) => setLabel(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") handleSave();
+          if (e.key === "Escape") onCancel();
+        }}
+        autoFocus
+        className="h-8 rounded-md border border-pink-200 bg-white px-2 text-[12.5px] text-rose-950 outline-none focus:border-pink-400"
+      />
+      <div className="flex items-center gap-1.5">
+        <select
+          value={category}
+          onChange={(e) => setCategory(e.target.value as StudyCategory)}
+          className="h-7 flex-1 rounded-md border border-pink-200 bg-white px-1.5 text-[11.5px] text-rose-800 outline-none focus:border-pink-400"
+        >
+          {STUDY_CATEGORIES.map((cat) => (
+            <option key={cat} value={cat}>
+              {cat}
+            </option>
+          ))}
+        </select>
+        <button
+          type="button"
+          onClick={handleSave}
+          disabled={saving || !label.trim()}
+          className="rounded-md bg-pink-500 px-2.5 py-1 text-[11.5px] font-semibold text-white disabled:opacity-50"
+        >
+          {saving ? "…" : "Kaydet"}
+        </button>
+        <button type="button" onClick={onCancel} className="rounded-md px-1.5 py-1 text-[11.5px] text-rose-700/70 hover:bg-pink-100">
+          Vazgeç
+        </button>
+      </div>
+      {error && <p className="text-[11px] text-rose-600">{error}</p>}
+    </div>
+  );
+}
+
 export function YagmurStudyChecklist() {
   const [checked, setChecked] = useState<Set<string> | null>(null);
   const [customTasks, setCustomTasks] = useState<YagmurCustomStudyTask[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const fetchChecked = useCallback(async () => {
     try {
@@ -152,7 +224,21 @@ export function YagmurStudyChecklist() {
     if (!response.ok) await fetchCustomTasks();
   }
 
+  async function handleResetOverride(taskId: string) {
+    setCustomTasks((prev) => prev.filter((task) => task.taskId !== taskId));
+    const response = await fetch(`/api/yagmur/study-tasks/${taskId}`, { method: "DELETE" });
+    if (!response.ok) await fetchCustomTasks();
+  }
+
+  function handleEdited() {
+    setEditingId(null);
+    fetchCustomTasks();
+  }
+
   if (error) return null;
+
+  const overrides = new Map(customTasks.map((task) => [task.taskId, task]));
+  const staticIds = new Set(Object.values(YAGMUR_STUDY_PLAN).flatMap((list) => list.map((task) => task.id)));
 
   return (
     <div className="flex flex-col gap-3">
@@ -163,14 +249,22 @@ export function YagmurStudyChecklist() {
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {WEEKDAYS.map((day) => {
-          const staticTasks: DisplayTask[] = YAGMUR_STUDY_PLAN[day].map((task) => ({ ...task, custom: false }));
+          const toCategory = (value: string): StudyCategory =>
+            (STUDY_CATEGORIES as string[]).includes(value) ? (value as StudyCategory) : "Diğer";
+          const staticTasks: DisplayTask[] = YAGMUR_STUDY_PLAN[day].map((task) => {
+            const override = overrides.get(task.id);
+            return override
+              ? { id: task.id, category: toCategory(override.category), label: override.label, custom: false, overridden: true }
+              : { ...task, custom: false, overridden: false };
+          });
           const dayCustomTasks: DisplayTask[] = customTasks
-            .filter((task) => task.weekday === day)
+            .filter((task) => task.weekday === day && !staticIds.has(task.taskId))
             .map((task) => ({
               id: task.taskId,
-              category: (STUDY_CATEGORIES as string[]).includes(task.category) ? (task.category as StudyCategory) : "Diğer",
+              category: toCategory(task.category),
               label: task.label,
               custom: true,
+              overridden: false,
             }));
           const tasks = [...staticTasks, ...dayCustomTasks];
           const doneCount = checked ? tasks.filter((task) => checked.has(task.id)).length : 0;
@@ -188,6 +282,13 @@ export function YagmurStudyChecklist() {
                 {tasks.map((task) => {
                   const isChecked = checked?.has(task.id) ?? false;
                   const meta = STUDY_CATEGORY_META[task.category];
+                  if (editingId === task.id) {
+                    return (
+                      <li key={task.id}>
+                        <EditTaskRow task={task} onCancel={() => setEditingId(null)} onSaved={handleEdited} />
+                      </li>
+                    );
+                  }
                   return (
                     <li key={task.id} className="group flex items-start">
                       <button
@@ -218,11 +319,32 @@ export function YagmurStudyChecklist() {
                           </span>
                         </span>
                       </button>
+                      <div className="mt-1.5 flex shrink-0 items-center opacity-0 transition-opacity focus-within:opacity-100 group-hover:opacity-100 max-sm:opacity-100">
+                        <button
+                          type="button"
+                          onClick={() => setEditingId(task.id)}
+                          className="flex size-5 items-center justify-center rounded text-rose-300 hover:bg-rose-50 hover:text-rose-600"
+                          aria-label={`${task.label} görevini düzenle`}
+                        >
+                          <Pencil className="size-3" aria-hidden />
+                        </button>
+                        {task.overridden && (
+                          <button
+                            type="button"
+                            onClick={() => handleResetOverride(task.id)}
+                            className="flex size-5 items-center justify-center rounded text-rose-300 hover:bg-rose-50 hover:text-rose-600"
+                            aria-label={`${task.label} görevini varsayılana döndür`}
+                            title="Varsayılana döndür"
+                          >
+                            <RotateCcw className="size-3" aria-hidden />
+                          </button>
+                        )}
+                      </div>
                       {task.custom && (
                         <button
                           type="button"
                           onClick={() => handleDeleteCustom(task.id)}
-                          className="mt-1.5 flex size-5 shrink-0 items-center justify-center rounded text-rose-300 opacity-0 transition-opacity hover:bg-rose-50 hover:text-rose-600 group-hover:opacity-100"
+                          className="mt-1.5 flex size-5 shrink-0 items-center justify-center rounded text-rose-300 opacity-0 transition-opacity hover:bg-rose-50 hover:text-rose-600 group-hover:opacity-100 max-sm:opacity-100"
                           aria-label={`${task.label} görevini sil`}
                         >
                           <X className="size-3" aria-hidden />

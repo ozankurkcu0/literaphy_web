@@ -1388,6 +1388,7 @@ const CLASS_SCHEDULE_DATA_COLUMNS = "A:H";
 // WEEKDAYS/TIMELINE_KINDS client component'lerden de kullanılıyor, bu
 // yüzden bu "server-only" dosyada değil, calisma-program-constants.ts'te
 // tanımlı — burada sadece reuse ediliyor.
+import { YAGMUR_STUDY_PLAN } from "@/lib/yagmur-study-plan";
 import { WEEKDAYS, TIMELINE_KINDS, type Weekday, type TimelineKind } from "@/lib/calisma-program-constants";
 export { WEEKDAYS, TIMELINE_KINDS, type Weekday, type TimelineKind };
 
@@ -2296,6 +2297,56 @@ export async function createYagmurCustomTask(input: { weekday: Weekday; category
   return { rowNumber: -1, taskId, ...input };
 }
 
+/** Sabit programdaki bir görevin (ör. "pzt-1") hangi güne ait olduğunu bulur. */
+function findStaticYagmurTaskWeekday(taskId: string): Weekday | null {
+  for (const [day, tasks] of Object.entries(YAGMUR_STUDY_PLAN)) {
+    if (tasks.some((task) => task.id === taskId)) return day as Weekday;
+  }
+  return null;
+}
+
+/**
+ * Bir görevin başlığını/kategorisini günceller. Yağmur'un kendi eklediği
+ * görevlerde satır yerinde güncellenir; sabit programdaki görevlerde ise aynı
+ * görev ID'siyle bir "override" satırı yazılır (yoksa eklenir) — arayüz bu
+ * satırı sabit görevin üstüne bindirir. Override'ı silmek varsayılana döner.
+ */
+export async function updateYagmurTask(
+  taskId: string,
+  input: { category: string; label: string },
+): Promise<YagmurCustomStudyTask> {
+  await ensureYagmurCustomTasksSheet();
+  const sheets = await getSheetsClient();
+  const { sheetId } = getConfig();
+
+  const all = await listYagmurCustomTasks();
+  const current = all.find((task) => task.taskId === taskId);
+  const category = protectFromFormula(input.category);
+  const label = protectFromFormula(input.label);
+
+  if (current) {
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: sheetId,
+      range: `${YAGMUR_CUSTOM_TASKS_SHEET_NAME}!C${current.rowNumber}:D${current.rowNumber}`,
+      valueInputOption: "USER_ENTERED",
+      requestBody: { values: [[category, label]] },
+    });
+    return { ...current, ...input };
+  }
+
+  const staticWeekday = findStaticYagmurTaskWeekday(taskId);
+  if (!staticWeekday) throw new Error(`${taskId} numaralı görev bulunamadı.`);
+
+  await sheets.spreadsheets.values.append({
+    spreadsheetId: sheetId,
+    range: `${YAGMUR_CUSTOM_TASKS_SHEET_NAME}!${YAGMUR_CUSTOM_TASKS_DATA_COLUMNS}`,
+    valueInputOption: "USER_ENTERED",
+    insertDataOption: "INSERT_ROWS",
+    requestBody: { values: [[taskId, staticWeekday, category, label]] },
+  });
+  return { rowNumber: -1, taskId, weekday: staticWeekday, ...input };
+}
+
 export async function deleteYagmurCustomTask(taskId: string): Promise<void> {
   const sheets = await getSheetsClient();
   const { sheetId } = getConfig();
@@ -2326,6 +2377,8 @@ export async function deleteYagmurCustomTask(taskId: string): Promise<void> {
 
   // Bu görevin geçmiş haftalardaki işaretlerini de temizle — silinen bir
   // görev artık listede yokken "işaretli" satırları sheet'te asılı kalmasın.
+  // Sabit görevin override'ı siliniyorsa görev varsayılana döner, işaretler kalır.
+  if (findStaticYagmurTaskWeekday(taskId)) return;
   const checkRows = await listYagmurStudyCheckRows();
   const staleRows = checkRows.filter((row) => row.taskId === taskId);
   if (staleRows.length === 0) return;
