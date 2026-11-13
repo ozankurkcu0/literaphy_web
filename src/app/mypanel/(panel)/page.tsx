@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, CigaretteOff, GraduationCap, Heart } from "lucide-react";
+import { ArrowRight, GraduationCap, Heart } from "lucide-react";
 import { MypanelLogoutButton } from "@/components/mypanel/LogoutButton";
 import { cardSurfaceClass, cn } from "@/lib/utils";
 
@@ -21,12 +21,6 @@ const PANEL_LINKS = [
     label: "Yağmur'un Programı",
     description: "Haftalık İngilizce çalışma programı.",
     icon: Heart,
-  },
-  {
-    href: "/mypanel/sigara",
-    label: "Sigarayı Bırakma",
-    description: "Sigarasız geçen süre, biriken para ve vücuttaki değişimler.",
-    icon: CigaretteOff,
   },
 ];
 
