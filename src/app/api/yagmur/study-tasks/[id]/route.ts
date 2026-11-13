@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { requireYagmurSession } from "@/lib/yagmur-session-guard";
 import { z } from "zod";
-import { STUDY_CATEGORIES } from "@/lib/yagmur-study-plan";
-import { deleteYagmurCustomTask, isSheetsConfigured, updateYagmurTask } from "@/lib/google-sheets";
+import { STUDY_CATEGORIES, YAGMUR_STUDY_PLAN } from "@/lib/yagmur-study-plan";
+import { deleteYagmurCustomTask, hideYagmurStaticTask, isSheetsConfigured, updateYagmurTask } from "@/lib/google-sheets";
 
 const NOT_CONFIGURED_MESSAGE = "Google Sheets bağlantısı henüz yapılandırılmamış.";
 
@@ -15,15 +15,21 @@ interface RouteParams {
   params: Promise<{ id: string }>;
 }
 
-export async function DELETE(_request: Request, { params }: RouteParams) {
+export async function DELETE(request: Request, { params }: RouteParams) {
   const authorized = await requireYagmurSession();
   if (!authorized) return NextResponse.json({ error: "Oturum gerekli." }, { status: 401 });
   if (!isSheetsConfigured()) return NextResponse.json({ error: NOT_CONFIGURED_MESSAGE }, { status: 400 });
 
   const { id } = await params;
 
+  // ?mode=reset → override satırını sil (sabit görev varsayılana döner / geri gelir).
+  // Aksi halde sabit görev gizlenir, özel görev tamamen silinir.
+  const isStatic = Object.values(YAGMUR_STUDY_PLAN).some((tasks) => tasks.some((task) => task.id === id));
+  const reset = new URL(request.url).searchParams.get("mode") === "reset";
+
   try {
-    await deleteYagmurCustomTask(id);
+    if (isStatic && !reset) await hideYagmurStaticTask(id);
+    else await deleteYagmurCustomTask(id);
     return NextResponse.json({ ok: true });
   } catch (error) {
     console.error("[api/yagmur/study-tasks/:id] deleteYagmurCustomTask hata:", error);

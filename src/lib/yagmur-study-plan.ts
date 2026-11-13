@@ -18,6 +18,10 @@ export const STUDY_CATEGORIES: StudyCategory[] = [
   "Diğer",
 ];
 
+/** Sabit bir görev "silindiğinde" override satırına yazılan kategori değeri —
+ * görev listeden gizlenir, geri getirilince satır silinir. */
+export const HIDDEN_TASK_CATEGORY = "__gizli__";
+
 export interface StudyTask {
   id: string;
   category: StudyCategory;

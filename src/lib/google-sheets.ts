@@ -1388,7 +1388,7 @@ const CLASS_SCHEDULE_DATA_COLUMNS = "A:H";
 // WEEKDAYS/TIMELINE_KINDS client component'lerden de kullanılıyor, bu
 // yüzden bu "server-only" dosyada değil, calisma-program-constants.ts'te
 // tanımlı — burada sadece reuse ediliyor.
-import { YAGMUR_STUDY_PLAN } from "@/lib/yagmur-study-plan";
+import { HIDDEN_TASK_CATEGORY, YAGMUR_STUDY_PLAN } from "@/lib/yagmur-study-plan";
 import { WEEKDAYS, TIMELINE_KINDS, type Weekday, type TimelineKind } from "@/lib/calisma-program-constants";
 export { WEEKDAYS, TIMELINE_KINDS, type Weekday, type TimelineKind };
 
@@ -2345,6 +2345,18 @@ export async function updateYagmurTask(
     requestBody: { values: [[taskId, staticWeekday, category, label]] },
   });
   return { rowNumber: -1, taskId, weekday: staticWeekday, ...input };
+}
+
+/** Sabit programdaki bir görevi listeden gizler (override satırı yazar). */
+export async function hideYagmurStaticTask(taskId: string): Promise<void> {
+  for (const tasks of Object.values(YAGMUR_STUDY_PLAN)) {
+    const task = tasks.find((candidate) => candidate.id === taskId);
+    if (task) {
+      await updateYagmurTask(taskId, { category: HIDDEN_TASK_CATEGORY, label: task.label });
+      return;
+    }
+  }
+  throw new Error(`${taskId} numaralı görev bulunamadı.`);
 }
 
 export async function deleteYagmurCustomTask(taskId: string): Promise<void> {

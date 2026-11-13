@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Check, Pencil, Plus, RotateCcw, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { WEEKDAYS, type Weekday } from "@/lib/calisma-program-constants";
-import { YAGMUR_STUDY_PLAN, STUDY_CATEGORY_META, STUDY_CATEGORIES, type StudyCategory } from "@/lib/yagmur-study-plan";
+import { HIDDEN_TASK_CATEGORY, YAGMUR_STUDY_PLAN, STUDY_CATEGORY_META, STUDY_CATEGORIES, type StudyCategory } from "@/lib/yagmur-study-plan";
 import type { YagmurCustomStudyTask } from "@/lib/google-sheets";
 
 interface DisplayTask {
@@ -218,15 +218,24 @@ export function YagmurStudyChecklist() {
     if (!response.ok) await fetchChecked();
   }
 
-  async function handleDeleteCustom(taskId: string) {
-    setCustomTasks((prev) => prev.filter((task) => task.taskId !== taskId));
-    const response = await fetch(`/api/yagmur/study-tasks/${taskId}`, { method: "DELETE" });
-    if (!response.ok) await fetchCustomTasks();
+  async function handleDeleteTask(task: DisplayTask) {
+    if (!task.custom) {
+      // Sabit görev: sunucu gizleme satırı yazar.
+      setCustomTasks((prev) => [
+        ...prev.filter((item) => item.taskId !== task.id),
+        { rowNumber: -1, taskId: task.id, weekday: "Pazartesi", category: HIDDEN_TASK_CATEGORY, label: task.label },
+      ]);
+    } else {
+      setCustomTasks((prev) => prev.filter((item) => item.taskId !== task.id));
+    }
+    const response = await fetch(`/api/yagmur/study-tasks/${task.id}`, { method: "DELETE" });
+    await fetchCustomTasks();
+    if (!response.ok) setError(null);
   }
 
   async function handleResetOverride(taskId: string) {
     setCustomTasks((prev) => prev.filter((task) => task.taskId !== taskId));
-    const response = await fetch(`/api/yagmur/study-tasks/${taskId}`, { method: "DELETE" });
+    const response = await fetch(`/api/yagmur/study-tasks/${taskId}?mode=reset`, { method: "DELETE" });
     if (!response.ok) await fetchCustomTasks();
   }
 
@@ -251,7 +260,10 @@ export function YagmurStudyChecklist() {
         {WEEKDAYS.map((day) => {
           const toCategory = (value: string): StudyCategory =>
             (STUDY_CATEGORIES as string[]).includes(value) ? (value as StudyCategory) : "Diğer";
-          const staticTasks: DisplayTask[] = YAGMUR_STUDY_PLAN[day].map((task) => {
+          const hiddenTasks = YAGMUR_STUDY_PLAN[day].filter((task) => overrides.get(task.id)?.category === HIDDEN_TASK_CATEGORY);
+          const staticTasks: DisplayTask[] = YAGMUR_STUDY_PLAN[day]
+            .filter((task) => overrides.get(task.id)?.category !== HIDDEN_TASK_CATEGORY)
+            .map((task) => {
             const override = overrides.get(task.id);
             return override
               ? { id: task.id, category: toCategory(override.category), label: override.label, custom: false, overridden: true }
@@ -340,22 +352,40 @@ export function YagmurStudyChecklist() {
                           </button>
                         )}
                       </div>
-                      {task.custom && (
-                        <button
-                          type="button"
-                          onClick={() => handleDeleteCustom(task.id)}
-                          className="mt-1.5 flex size-5 shrink-0 items-center justify-center rounded text-rose-300 opacity-0 transition-opacity hover:bg-rose-50 hover:text-rose-600 group-hover:opacity-100 max-sm:opacity-100"
-                          aria-label={`${task.label} görevini sil`}
-                        >
-                          <X className="size-3" aria-hidden />
-                        </button>
-                      )}
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteTask(task)}
+                        className="mt-1.5 flex size-5 shrink-0 items-center justify-center rounded text-rose-300 opacity-0 transition-opacity hover:bg-rose-50 hover:text-rose-600 group-hover:opacity-100 focus-visible:opacity-100 max-sm:opacity-100"
+                        aria-label={`${task.label} görevini sil`}
+                      >
+                        <X className="size-3" aria-hidden />
+                      </button>
                     </li>
                   );
                 })}
               </ul>
 
               <AddTaskRow weekday={day} onAdded={fetchCustomTasks} />
+
+              {hiddenTasks.length > 0 && (
+                <details className="text-[11.5px] text-rose-700/70">
+                  <summary className="cursor-pointer select-none">Silinenler ({hiddenTasks.length})</summary>
+                  <ul className="mt-1 flex flex-col gap-1">
+                    {hiddenTasks.map((task) => (
+                      <li key={task.id} className="flex items-center gap-1.5">
+                        <span className="min-w-0 flex-1 truncate">{overrides.get(task.id)?.label ?? task.label}</span>
+                        <button
+                          type="button"
+                          onClick={() => handleResetOverride(task.id)}
+                          className="shrink-0 rounded px-1.5 py-0.5 font-medium text-rose-600 hover:bg-pink-50"
+                        >
+                          Geri getir
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </details>
+              )}
             </div>
           );
         })}
